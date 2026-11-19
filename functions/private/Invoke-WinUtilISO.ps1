@@ -186,7 +186,7 @@ function Invoke-WinUtilISOBrowse {
 function Invoke-WinUtilISOMountAndVerify {
     $isoPath = $sync["WPFWin11ISOPath"].Text
 
-    if ([string]::IsNullOrWhiteSpace($isoPath) -or $isoPath -eq "No ISO selected...") {
+    if ([string]::IsNullOrWhiteSpace($isoPath) -or $isoPath -eq "Nenhuma ISO selecionada...") {
         Show-WinUtilMessage -Message "Selecione um arquivo ISO primeiro." -Title "Nenhuma ISO Selecionada" -Button "OK" -Icon "Warning" | Out-Null
         return
     }
