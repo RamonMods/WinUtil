@@ -178,7 +178,7 @@ exit 23
     }
 
     It "nomeia as predefinições existentes quando recebe uma que não existe" {
-        $script:mainScript | Should -Match "There is no preset called"
+        $script:mainScript | Should -Match "Não existe uma predefinição chamada"
     }
 
     It "aguarda a execução elevada e devolve seu código" {
@@ -227,7 +227,7 @@ Describe "Invoke-WinUtilAutoRun" {
         $summary = Invoke-WinUtilAutoRun
 
         @($summary.Steps).Count | Should -Be 0
-        Should -Invoke -CommandName Write-WinUtilLog -ParameterFilter { $Level -eq "WARN" -and $Message -like "*nothing to do*" }
+        Should -Invoke -CommandName Write-WinUtilLog -ParameterFilter { $Level -eq "WARN" -and $Message -like "*nada a fazer*" }
     }
 
     It "aplica interruptores, o que nada fora da janela fazia" {
@@ -237,7 +237,7 @@ Describe "Invoke-WinUtilAutoRun" {
         $summary = Invoke-WinUtilAutoRun
 
         Should -Invoke -CommandName Invoke-WPFToggleSelections -Times 1 -Exactly
-        @($summary.Steps | Where-Object { $_.Name -eq "Toggles" }).Count | Should -Be 1
+        @($summary.Steps | Where-Object { $_.Name -eq "Interruptores" }).Count | Should -Be 1
     }
 
     It "executa apenas as etapas que têm algo selecionado" {
@@ -248,7 +248,7 @@ Describe "Invoke-WinUtilAutoRun" {
         $summary = Invoke-WinUtilAutoRun
 
         @($summary.Steps).Count | Should -Be 1
-        $summary.Steps[0].Name | Should -Be "Applications"
+        $summary.Steps[0].Name | Should -Be "Aplicativos"
         Should -Invoke -CommandName Invoke-WPFtweaksbutton -Times 0 -Exactly
     }
 
@@ -358,12 +358,12 @@ Describe "Write-WinUtilAutoRunSummary" {
 
     It "relata avisos sem transformar uma omissão esperada de pacote em falha" {
         $summary = [pscustomobject]@{
-            Steps = @([pscustomobject]@{ Name = "Applications"; Items = 1; Seconds = 1; Errors = 0; Warnings = 1; TimedOut = $false })
+            Steps = @([pscustomobject]@{ Name = "Aplicativos"; Items = 1; Seconds = 1; Errors = 0; Warnings = 1; TimedOut = $false })
             Failed = 0; TimedOut = 0; Errors = 0; Warnings = 1
         }
 
         Write-WinUtilAutoRunSummary -Summary $summary | Should -Be 0
-        Should -Invoke Write-Host -ParameterFilter { $Object -like "Completed with warnings*" }
+        Should -Invoke Write-Host -ParameterFilter { $Object -like "Concluído com avisos*" }
     }
 }
 

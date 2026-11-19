@@ -59,8 +59,8 @@ Describe "Fluxo de triagem de issues do GitHub" {
 
     It "mantém o guia do mantenedor no site de documentação" {
         Test-Path -Path (Join-Path $script:repoRoot ".github\TRIAGE_TOOLS.md") | Should -BeFalse
-        $script:guide | Should -Match 'These commands work only on issues\.'
-        $script:guide | Should -Match '`not-related` label without replacing existing labels'
+        $script:guide | Should -Match 'Esses comandos funcionam apenas em issues\.'
+        $script:guide | Should -Match '`not-related` sem substituir os rótulos existentes'
 
         $astroConfig = Get-Content -Path (Join-Path $script:repoRoot "docs\astro.config.mjs") -Raw
         $astroConfig | Should -Match "slug: 'code-reference/issue-triage'"

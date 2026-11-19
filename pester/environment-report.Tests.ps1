@@ -124,10 +124,10 @@ Describe "Get-WinUtilEnvironmentReport" {
         $report.packageManagers.winget.installed | Should -BeTrue
         $report.packageManagers.winget.version | Should -BeNullOrEmpty
         Should -Invoke Write-WinUtilLog -ParameterFilter {
-            $Level -eq "WARN" -and $Message -like "Failed to read WinGet version:*code 7*"
+            $Level -eq "WARN" -and $Message -like "Falha ao ler a versão do WinGet:*código 7*"
         }
         Should -Invoke Write-Warning -ParameterFilter {
-            $Message -like "Failed to read WinGet version:*code 7*"
+            $Message -like "Falha ao ler a versão do WinGet:*código 7*"
         }
     }
 
@@ -139,7 +139,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         Get-WinUtilEnvironmentReport | Out-Null
 
         Should -Invoke Write-Warning -ParameterFilter {
-            $Message -eq "Failed to collect the complete tweak state for the environment report."
+            $Message -eq "Falha ao coletar o estado completo dos ajustes para o relatório de ambiente."
         }
     }
 
@@ -170,7 +170,7 @@ Describe "Get-WinUtilEnvironmentReport" {
 
         $report.system.pendingRebootRequired | Should -BeNullOrEmpty
         Should -Invoke Write-Warning -ParameterFilter {
-            $Message -like "Failed to check pending-reboot registry state:*registry access denied*"
+            $Message -like "Falha ao verificar o estado de reinicialização pendente no registro:*registry access denied*"
         }
     }
 
@@ -198,7 +198,7 @@ Describe "Proteção contra sobrescrita em Invoke-WPFExportEnvironmentReport" {
     It "aborta em vez de manter um arquivo complementar obsoleto quando os logs são excluídos" {
         $source = Get-Content -LiteralPath (Join-Path $script:repoRoot "functions\public\Invoke-WPFExportEnvironmentReport.ps1") -Raw
 
-        $source | Should -Match 'if \(-not \$includeLogs\) \{[\s\S]*Choose another report filename[\s\S]*return'
+        $source | Should -Match 'if \(-not \$includeLogs\) \{[\s\S]*Escolha outro nome para o relatório[\s\S]*return'
         $source | Should -Match 'if \(-not \$replaceLogs\) \{\s*return\s*\}'
     }
 }

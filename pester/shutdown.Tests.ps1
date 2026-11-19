@@ -189,7 +189,7 @@ Describe "A pergunta de fechamento" {
 
         Invoke-WinUtilCloseRequest -RunningJob "Install"
 
-        $script:closeMessage | Should -Match "up to $limit"
+        $script:closeMessage | Should -Match "até $limit"
     }
 }
 

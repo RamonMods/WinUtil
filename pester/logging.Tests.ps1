@@ -297,7 +297,7 @@ Describe "Write-WinUtilLog" {
 
         $script:sync.StepTimings.Count | Should -Be 1
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq "DEBUG" -and $Component -eq "UI" -and $Message -like "timing: parse XAML took*"
+            $Level -eq "DEBUG" -and $Component -eq "UI" -and $Message -like "timing: parse XAML levou*"
         }
     }
 

@@ -65,7 +65,7 @@ Describe "Atualização MSI do PowerShell" {
         $result = Update-WinUtilPowerShellMSI
         $result.Outcome | Should -Be "Succeeded"
         $result.ExitCode | Should -Be $Code
-        $expected = if ($Code -eq 3010) { 'restart is required' } else { 'started a restart' }
+        $expected = if ($Code -eq 3010) { 'é preciso reiniciar para concluir' } else { 'o instalador iniciou uma reinicialização' }
         $result.Detail | Should -Match $expected
         Should -Invoke Write-Host -Times 1 -Exactly -ParameterFilter { $Object -match $expected }
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter { $Message -match $expected }
@@ -258,7 +258,7 @@ Describe "Atualização MSI do PowerShell" {
         }
         $result = Install-WinUtilProgramWinget -Action Install -Programs @('Microsoft.PowerShell')
         $result.Outcome | Should -Be 'Failed'
-        $result.Detail | Should -Match 'Multiple stable PowerShell MSI installations'
+        $result.Detail | Should -Match 'Várias instalações estáveis do PowerShell via MSI'
         Should -Invoke Invoke-RestMethod -Times 0 -Exactly
         Should -Invoke Start-Process -Times 0 -Exactly
     }

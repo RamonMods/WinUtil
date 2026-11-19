@@ -236,7 +236,7 @@ Describe "Auxiliar de geração de ícones" {
 
     It "rejeita uma chave desconhecida antes de criar um ícone" {
         { & $script:iconHelper -Key "not-in-catalog" -Path $script:iconInput } |
-            Should -Throw "'not-in-catalog' is not a key in config/applications.json."
+            Should -Throw "'not-in-catalog' não é uma chave em config/applications.json."
 
         Test-Path -LiteralPath (Join-Path $script:iconFixtureRoot "config/icons") | Should -BeFalse
     }

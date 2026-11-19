@@ -90,7 +90,7 @@ Describe "Invoke-WinUtilFeatureInstall" {
             $Level -eq 'ERROR' -and $Message -like '*FeatureA*'
         }
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq 'WARN' -and $Message -like '*Skipping dependent scripts*'
+            $Level -eq 'WARN' -and $Message -like '*Ignorando scripts dependentes*'
         }
     }
 
@@ -98,7 +98,7 @@ Describe "Invoke-WinUtilFeatureInstall" {
         Invoke-WinUtilFeatureInstall -CheckBox "WPFFeaturesScriptOnly"
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Feature action completed: WPFFeaturesScriptOnly"
+            $Message -eq "Ação de recurso concluída: WPFFeaturesScriptOnly"
         }
     }
 }

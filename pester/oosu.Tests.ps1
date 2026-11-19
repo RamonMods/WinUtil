@@ -111,10 +111,10 @@ Describe "Invoke-WPFOOSU" {
         & $script:capturedJob.ScriptBlock @jobParameters
 
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Downloading O&O ShutUp10++ (35%)" -and $Percent -eq 35
+            $Status -eq "Baixando o O&O ShutUp10++ (35%)" -and $Percent -eq 35
         }
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Launching O&O ShutUp10++" -and $Percent -eq 100
+            $Status -eq "Iniciando o O&O ShutUp10++" -and $Percent -eq 100
         }
         Should -Invoke Start-Process -Times 1 -Exactly -ParameterFilter {
             $FilePath -eq (Join-Path $TestDrive "ooshutup10.exe")
@@ -131,7 +131,7 @@ Describe "Invoke-WPFOOSU" {
         & $script:capturedJob.ScriptBlock @jobParameters
 
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Downloading O&O ShutUp10++ (35% of 82 MB)" -and $Percent -eq 35
+            $Status -eq "Baixando o O&O ShutUp10++ (35% de 82 MB)" -and $Percent -eq 35
         }
     }
 
@@ -145,7 +145,7 @@ Describe "Invoke-WPFOOSU" {
         & $script:capturedJob.ScriptBlock @jobParameters
 
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Downloading O&O ShutUp10++ (100%)" -and $Percent -eq 100
+            $Status -eq "Baixando o O&O ShutUp10++ (100%)" -and $Percent -eq 100
         }
     }
 
@@ -164,7 +164,7 @@ Describe "Botão O&O ShutUp10++" {
     It "informa ao usuário que baixa a ferramenta antes de qualquer coisa começar" {
         $tweaks = Get-Content (Join-Path $script:repoRoot "config\tweaks.json") -Raw | ConvertFrom-Json
 
-        $tweaks.WPFOOSUbutton.Description | Should -Match "(?i)download"
+        $tweaks.WPFOOSUbutton.Description | Should -Match "(?i)baix"
         $tweaks.WPFOOSUbutton.Description | Should -Match "MB"
     }
 

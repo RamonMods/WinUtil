@@ -218,7 +218,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Set-DnsClientServerAddress -Times 0 -Exactly
         Should -Invoke -CommandName Add-DnsClientDohServerAddress -Times 0 -Exactly
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "DNS provider DohOnlyProvider requires DNS over HTTPS, which is not supported on this system."
+            $Message -eq "O provedor de DNS DohOnlyProvider exige DNS over HTTPS, que não é suportado neste sistema."
         }
     }
 
@@ -232,7 +232,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "ERROR" -and
                 $Component -eq "DNS" -and
-                $Message -like "DNS provider DohOnlyProvider was not completed: *"
+                $Message -like "O provedor de DNS DohOnlyProvider não foi concluído: *"
         }
     }
 
@@ -244,12 +244,12 @@ Describe "Set-WinUtilDNS" {
         $result | Should -BeTrue
         Should -Invoke -CommandName Set-DnsClientServerAddress -Times 2 -Exactly
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "DNS over HTTPS setup for provider Cloudflare failed; continuing with plain DNS."
+            $Message -eq "A configuração de DNS over HTTPS para o provedor Cloudflare falhou; continuando com DNS simples."
         }
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "WARN" -and
                 $Component -eq "DNS" -and
-                $Message -like "DNS over HTTPS setup for provider Cloudflare failed; continuing with plain DNS: *"
+                $Message -like "A configuração de DNS over HTTPS para o provedor Cloudflare falhou; continuando com DNS simples: *"
         }
     }
 
@@ -309,7 +309,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "ERROR" -and
                 $Component -eq "DNS" -and
-                $Message -like "DNS provider Cloudflare was not completed: *"
+                $Message -like "O provedor de DNS Cloudflare não foi concluído: *"
         }
     }
 

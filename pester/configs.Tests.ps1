@@ -286,7 +286,7 @@ Describe "Configuração de ajustes" {
 
         $tweak | Should -Not -BeNullOrEmpty
         $tweak.category | Should -Be "z__Advanced Tweaks - CAUTION"
-        $tweak.Description | Should -Match "slower"
+        $tweak.Description | Should -Match "lentas"
 
         $search = @($tweak.service | Where-Object Name -eq "WSearch")
         $search | Should -HaveCount 1

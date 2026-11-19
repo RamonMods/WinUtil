@@ -159,7 +159,7 @@ Describe "Ponto de entrada de Invoke-WPFInstall" {
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Component -eq "Install" -and
-                $Message -eq "Install selected package(s): Git (winget: Git.Git)"
+                $Message -eq "Instalar pacote(s) selecionado(s): Git (winget: Git.Git)"
         }
     }
 
@@ -181,7 +181,7 @@ Describe "Ponto de entrada de Invoke-WPFInstall" {
         Invoke-WPFInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Please select the program(s) to install or upgrade." -and
+            $Message -eq "Selecione o(s) programa(s) a instalar ou atualizar." -and
                 $Title -eq "WinUtil" -and
                 $Button -eq "OK" -and
                 $Icon -eq "Warning"
@@ -238,10 +238,10 @@ Describe "Corpo do job de Invoke-WPFInstall" {
             $Action -eq "Install" -and @($Programs)[0] -eq "vlc"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Installed Git.Git (1/2)" -and $Percent -eq 50
+            $Status -eq "Git.Git instalado (1/2)" -and $Percent -eq 50
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Installed Chocolatey packages (2/2)" -and $Percent -eq 100
+            $Status -eq "Pacotes do Chocolatey instalados (2/2)" -and $Percent -eq 100
         }
     }
 
@@ -283,7 +283,7 @@ Describe "Ponto de entrada de Invoke-WPFUnInstall" {
         Invoke-WPFUnInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Title -eq "Are you sure?" -and $Button -eq "YesNo"
+            $Title -eq "Tem certeza?" -and $Button -eq "YesNo"
         }
         Should -Invoke -CommandName Start-WinUtilJob -Times 1 -Exactly -ParameterFilter {
             $Name -eq "Uninstall" -and
@@ -300,7 +300,7 @@ Describe "Ponto de entrada de Invoke-WPFUnInstall" {
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Component -eq "Uninstall" -and
-                $Message -eq "Uninstall selected package(s): Git (winget: Git.Git)"
+                $Message -eq "Desinstalar pacote(s) selecionado(s): Git (winget: Git.Git)"
         }
     }
 
@@ -310,7 +310,7 @@ Describe "Ponto de entrada de Invoke-WPFUnInstall" {
         Invoke-WPFUnInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Please select the program(s) to uninstall"
+            $Message -eq "Selecione o(s) programa(s) a desinstalar"
         }
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
@@ -367,10 +367,10 @@ Describe "Corpo do job de Invoke-WPFUnInstall" {
             $Action -eq "Uninstall" -and @($Programs)[0] -eq "vlc"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Uninstalled Git.Git (1/2)" -and $Percent -eq 50
+            $Status -eq "Desinstalado Git.Git (1/2)" -and $Percent -eq 50
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Uninstalled Chocolatey packages (2/2)" -and $Percent -eq 100
+            $Status -eq "Pacotes do Chocolatey desinstalados (2/2)" -and $Percent -eq 100
         }
     }
 

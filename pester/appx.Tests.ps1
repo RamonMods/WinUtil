@@ -134,7 +134,7 @@ Describe "Get-WinUtilInstalledAPPX" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "ERROR" -and
                 $Component -eq "AppX" -and
-                $Message -eq "Failed to get installed AppX packages: AppX query failed"
+                $Message -eq "Falha ao obter os pacotes AppX instalados: AppX query failed"
         }
     }
 }
@@ -159,7 +159,7 @@ Describe "Install-WinUtilAPPX" {
         Should -Invoke -CommandName Install-WinUtilProgramWinget -Times 0 -Exactly
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Component -eq "AppX" -and
-                $Message -like "Registered local AppX manifest for Example.Package*"
+                $Message -like "Manifesto AppX local registrado para Example.Package:*"
         }
     }
 
@@ -199,7 +199,7 @@ Describe "Install-WinUtilAPPX" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "WARN" -and
                 $Component -eq "AppX" -and
-                $Message -eq "Local AppX registration failed for Example.Package: Registration failed"
+                $Message -eq "Falha no registro do AppX local para Example.Package: Registration failed"
         }
         Should -Invoke -CommandName Install-WinUtilProgramWinget -Times 1 -Exactly
     }
@@ -212,12 +212,12 @@ Describe "Install-WinUtilAPPX" {
         $result.Count | Should -Be 1
         $result[0].Outcome | Should -Be "Failed"
         $result[0].Manager | Should -Be "appx"
-        $result[0].Detail | Should -Be "Unable to install Example.Package because no local manifest or Microsoft Store ID is available."
+        $result[0].Detail | Should -Be "Não foi possível instalar Example.Package porque não há manifesto local nem ID da Microsoft Store disponível."
         Should -Invoke -CommandName Install-WinUtilProgramWinget -Times 0 -Exactly
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "ERROR" -and
                 $Component -eq "AppX" -and
-                $Message -eq "Unable to install Example.Package because no local manifest or Microsoft Store ID is available."
+                $Message -eq "Não foi possível instalar Example.Package porque não há manifesto local nem ID da Microsoft Store disponível."
         }
     }
 
@@ -327,7 +327,7 @@ Describe "Remove-WinUtilAPPX" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "ERROR" -and
                 $Component -eq "AppX" -and
-                $Message -eq "Failed to remove AppX package *Example.Package*.FullName: Removal failed"
+                $Message -eq "Falha ao remover o pacote AppX *Example.Package*.FullName: Removal failed"
         }
     }
 }
@@ -361,7 +361,7 @@ Describe "Remove-WinUtilProvisionedAPPX" {
         Mock Remove-AppxProvisionedPackage { throw "DISM failed" }
 
         { & $script:provisionedRemovalScriptBlock "Example.One" } |
-            Should -Throw "*Failed to remove provisioned AppX package Example.One_1.0: DISM failed*"
+            Should -Throw "*Falha ao remover o pacote AppX provisionado Example.One_1.0: DISM failed*"
         Should -Invoke -CommandName Remove-AppxProvisionedPackage -Times 1 -Exactly -ParameterFilter {
             $PackageName -eq "Example.One_1.0" -and
                 $Online -eq $true -and
@@ -374,7 +374,7 @@ Describe "Remove-WinUtilProvisionedAPPX" {
 
         $source | Should -Match '\$removalOutput = powershell\.exe .* 2>&1'
         $source | Should -Match 'Write-WinUtilLog -Level "ERROR" -Component "AppX" -Message \$errorMessage'
-        $source | Should -Match '(?s)AppX provisioned package removal failed:.*WinUtilErrorReported.*throw \$exception.*AppX provisioned package removal completed\.'
+        $source | Should -Match '(?s)A remoção do pacote AppX provisionado falhou:.*WinUtilErrorReported.*throw \$exception.*Remoção de pacote AppX provisionado concluída\.'
     }
 }
 
@@ -420,8 +420,8 @@ Describe "Invoke-WPFAppxInstall" {
         Invoke-WPFAppxInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "No AppX Package selected" -and
-                $Title -eq "Error" -and
+            $Message -eq "Nenhum pacote AppX selecionado" -and
+                $Title -eq "Erro" -and
                 $Button -eq "OK" -and
                 $Icon -eq "Error"
         }
@@ -450,7 +450,7 @@ Describe "Invoke-WPFAppxInstall" {
             $Name -eq "Example.Package" -and $StoreId -eq "9EXAMPLE1234"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Installing Example App (1/1)" -and $Percent -eq 0
+            $Status -eq "Instalando Example App (1/1)" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
             $Status -eq "Installed Example App (1/1)" -and $Percent -eq 100
@@ -602,8 +602,8 @@ Describe "Invoke-WPFAppxRemoval" {
         Invoke-WPFAppxRemoval
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "No AppX Package selected" -and
-                $Title -eq "Error" -and
+            $Message -eq "Nenhum pacote AppX selecionado" -and
+                $Title -eq "Erro" -and
                 $Button -eq "OK" -and
                 $Icon -eq "Error"
         }
@@ -644,13 +644,13 @@ Describe "Invoke-WPFAppxRemoval" {
             $PackageList.Count -eq 1 -and $PackageList[0] -eq "Example.Package"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Removing Example App (1/1)" -and $Percent -eq 0
+            $Status -eq "Removendo Example App (1/1)" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Removed Example App (1/1)" -and $Percent -eq 90
+            $Status -eq "Removido Example App (1/1)" -and $Percent -eq 90
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Removing provisioned AppX packages" -and $Percent -eq 90
+            $Status -eq "Removendo pacotes AppX provisionados" -and $Percent -eq 90
         }
     }
 

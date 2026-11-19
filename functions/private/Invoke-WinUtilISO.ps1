@@ -27,7 +27,7 @@ function Invoke-WinUtilRobocopy {
 function Write-WinUtilISOLog {
     <#
     .SYNOPSIS
-        Acrescenta uma linha ao registro de status do Criar Win11 e ao log da sessÃ£o.
+        Acrescenta uma linha ao registro de status do Criar Win11 e ao log da sessão.
 
     .DESCRIPTION
         O registro de status é um controle da interface, então a inclusão é enviada à thread da interface
@@ -53,7 +53,7 @@ function Write-WinUtilISOLog {
         $box = $sync["WPFWin11ISOStatusLog"]
         if ($null -eq $box) { return }
 
-        if ($box.Text -eq "Pronto. Selecione uma ISO do Windows 11 para comeÃ§ar.") {
+        if ($box.Text -eq "Pronto. Selecione uma ISO do Windows 11 para começar.") {
             $box.Text = $LogLine
         } else {
             $box.Text += "`n$LogLine"
@@ -66,7 +66,7 @@ function Write-WinUtilISOLog {
 function Set-WinUtilISOStep {
     <#
         .SYNOPSIS
-            Escolhe uma pÃ¡gina do assistente do Criar Win11 e define para quais pÃ¡ginas dÃ¡ para voltar
+            Escolhe uma página do assistente do Criar Win11 e define para quais páginas dá para voltar
 
         .PARAMETER Step
             Select, Modify, Working ou Output
@@ -641,7 +641,7 @@ function Invoke-WinUtilISOCleanAndReset {
                 $sync["WPFWin11ISOOptionUSB"].Visibility         = "Collapsed"
                 $sync["WPFWin11ISODonePanel"].Visibility         = "Collapsed"
                 $sync["WPFWin11ISOModifyButton"].IsEnabled       = $true
-                $sync["WPFWin11ISOStatusLog"].Text               = "Pronto. Selecione uma ISO do Windows 11 para comeÃ§ar."
+                $sync["WPFWin11ISOStatusLog"].Text               = "Pronto. Selecione uma ISO do Windows 11 para começar."
                 Set-WinUtilISOStep -Step "Select"
             }
             Step-WinUtilJob -Hide

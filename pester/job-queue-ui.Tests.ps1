@@ -70,7 +70,7 @@ Describe 'Controles nativos da fila de trabalhos' {
         Update-WinUtilJobQueueUI
         foreach ($rowIndex in 0..1) {
             $actionIndex = 1
-            foreach ($action in @('Run sooner', 'Run later', 'Cancel')) {
+            foreach ($action in @('Executar antes', 'Executar depois', 'Cancelar')) {
                 $button = $script:sync.JobQueueItems.Children[$rowIndex].Children[$actionIndex++]
                 $peer = [Windows.Automation.Peers.ButtonAutomationPeer]::new($button)
                 $peer.GetName() | Should -Be "$action`: $($script:sync.JobQueue[$rowIndex].Name)"
@@ -80,7 +80,7 @@ Describe 'Controles nativos da fila de trabalhos' {
 
         Move-WinUtilQueuedJob -Id 'Selected tweaks' -Direction Up
         $peer = [Windows.Automation.Peers.ButtonAutomationPeer]::new($script:sync.JobQueueItems.Children[0].Children[3])
-        $peer.GetName() | Should -Be 'Cancel: Selected tweaks'
+        $peer.GetName() | Should -Be 'Cancelar: Selected tweaks'
     }
 
     It 'roteia os botões das linhas pela identidade estável do trabalho durante reordenação e cancelamento' {

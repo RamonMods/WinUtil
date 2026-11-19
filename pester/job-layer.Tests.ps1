@@ -204,7 +204,7 @@ Describe "Start-WinUtilJob" {
         $script:activeJobAtQueueTime | Should -Be "Example"
         Should -Invoke -CommandName Invoke-WPFRunspace -Times 1 -Exactly
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Component -eq "Example" -and $Message -eq "Example job started."
+            $Component -eq "Example" -and $Message -eq "Job Example iniciado."
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
             $Status -eq "Example..." -and $Percent -eq 0
@@ -227,7 +227,7 @@ Describe "Start-WinUtilJob" {
         $result | Should -BeNullOrEmpty
         Should -Invoke -CommandName Invoke-WPFRunspace -Times 0 -Exactly
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -like "Install is still running*"
+            $Message -like "Install ainda está em execução*"
         }
         $script:sync.ActiveJob | Should -Be "Install"
     }
@@ -373,7 +373,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
         $script:sync.ActiveJobToken | Should -BeNullOrEmpty
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq "WARN" -and $Message -like "Could not hide the working view*"
+            $Level -eq "WARN" -and $Message -like "Não foi possível ocultar a visualização de trabalho*"
         }
     }
 
@@ -417,10 +417,10 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Component -eq "Example" -and $Message -like "Example job finished in * ms."
+            $Component -eq "Example" -and $Message -like "Job Example concluído em * ms."
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example finished" -and $Percent -eq 100 -and $State -eq "None" -and $Overlay -eq "checkmark"
+            $Status -eq "Example concluído" -and $Percent -eq 100 -and $State -eq "None" -and $Overlay -eq "checkmark"
         }
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
@@ -460,10 +460,10 @@ Describe "Start-WinUtilJob" {
         } | Should -Not -Throw
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq "ERROR" -and $Component -eq "Example" -and $Message -like "*failed after * ms : boom"
+            $Level -eq "ERROR" -and $Component -eq "Example" -and $Message -like "*falhou após * ms : boom"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example failed" -and $State -eq "Error" -and $Overlay -eq "warning"
+            $Status -eq "Example falhou" -and $State -eq "Error" -and $Overlay -eq "warning"
         }
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
@@ -512,7 +512,7 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example finished with 1 error(s)" -and $State -eq "Paused" -and $Overlay -eq "warning"
+            $Status -eq "Example concluído com 1 erro(s)" -and $State -eq "Paused" -and $Overlay -eq "warning"
         }
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
@@ -531,7 +531,7 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example finished" -and $State -eq "None" -and $Overlay -eq "checkmark"
+            $Status -eq "Example concluído" -and $State -eq "None" -and $Overlay -eq "checkmark"
         }
     }
 
@@ -551,7 +551,7 @@ Describe "Start-WinUtilJob" {
             $Level -eq "WARN" -and $Message -eq "a warning"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example finished with 1 warning(s)" -and $State -eq "Paused" -and $Overlay -eq "warning"
+            $Status -eq "Example concluído com 1 aviso(s)" -and $State -eq "Paused" -and $Overlay -eq "warning"
         }
         $script:sync.LastJobResult.Warnings | Should -Be 1
         $script:sync.LastJobResult.Errors | Should -Be 0
@@ -593,7 +593,7 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Install finished with 1 warning(s)" -and $State -eq "Paused" -and $Overlay -eq "warning"
+            $Status -eq "Install concluído com 1 aviso(s)" -and $State -eq "Paused" -and $Overlay -eq "warning"
         }
     }
 
@@ -638,7 +638,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
         $script:sync.ActiveJobToken | Should -BeNullOrEmpty
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq "WARN" -and $Message -like "Could not restore the app list*"
+            $Level -eq "WARN" -and $Message -like "Não foi possível restaurar a lista de aplicativos*"
         }
     }
 }
@@ -657,7 +657,7 @@ Describe "Resumos de tempo dos jobs" {
         Write-WinUtilTimingSummary -Scope "Install" -TotalMilliseconds 30 -StartIndex 1
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "timing summary: 1 step(s), 25 ms measured of 30 ms total"
+            $Message -eq "timing summary: 1 etapa(s), 25 ms medidos de 30 ms no total"
         }
     }
 }
@@ -712,7 +712,7 @@ Describe "Fila de jobs" {
         Should -Invoke -CommandName Show-WinUtilMessage -Times 0 -Exactly
         $script:started.Count | Should -Be 0
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Component -eq "Tweaks" -and $Message -like "*queued behind Install*position 1*"
+            $Component -eq "Tweaks" -and $Message -like "*enfileirado atrás de Install*posição 1*"
         }
     }
 
@@ -731,7 +731,7 @@ Describe "Fila de jobs" {
 
         $script:sync.JobQueue.Count | Should -Be 0
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -like "Install is still running*"
+            $Message -like "Install ainda está em execução*"
         }
     }
 
@@ -800,7 +800,7 @@ Describe "Fila de jobs" {
         $script:started.Count | Should -Be 3
         $script:sync.ActiveJob | Should -BeNullOrEmpty
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Component -eq "Second" -and $Message -eq "Starting queued Second job."
+            $Component -eq "Second" -and $Message -eq "Iniciando o job enfileirado Second."
         }
     }
 
@@ -880,7 +880,7 @@ Describe "Fila de jobs" {
         & $order | Should -Be "BAC"
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Component -eq "B" -and $Message -eq "Moved queued B job up."
+            $Component -eq "B" -and $Message -eq "Movido o job enfileirado B up."
         }
     }
 
@@ -896,7 +896,7 @@ Describe "Fila de jobs" {
 
         @($script:sync.JobQueue | ForEach-Object Name) | Should -Be @("B")
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Component -eq "A" -and $Message -eq "Cancelled queued A job."
+            $Component -eq "A" -and $Message -eq "Cancelado o job enfileirado A."
         }
 
         # B começa, então cancelá-lo agora não encontra nada na fila e deixa o job em execução como está
@@ -1009,7 +1009,7 @@ Describe "Fila de jobs" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
         $script:started.Count | Should -Be 0
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -like "*queued behind Queued operations, position 2*"
+            $Message -like "*enfileirado atrás de Operações na fila, posição 2*"
         }
     }
 
@@ -1022,7 +1022,7 @@ Describe "Fila de jobs" {
         $script:sync.JobQueue.Count | Should -Be 1
         $script:started.Count | Should -Be 0
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -like "Queued operations is still running*"
+            $Message -like "Operações na fila ainda está em execução*"
         }
     }
 
@@ -1140,7 +1140,7 @@ Describe "Fila de jobs" {
 
         $script:sync.JobQueue.Count | Should -Be 1
         Should -Invoke -CommandName Write-WinUtilLog -Times 3 -Exactly -ParameterFilter {
-            $Component -eq "Tweaks" -and $Message -eq "Tweaks is already queued, ignored."
+            $Component -eq "Tweaks" -and $Message -eq "Tweaks já está na fila, ignorado."
         }
         Should -Invoke -CommandName Show-WinUtilMessage -Times 0 -Exactly
     }
@@ -1183,7 +1183,7 @@ Describe "Fila de jobs" {
 
         $script:sync.JobQueue.Count | Should -Be 2
         Should -Invoke -CommandName Write-WinUtilLog -Times 2 -Exactly -ParameterFilter {
-            $Level -eq "WARN" -and $Message -like "Could not compare Tweaks*"
+            $Level -eq "WARN" -and $Message -like "Não foi possível comparar Tweaks*"
         }
     }
 
@@ -1255,7 +1255,7 @@ Describe "Fechamento com jobs enfileirados" {
         Invoke-WinUtilCloseRequest -RunningJob "Install" -QueuedCount 2
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -like "*2 queued operation(s) will be discarded*"
+            $Message -like "*2 operação(ões) na fila serão descartadas*"
         }
     }
 
@@ -1277,7 +1277,7 @@ Describe "Fechamento com jobs enfileirados" {
 
         $script:sync.JobQueue.Count | Should -Be 0
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -like "Discarded 2 queued job(s)*"
+            $Message -like "Descartados 2 job(s) enfileirado(s)*"
         }
     }
 
@@ -1296,7 +1296,7 @@ Describe "Fechamento com jobs enfileirados" {
         Invoke-WinUtilCloseRequest -RunningJob "Queued operations" -QueuedCount 2
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Button -eq "YesNo" -and $Message -like "Nothing is running. 2 queued operation(s) will be discarded*"
+            $Button -eq "YesNo" -and $Message -like "Nada está em execução. 2 operação(ões) na fila serão descartadas*"
         }
         $script:sync.ForceClose | Should -BeTrue
         $script:sync.FinishInConsole | Should -Not -BeTrue
@@ -1403,7 +1403,7 @@ Describe "Fechamento com jobs enfileirados" {
         Invoke-WinUtilCloseRequest -RunningJob "Queued operations" -QueuedCount 2
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 2 -Exactly
-        Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter { $Title -eq "Head is still running" }
+        Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter { $Title -eq "Head ainda está em execução" }
         $script:sync.ForceClose | Should -Not -BeTrue
         $script:sync.ShuttingDown | Should -Not -BeTrue
         $script:sync.JobQueue.Count | Should -Be 1

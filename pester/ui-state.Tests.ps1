@@ -264,7 +264,7 @@ Describe "Update-WinUtilSelections" {
                 "WPFInstallGit",
                 "NotAWinUtilKey"
             ) -Replace
-        } | Should -Throw "Unsupported selection key 'NotAWinUtilKey'."
+        } | Should -Throw "Chave de seleção não suportada: 'NotAWinUtilKey'."
 
         @($script:sync.selectedApps) | Should -Be @("WPFInstallExisting")
         @($script:sync.selectedTweaks) | Should -Be @("WPFTweaksExisting")
@@ -279,7 +279,7 @@ Describe "Update-WinUtilSelections" {
                 "WPFInstallGit",
                 "WPFInstallUnknown"
             ) -Replace
-        } | Should -Throw "Unknown selection key 'WPFInstallUnknown'."
+        } | Should -Throw "Chave de seleção desconhecida: 'WPFInstallUnknown'."
 
         @($script:sync.selectedApps) | Should -Be @("WPFInstallExisting")
         @($script:sync.selectedTweaks) | Should -Be @()
@@ -362,10 +362,10 @@ Describe "Estado da seleção na importação de Invoke-WPFImpex" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Component -eq "Impex" -and
             $Level -eq "WARN" -and
-            $Message -eq "Skipped unsupported legacy selections: WPFInstallRetired"
+            $Message -eq "Seleções herdadas sem suporte ignoradas: WPFInstallRetired"
         }
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Title -eq "Legacy Configuration Partially Imported" -and
+            $Title -eq "Configuração herdada importada parcialmente" -and
             $Message -like "*WPFInstallRetired*"
         }
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
@@ -385,7 +385,7 @@ Describe "Estado da seleção na importação de Invoke-WPFImpex" {
         Should -Invoke -CommandName Reset-WPFCheckBoxes -Times 1 -Exactly
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Component -eq "Impex" -and
-            $Message -eq "Detected legacy WinUtil config structure; flattening import object."
+            $Message -eq "Estrutura de configuração herdada do WinUtil detectada; achatando o objeto de importação."
         }
         Should -Invoke -CommandName Show-WinUtilMessage -Times 0 -Exactly
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
@@ -406,10 +406,10 @@ Describe "Estado da seleção na importação de Invoke-WPFImpex" {
         @($script:sync.selectedApps) | Should -Be @("WPFInstallExisting")
         Should -Invoke -CommandName Reset-WPFCheckBoxes -Times 0 -Exactly
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Skipped unsupported legacy selections: WPFInstallRetired"
+            $Message -eq "Seleções herdadas sem suporte ignoradas: WPFInstallRetired"
         }
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Title -eq "Unsupported Legacy Configuration"
+            $Title -eq "Configuração herdada sem suporte"
         }
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
     }
@@ -454,7 +454,7 @@ Describe "Estado da seleção na importação de Invoke-WPFImpex" {
         @($script:sync.selectedFeatures) | Should -Be @()
         Should -Invoke -CommandName Reset-WPFCheckBoxes -Times 0 -Exactly
         Should -Invoke -CommandName Write-Error -Times 1 -Exactly -ParameterFilter {
-            $Message -like "An error occurred while importing: *Unknown selection key 'WPFInstallUnknown'.*"
+            $Message -like "Ocorreu um erro durante a importação: *Chave de seleção desconhecida: 'WPFInstallUnknown'.*"
         }
     }
 }
@@ -482,7 +482,7 @@ Describe "Invoke-WPFSelectedCheckboxesUpdate" {
         @($script:sync.selectedToggles) | Should -Be @("WPFToggleDarkMode")
         @($script:sync.selectedFeatures) | Should -Be @("WPFFeatureSandbox")
         @($script:sync.selectedAppx) | Should -Be @("WPFAppxExample")
-        $script:sync.WPFselectedAppsButton.Content | Should -Be "Selected Apps: 1"
+        $script:sync.WPFselectedAppsButton.Content | Should -Be "Aplicativos selecionados: 1"
         $script:sync.selectedAppsstackPanel.Children.Count | Should -Be 1
         $script:sync.selectedAppsstackPanel.Children[0].Key | Should -Be "WPFInstallGit"
     }
@@ -505,7 +505,7 @@ Describe "Invoke-WPFSelectedCheckboxesUpdate" {
         $script:sync.selectedToggles.Count | Should -Be 0
         $script:sync.selectedFeatures.Count | Should -Be 0
         $script:sync.selectedAppx.Count | Should -Be 0
-        $script:sync.WPFselectedAppsButton.Content | Should -Be "Selected Apps: 0"
+        $script:sync.WPFselectedAppsButton.Content | Should -Be "Aplicativos selecionados: 0"
         $script:sync.selectedAppsstackPanel.Children.Count | Should -Be 0
     }
 }
@@ -554,7 +554,7 @@ Describe "Estado da seleção de Invoke-WPFGetInstalled" {
 
         @($script:sync.selectedApps) | Should -Be @("WPFInstallGit")
         $script:sync.WPFInstallGit.IsChecked | Should -BeTrue
-        $script:sync.WPFselectedAppsButton.Content | Should -Be "Selected Apps: 1"
+        $script:sync.WPFselectedAppsButton.Content | Should -Be "Aplicativos selecionados: 1"
         $script:sync.selectedAppsstackPanel.Children.Count | Should -Be 1
         $script:sync.selectedAppsstackPanel.Children[0].Key | Should -Be "WPFInstallGit"
     }

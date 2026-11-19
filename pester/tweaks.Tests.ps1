@@ -262,10 +262,10 @@ Describe "Invoke-WinUtilTweaks" {
         }
 
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Service CscService was not found."
+            $Message -eq "Serviço CscService não encontrado."
         }
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq "WARN" -and $Component -eq "Service" -and $Message -eq "Service CscService was not found."
+            $Level -eq "WARN" -and $Component -eq "Service" -and $Message -eq "Serviço CscService não encontrado."
         }
         Should -Invoke -CommandName Set-WinUtilService -Times 0 -Exactly -ParameterFilter {
             $Name -eq "CscService"
@@ -349,25 +349,25 @@ Describe "Status de conclusão de Invoke-WinUtilTweaks" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksFailing"
 
         $log = Get-Content -Path $script:logPath -Raw
-        $log | Should -Match "\[ERROR\] \[Script\] Runtime exception while running script for WPFTweaksFailing"
-        $log | Should -Match "\[WARN\] \[Tweaks\] Apply tweak finished with 1 error\(s\): WPFTweaksFailing"
-        $log | Should -Not -Match "tweak completed: WPFTweaksFailing"
+        $log | Should -Match "\[ERROR\] \[Script\] Exceção de tempo de execução ao executar o script para WPFTweaksFailing"
+        $log | Should -Match "\[WARN\] \[Tweaks\] Ajuste aplicado com 1 erro\(s\): WPFTweaksFailing"
+        $log | Should -Not -Match "Ajuste aplicado concluído: WPFTweaksFailing"
     }
 
     It "avisa quando uma etapa de desfazer registrou um erro" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksFailing" -undo $true
 
         $log = Get-Content -Path $script:logPath -Raw
-        $log | Should -Match "\[ERROR\] \[Script\] Runtime exception while running script for WPFTweaksFailing"
-        $log | Should -Match "\[WARN\] \[Tweaks\] Undo tweak finished with 1 error\(s\): WPFTweaksFailing"
-        $log | Should -Not -Match "tweak completed: WPFTweaksFailing"
+        $log | Should -Match "\[ERROR\] \[Script\] Exceção de tempo de execução ao executar o script para WPFTweaksFailing"
+        $log | Should -Match "\[WARN\] \[Tweaks\] Ajuste desfeito com 1 erro\(s\): WPFTweaksFailing"
+        $log | Should -Not -Match "Ajuste aplicado concluído: WPFTweaksFailing"
     }
 
     It "relata conclusão quando todas as etapas de ajuste tiveram sucesso" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksClean"
 
         $log = Get-Content -Path $script:logPath -Raw
-        $log | Should -Match "\[INFO\] \[Tweaks\] Apply tweak completed: WPFTweaksClean"
+        $log | Should -Match "\[INFO\] \[Tweaks\] Ajuste aplicado concluído: WPFTweaksClean"
         $log | Should -Not -Match "\[WARN\]"
         $log | Should -Not -Match "\[ERROR\]"
     }
@@ -376,8 +376,8 @@ Describe "Status de conclusão de Invoke-WinUtilTweaks" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksDuringJob"
 
         $log = Get-Content -Path $script:logPath -Raw
-        $log | Should -Match "\[INFO\] \[Tweaks\] Apply tweak completed: WPFTweaksDuringJob"
-        $log | Should -Not -Match "tweak finished with"
+        $log | Should -Match "\[INFO\] \[Tweaks\] Ajuste aplicado concluído: WPFTweaksDuringJob"
+        $log | Should -Not -Match "Ajuste aplicado com"
     }
 }
 
@@ -455,7 +455,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Invoke-WPFtweaksbutton
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Please check the tweaks you wish to perform."
+            $Message -eq "Marque os ajustes que deseja executar."
         }
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
@@ -487,10 +487,10 @@ Describe "Invoke-WPFtweaksbutton" {
         }
         Should -Invoke -CommandName Invoke-WinUtilTweaks -Times 2 -Exactly
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying Telemetry - Disable (1/2)" -and $Percent -eq 0
+            $Status -eq "Aplicando Telemetry - Disable (1/2)" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying Services - Set to Manual (2/2)" -and $Percent -eq 50
+            $Status -eq "Aplicando Services - Set to Manual (2/2)" -and $Percent -eq 50
         }
     }
 
@@ -502,7 +502,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Invoke-WPFtweaksbutton
         $jobParameters = $script:capturedTweaksJob.Parameters
 
-        { & $script:capturedTweaksJob.ScriptBlock @jobParameters } | Should -Throw -ExpectedMessage "*DNS change to Cloudflare failed*"
+        { & $script:capturedTweaksJob.ScriptBlock @jobParameters } | Should -Throw -ExpectedMessage "*A alteração de DNS para Cloudflare falhou*"
         Should -Invoke -CommandName Invoke-WinUtilTweaks -Times 0 -Exactly
     }
 
@@ -529,10 +529,10 @@ Describe "Invoke-WPFtweaksbutton" {
 
         $script:appliedOrder | Should -Be @("WPFTweaksRestorePoint", "WPFTweaksTelemetry")
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Creating restore point" -and $Percent -eq 0
+            $Status -eq "Criando ponto de restauração" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying Telemetry - Disable (2/2)" -and $Percent -eq 50
+            $Status -eq "Aplicando Telemetry - Disable (2/2)" -and $Percent -eq 50
         }
     }
 
@@ -545,7 +545,7 @@ Describe "Invoke-WPFtweaksbutton" {
         & $script:capturedTweaksJob.ScriptBlock @jobParameters
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying WPFTweaksTelemetry (1/1)" -and $Percent -eq 0
+            $Status -eq "Aplicando WPFTweaksTelemetry (1/1)" -and $Percent -eq 0
         }
     }
 }
@@ -586,7 +586,7 @@ Describe "Invoke-WPFundoall" {
         Invoke-WPFundoall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Please check the tweaks you wish to undo."
+            $Message -eq "Marque os ajustes que deseja desfazer."
         }
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }

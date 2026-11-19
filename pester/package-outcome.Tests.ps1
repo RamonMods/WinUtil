@@ -39,7 +39,7 @@ Describe "Resultados de Install-WinUtilProgramWinget" {
         $result = Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
 
         $result.Outcome | Should -Be "Skipped"
-        $result.Detail | Should -Be "already installed"
+        $result.Detail | Should -Be "já instalado"
     }
 
     It "ignora um pacote por usuário que o WinGet elevado não pode atualizar durante a instalação" {
@@ -48,7 +48,7 @@ Describe "Resultados de Install-WinUtilProgramWinget" {
         $result = Install-WinUtilProgramWinget -Action Install -Programs @("Microsoft.Sysinternals.ProcessExplorer")
 
         $result.Outcome | Should -Be "Skipped"
-        $result.Detail | Should -Be "already installed for the current user; elevated WinUtil cannot update it"
+        $result.Detail | Should -Be "já instalado para o usuário atual; o WinUtil elevado não pode atualizá-lo"
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "INFO" -and $Message -like "*skipped: Microsoft.Sysinternals.ProcessExplorer*"
         }
@@ -57,8 +57,8 @@ Describe "Resultados de Install-WinUtilProgramWinget" {
 
     It "ignora ações que o WinGet elevado não pode executar em um pacote por usuário" {
         $expectedDetails = @{
-            Upgrade = "not upgraded; installed for the current user and elevated WinUtil cannot modify it"
-            Uninstall = "remains installed for the current user; elevated WinUtil cannot uninstall it"
+            Upgrade = "não atualizado; instalado para o usuário atual e o WinUtil elevado não pode modificá-lo"
+            Uninstall = "continua instalado para o usuário atual; o WinUtil elevado não pode desinstalá-lo"
         }
 
         foreach ($action in $expectedDetails.Keys) {
@@ -103,7 +103,7 @@ Describe "Resultados de Install-WinUtilProgramWinget" {
             $result = Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
 
             $result.Outcome | Should -Be "Succeeded" -Because "código de saída $code significa que a instalação funcionou"
-            $result.Detail | Should -Match "restart"
+            $result.Detail | Should -Match "reinici"
         }
     }
 }
@@ -124,7 +124,7 @@ Describe "Resultados de Install-WinUtilProgramChoco" {
 
         $result = Install-WinUtilProgramChoco -Action Install -Programs @("git")
         $result.Outcome | Should -Be "Succeeded"
-        $result.Detail | Should -Match "restart"
+        $result.Detail | Should -Match "reinici"
     }
 
     It "informa um código de saída diferente de zero como falha" {
@@ -146,7 +146,7 @@ Describe "Resultados de Install-WinUtilProgramChoco" {
         $result = Install-WinUtilProgramChoco -Action Uninstall -Programs @("git")
 
         $result.Outcome | Should -Be "Failed"
-        $result.Detail | Should -Be "exit code 1"
+        $result.Detail | Should -Be "código de saída 1"
     }
 
     It "falha em vez de reutilizar um código de saída obsoleto quando o Chocolatey não está disponível" {
@@ -157,7 +157,7 @@ Describe "Resultados de Install-WinUtilProgramChoco" {
 
         $result.Outcome | Should -Be "Failed"
         $result.ExitCode | Should -Be -1
-        $result.Detail | Should -Be "Chocolatey command did not start"
+        $result.Detail | Should -Be "O comando do Chocolatey não iniciou"
     }
 }
 
@@ -171,28 +171,28 @@ Describe "Complete-WinUtilPackageRun" {
     It "informa as contagens de cada resultado" {
         $results = @(
             [pscustomobject]@{ Package = "a"; Outcome = "Succeeded"; Detail = "exit code 0" },
-            [pscustomobject]@{ Package = "b"; Outcome = "Skipped"; Detail = "already installed" }
+            [pscustomobject]@{ Package = "b"; Outcome = "Skipped"; Detail = "já instalado" }
         )
 
         Complete-WinUtilPackageRun -Action "Install" -Results $results
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Install summary: 1 succeeded, 1 skipped, 0 failed"
+            $Message -eq "Resumo de Install: 1 com sucesso, 1 ignorados, 0 com falha"
         }
     }
 
     It "não falha uma instalação quando todos os pacotes selecionados já estão presentes" {
         $results = @(
             [pscustomobject]@{ Package = "Microsoft.Sysinternals.ProcessMonitor"; Outcome = "Skipped"; Detail = "no applicable update" },
-            [pscustomobject]@{ Package = "Microsoft.Sysinternals.ProcessExplorer"; Action = "Install"; ExitCode = -1978335107; Outcome = "Skipped"; Detail = "already installed for the current user; elevated WinUtil cannot update it" }
+            [pscustomobject]@{ Package = "Microsoft.Sysinternals.ProcessExplorer"; Action = "Install"; ExitCode = -1978335107; Outcome = "Skipped"; Detail = "já instalado para o usuário atual; o WinUtil elevado não pode atualizá-lo" }
         )
 
         { Complete-WinUtilPackageRun -Action "Install" -Results $results } | Should -Not -Throw
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Install summary: 0 succeeded, 2 skipped, 0 failed"
+            $Message -eq "Resumo de Install: 0 com sucesso, 2 ignorados, 0 com falha"
         }
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "1 package action(s) were skipped because elevated WinUtil cannot modify user-scoped installations."
+            $Message -eq "1 ação(ões) de pacote foram ignoradas porque o WinUtil elevado não pode modificar instalações do escopo do usuário."
         }
     }
 
@@ -206,10 +206,10 @@ Describe "Complete-WinUtilPackageRun" {
         { Complete-WinUtilPackageRun -Action "Uninstall" -Results $results } | Should -Not -Throw
         @($results | Where-Object Outcome -eq "Skipped").Count | Should -Be 2
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Uninstall summary: 0 succeeded, 2 skipped, 0 failed"
+            $Message -eq "Resumo de Uninstall: 0 com sucesso, 2 ignorados, 0 com falha"
         }
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "2 package action(s) were skipped because elevated WinUtil cannot modify user-scoped installations."
+            $Message -eq "2 ação(ões) de pacote foram ignoradas porque o WinUtil elevado não pode modificar instalações do escopo do usuário."
         }
     }
 
@@ -226,7 +226,7 @@ Describe "Complete-WinUtilPackageRun" {
             $caught = $_
         }
 
-        $caught.Exception.Message | Should -BeLike "1 of 2 package(s) failed: b. *"
+        $caught.Exception.Message | Should -BeLike "1 de 2 pacote(s) falharam: b. *"
         $caught.Exception.Data["WinUtilErrorReported"] | Should -BeTrue
     }
 

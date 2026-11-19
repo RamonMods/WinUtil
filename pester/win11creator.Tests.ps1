@@ -223,7 +223,7 @@ Describe "Mídia de configuração do Criador do Win11" {
             "'/Add-Driver'",
             "'/Commit'",
             "`$mountDir = Join-Path (Split-Path -Path `$ContentRoot -Parent) 'wim_mount'",
-            'install.wim metadata validation passed',
+            'validação dos metadados do install.wim passou',
             "Join-Path `$ContentRoot 'sources\boot.wim'"
         )) {
             $isoScriptContent | Should -Match ([regex]::Escape($expectedText))
@@ -262,8 +262,8 @@ Describe "Mídia de configuração do Criador do Win11" {
         $invalidAfter = $valid.Clone()
         $invalidAfter.ProductType = '<undefined>'
 
-        { Assert-WinUtilISOWimMetadata -Before $invalidBefore } | Should -Throw '*already invalid*'
-        { Assert-WinUtilISOWimMetadata -Before $valid -After $invalidAfter } | Should -Throw '*validation failed*'
+        { Assert-WinUtilISOWimMetadata -Before $invalidBefore } | Should -Throw '*já são inválidos*'
+        { Assert-WinUtilISOWimMetadata -Before $valid -After $invalidAfter } | Should -Throw '*validação dos metadados do install.wim falhou*'
     }
 
     It "executa todos os fluxos de ISO em segundo plano pela camada de jobs compartilhada" {
@@ -364,10 +364,10 @@ Describe "Mídia de configuração do Criador do Win11" {
     It "bloqueia um install.esd grande demais antes da confirmação de apagamento do USB" {
         $script:writeUsbFunction | Should -Match ([regex]::Escape('$installEsd = Join-Path $contentsDir "sources\install.esd"'))
         $script:writeUsbFunction | Should -Match ([regex]::Escape('$esdSizeBytes -ge 4GB'))
-        $script:writeUsbFunction | Should -Match 'install\.esd file'
+        $script:writeUsbFunction | Should -Match 'arquivo install\.esd'
 
         $guardIndex = $script:writeUsbFunction.IndexOf('$installEsd = Join-Path $contentsDir "sources\install.esd"')
-        $confirmationIndex = $script:writeUsbFunction.IndexOf('Confirm USB Erase')
+        $confirmationIndex = $script:writeUsbFunction.IndexOf('Confirmar Apagamento da USB')
         $guardIndex | Should -BeGreaterThan -1
         $confirmationIndex | Should -BeGreaterThan $guardIndex
     }
@@ -474,8 +474,8 @@ Describe "Mídia de configuração do Criador do Win11" {
             Test-Path (Join-Path $sourcesDir "ei.cfg") | Should -BeTrue
             (Get-Content -Path (Join-Path $sourcesDir "ei.cfg")) -join "|" |
                 Should -Be "[EditionID]|Professional|[Channel]|Retail|[VL]|0"
-            ($logs -join "|") | Should -Match "Removed sources\\PID\.txt"
-            ($logs -join "|") | Should -Match "Written sources\\ei\.cfg"
+            ($logs -join "|") | Should -Match "Removido sources\\PID\.txt"
+            ($logs -join "|") | Should -Match "Gravado sources\\ei\.cfg"
         } finally {
             Remove-Item -Path $contentRoot -Recurse -Force -ErrorAction SilentlyContinue
         }
@@ -514,14 +514,14 @@ Describe "Mídia de configuração do Criador do Win11" {
             }
 
             Test-Path (Join-Path $contentRoot '$WinpeDriver$') | Should -BeFalse
-            ($logs -join '|') | Should -Match 'Warning: boot.wim was not found'
+            ($logs -join '|') | Should -Match 'Warning: boot.wim não foi encontrado'
 
             @($script:dismCalls | Where-Object { $_ -match '/Mount-Image' }).Count | Should -Be 1
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be 9
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Commit' }).Count | Should -Be 1
             @($script:dismCalls | Where-Object { $_ -match '/Get-WimInfo' }).Count | Should -Be 2
             ($script:dismCalls -join "`n") | Should -Not -Match '/Cleanup-Image|/Export-Image'
-            ($logs -join '|') | Should -Match "Added 9 of 9 driver packages"
+            ($logs -join '|') | Should -Match "Adicionados 9 de 9 pacotes de driver"
 
             # nested_pkg contém INFs na raiz e em x64. A adição na raiz já recursa
             # em x64, então a subpasta não deve receber uma chamada /Add-Driver própria.
@@ -532,10 +532,10 @@ Describe "Mídia de configuração do Criador do Win11" {
             $nsMgr = New-Object System.Xml.XmlNamespaceManager($answerFile.NameTable)
             $nsMgr.AddNamespace('sg', 'https://schneegans.de/windows/unattend-generator/')
             $answerFile.SelectSingleNode('//sg:File[@path="C:\Windows\Setup\Scripts\WinUtil-InstallDrivers.ps1"]', $nsMgr) | Should -BeNullOrEmpty
-            ($logs -join '|') | Should -Match 'Exported 10 of 11 driver packages \(1 excluded\)'
-            ($logs -join '|') | Should -Match "Excluding stale duplicate driver package '.*ntprint\.inf_x86_7426e1b60aa62272' \(DriverVer 1/1/2023,10\.0\.26100\.8875\) superseded by '.*ntprint\.inf_x86_58e7118cdecb935e' \(DriverVer 6/1/2024,10\.0\.26100\.9168\)"
-            ($logs -join '|') | Should -Match 'install.wim metadata validation passed'
-            ($logs -join '|') | Should -Match 'DISM mount completed.'
+            ($logs -join '|') | Should -Match 'Exportados 10 de 11 pacotes de driver \(1 excluídos\)'
+            ($logs -join '|') | Should -Match "Excluindo o pacote de driver duplicado e desatualizado '.*ntprint\.inf_x86_7426e1b60aa62272' \(DriverVer 1/1/2023,10\.0\.26100\.8875\), substituído por '.*ntprint\.inf_x86_58e7118cdecb935e' \(DriverVer 6/1/2024,10\.0\.26100\.9168\)"
+            ($logs -join '|') | Should -Match 'validação dos metadados do install.wim passou'
+            ($logs -join '|') | Should -Match 'DISM mount concluído.'
             ($logs -join '|') | Should -Not -Match '100.0%'
 
             $script:exportRootAtAddDriver | Should -Contain (Join-Path $script:driverExportRoot 'hdx_asusext_apot_g5-tse.inf_amd64_aabbccddeeff0011')
@@ -593,8 +593,8 @@ Describe "Mídia de configuração do Criador do Win11" {
             ($bootAdds -join "`n") | Should -Not -Match ([regex]::Escape('name_only_pkg'))
 
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be 8
-            ($logs -join '|') | Should -Match 'Added 2 of 2 driver packages to boot.wim'
-            ($logs -join '|') | Should -Match 'Added 6 of 6 driver packages to install.wim'
+            ($logs -join '|') | Should -Match 'Adicionados 2 de 2 pacotes de driver a boot.wim'
+            ($logs -join '|') | Should -Match 'Adicionados 6 de 6 pacotes de driver a install.wim'
         } finally {
             Remove-Item Function:\dism.exe -ErrorAction SilentlyContinue
             Remove-Item -Path $contentRoot -Recurse -Force -ErrorAction SilentlyContinue
@@ -626,8 +626,8 @@ Describe "Mídia de configuração do Criador do Win11" {
             $bootAdds = @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' })
             @($bootAdds | Where-Object { $_ -match '22222222bbbbbbbb' }).Count | Should -Be 2
             @($bootAdds | Where-Object { $_ -match '11111111aaaaaaaa' }).Count | Should -Be 0
-            ($logs -join '|') | Should -Match 'Added 1 of 1 driver packages to boot.wim'
-            ($logs -join '|') | Should -Match 'Added 1 of 1 driver packages to install.wim'
+            ($logs -join '|') | Should -Match 'Adicionados 1 de 1 pacotes de driver a boot.wim'
+            ($logs -join '|') | Should -Match 'Adicionados 1 de 1 pacotes de driver a install.wim'
         } finally {
             Remove-Item Function:\dism.exe -ErrorAction SilentlyContinue
             Remove-Item -Path $contentRoot -Recurse -Force -ErrorAction SilentlyContinue
@@ -657,7 +657,7 @@ Describe "Mídia de configuração do Criador do Win11" {
             }
 
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be 3
-            ($logs -join '|') | Should -Match 'Exported 3 of 3 driver packages \(0 excluded\)'
+            ($logs -join '|') | Should -Match 'Exportados 3 de 3 pacotes de driver \(0 excluídos\)'
             $driversInjected.Value | Should -BeTrue
 
             $script:exportRootAtAddDriver | Should -Contain (Join-Path $script:driverExportRoot 'ext_pkg_lower')
@@ -691,8 +691,8 @@ Describe "Mídia de configuração do Criador do Win11" {
                 $logs.Add([string]$message)
             }
 
-            ($logs -join '|') | Should -Match "Excluding stale duplicate driver package '.*main\.inf_amd64_11111111aaaaaaaa' \(DriverVer 1/1/2023,1\.0\.0\.0\) superseded by '.*main\.inf_amd64_22222222bbbbbbbb' \(DriverVer 6/1/2024,2\.0\.0\.0\)"
-            ($logs -join '|') | Should -Match "Keeping excluded driver package directory '.*main\.inf_amd64_11111111aaaaaaaa' because it contains a retained nested package"
+            ($logs -join '|') | Should -Match "Excluindo o pacote de driver duplicado e desatualizado '.*main\.inf_amd64_11111111aaaaaaaa' \(DriverVer 1/1/2023,1\.0\.0\.0\), substituído por '.*main\.inf_amd64_22222222bbbbbbbb' \(DriverVer 6/1/2024,2\.0\.0\.0\)"
+            ($logs -join '|') | Should -Match "Mantendo o diretório do pacote de driver excluído '.*main\.inf_amd64_11111111aaaaaaaa' porque ele contém um pacote aninhado retido"
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be 2
             $script:exportRootAtAddDriver | Should -Contain (Join-Path $script:driverExportRoot 'main.inf_amd64_11111111aaaaaaaa')
             $script:exportedInfsAtAddDriver | Should -Not -Contain (Join-Path $script:driverExportRoot 'main.inf_amd64_11111111aaaaaaaa\main.inf')
@@ -757,8 +757,8 @@ Describe "Mídia de configuração do Criador do Win11" {
             }
 
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be 2
-            ($logs -join '|') | Should -Match 'Exported 2 of 2 driver packages \(0 excluded\)'
-            ($logs -join '|') | Should -Not -Match 'Excluding stale duplicate driver package'
+            ($logs -join '|') | Should -Match 'Exportados 2 de 2 pacotes de driver \(0 excluídos\)'
+            ($logs -join '|') | Should -Not -Match 'Excluindo o pacote de driver duplicado e desatualizado'
 
             $script:exportRootAtAddDriver | Should -Contain (Join-Path $script:driverExportRoot 'device.inf_amd64_11111111aaaaaaaa')
             $script:exportRootAtAddDriver | Should -Contain (Join-Path $script:driverExportRoot 'device.inf_amd64_22222222bbbbbbbb')
@@ -798,11 +798,11 @@ Describe "Mídia de configuração do Criador do Win11" {
             }
 
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be 3
-            ($logs -join '|') | Should -Match 'Exported 3 of 7 driver packages \(4 excluded\)'
-            ($logs -join '|') | Should -Match "Excluding stale duplicate driver package '.*ntprint\.inf_x86_7426e1b60aa62272' \(DriverVer 1/1/2023,10\.0\.26100\.8875\) superseded by '.*ntprint\.inf_x86_58e7118cdecb935e'"
-            ($logs -join '|') | Should -Match "Excluding stale duplicate driver package '.*ntprint\.inf_x86_6688e7b66f8d9fb5' \(DriverVer 1/1/2024,10\.0\.26100\.8972\) superseded by '.*ntprint\.inf_x86_58e7118cdecb935e'"
-            ($logs -join '|') | Should -Match "Excluding stale duplicate driver package '.*sample\.inf_amd64_11111111aaaaaaaa' \(DriverVer unknown\) superseded by '.*sample\.inf_amd64_22222222bbbbbbbb' \(DriverVer 3/1/2024,1\.2\.3\.4\)"
-            ($logs -join '|') | Should -Match "Excluding stale duplicate driver package '.*caps\.inf_amd64_33333333cccccccc' \(DriverVer 1/1/2020,1\.0\.0\.0\) superseded by '.*caps\.inf_amd64_44444444dddddddd' \(DriverVer 1/1/2021,2\.0\.0\.0\)"
+            ($logs -join '|') | Should -Match 'Exportados 3 de 7 pacotes de driver \(4 excluídos\)'
+            ($logs -join '|') | Should -Match "Excluindo o pacote de driver duplicado e desatualizado '.*ntprint\.inf_x86_7426e1b60aa62272' \(DriverVer 1/1/2023,10\.0\.26100\.8875\), substituído por '.*ntprint\.inf_x86_58e7118cdecb935e'"
+            ($logs -join '|') | Should -Match "Excluindo o pacote de driver duplicado e desatualizado '.*ntprint\.inf_x86_6688e7b66f8d9fb5' \(DriverVer 1/1/2024,10\.0\.26100\.8972\), substituído por '.*ntprint\.inf_x86_58e7118cdecb935e'"
+            ($logs -join '|') | Should -Match "Excluindo o pacote de driver duplicado e desatualizado '.*sample\.inf_amd64_11111111aaaaaaaa' \(DriverVer desconhecida\), substituído por '.*sample\.inf_amd64_22222222bbbbbbbb' \(DriverVer 3/1/2024,1\.2\.3\.4\)"
+            ($logs -join '|') | Should -Match "Excluindo o pacote de driver duplicado e desatualizado '.*caps\.inf_amd64_33333333cccccccc' \(DriverVer 1/1/2020,1\.0\.0\.0\), substituído por '.*caps\.inf_amd64_44444444dddddddd' \(DriverVer 1/1/2021,2\.0\.0\.0\)"
 
             $script:exportRootAtAddDriver | Should -Not -Contain (Join-Path $script:driverExportRoot 'ntprint.inf_x86_7426e1b60aa62272')
             $script:exportRootAtAddDriver | Should -Not -Contain (Join-Path $script:driverExportRoot 'ntprint.inf_x86_6688e7b66f8d9fb5')
@@ -844,12 +844,12 @@ Describe "Mídia de configuração do Criador do Win11" {
             @($finalMountCalls | Where-Object { $_ -match '/Add-Driver' }).Count | Should -Be ($script:expectedRootPackages - 1)
             ($finalMountCalls -join "`n") | Should -Not -Match ([regex]::Escape('group_a\duplicate'))
 
-            ($logs -join '|') | Should -Match "Added $($script:expectedRootPackages - 1) of $script:expectedRootPackages driver packages"
-            ($logs -join '|') | Should -Match 'install.wim metadata validation passed'
+            ($logs -join '|') | Should -Match "Adicionados $($script:expectedRootPackages - 1) de $script:expectedRootPackages pacotes de driver"
+            ($logs -join '|') | Should -Match 'validação dos metadados do install.wim passou'
             # group_a e group_b compartilham um nome-folha, então o aviso deve identificar o pacote
             # com falha por seu subcaminho; um nome só de folha apareceria como 'duplicate' e seria ambíguo.
-            ($logs -join '|') | Should -Match ([regex]::Escape("failed to add driver package 'group_a\duplicate'"))
-            ($logs -join '|') | Should -Match ([regex]::Escape('add-driver:group_b\duplicate completed'))
+            ($logs -join '|') | Should -Match ([regex]::Escape("falha ao adicionar o pacote de driver 'group_a\duplicate'"))
+            ($logs -join '|') | Should -Match ([regex]::Escape('add-driver:group_b\duplicate concluído'))
             $driversInjected.Value | Should -BeTrue
         } finally {
             Remove-Item Function:\dism.exe -ErrorAction SilentlyContinue
@@ -880,8 +880,8 @@ Describe "Mídia de configuração do Criador do Win11" {
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Discard' }).Count | Should -Be $script:expectedRootPackages
             @($script:dismCalls | Where-Object { $_ -match '/Get-WimInfo' }).Count | Should -Be 1
 
-            ($logs -join '|') | Should -Match "none of the $script:expectedRootPackages exported driver packages could be added"
-            ($logs -join '|') | Should -Not -Match "Added 0 of $script:expectedRootPackages"
+            ($logs -join '|') | Should -Match "nenhum dos $script:expectedRootPackages pacotes de driver exportados pôde ser adicionado"
+            ($logs -join '|') | Should -Not -Match "Adicionados 0 de $script:expectedRootPackages"
             Test-Path (Join-Path $contentRoot '$WinpeDriver$') | Should -BeFalse
             $driversInjected.Value | Should -BeFalse
         } finally {
@@ -913,9 +913,9 @@ Describe "Mídia de configuração do Criador do Win11" {
                 $logs.Add([string]$message)
             }
 
-            ($logs -join '|') | Should -Match "Added $script:expectedRootPackages of $script:expectedRootPackages driver packages"
+            ($logs -join '|') | Should -Match "Adicionados $script:expectedRootPackages de $script:expectedRootPackages pacotes de driver"
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Commit' }).Count | Should -Be 1
-            ($logs -join '|') | Should -Match ([regex]::Escape('add-driver:nested_pkg completed'))
+            ($logs -join '|') | Should -Match ([regex]::Escape('add-driver:nested_pkg concluído'))
         } finally {
             $env:TEMP = $originalTemp
             Remove-Item Function:\dism.exe -ErrorAction SilentlyContinue
@@ -936,7 +936,7 @@ Describe "Mídia de configuração do Criador do Win11" {
             . $script:isoScriptPath
 
             { Invoke-WinUtilISOScript -ISOContentsDir $contentRoot -AutoUnattendXml $template -InjectCurrentSystemDrivers $true -InstallImagePath $installWim -InstallImageIndex 6 -InstallEditionId 'Professional' } |
-                Should -Throw '*Failed to discard the potentially partial install.wim mount after driver package*'
+                Should -Throw '*Falha ao descartar a montagem potencialmente parcial de install.wim após a falha do pacote de driver*'
 
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Discard' }).Count | Should -Be 2
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Commit' }).Count | Should -Be 0
@@ -985,7 +985,7 @@ Describe "Mídia de configuração do Criador do Win11" {
             . $script:isoScriptPath
 
             { Invoke-WinUtilISOScript -ISOContentsDir $contentRoot -AutoUnattendXml $template -InjectCurrentSystemDrivers $true -InstallImagePath $installWim -InstallImageIndex 6 -InstallEditionId 'Professional' } |
-                Should -Throw '*DISM mount failed*'
+                Should -Throw '*DISM mount falhou*'
 
             @($script:dismCalls | Where-Object { $_ -match '/Get-MountedImageInfo' }).Count | Should -Be 1
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Discard' }).Count | Should -Be 1
@@ -1034,7 +1034,7 @@ Describe "Mídia de configuração do Criador do Win11" {
             . $script:isoScriptPath
 
             { Invoke-WinUtilISOScript -ISOContentsDir $contentRoot -AutoUnattendXml $template -InjectCurrentSystemDrivers $true -InstallImagePath $installWim -InstallImageIndex 6 -InstallEditionId 'Professional' } |
-                Should -Throw '*112*Disk is full*'
+                Should -Throw '*112*Disco cheio*'
 
             @($script:dismCalls | Where-Object { $_ -match '/Get-MountedImageInfo' }).Count | Should -Be 1
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Discard' }).Count | Should -Be 1
@@ -1088,7 +1088,7 @@ Describe "Mídia de configuração do Criador do Win11" {
             } catch {
                 $thrown = $_.Exception.Message
             }
-            $thrown | Should -Be 'DISM mount failed with exit code 999.'
+            $thrown | Should -Be 'DISM mount falhou com o código de saída 999.'
 
             @($script:dismCalls | Where-Object { $_ -match '/Get-MountedImageInfo' }).Count | Should -Be 1
             @($script:dismCalls | Where-Object { $_ -match '/Unmount-Image\|.*\|/Discard' }).Count | Should -Be 1
@@ -1140,25 +1140,25 @@ Describe "Mídia de configuração do Criador do Win11" {
         $content = Get-Content -Path $script:isoWorkflowPath -Raw
 
         foreach ($expectedText in @(
-            'oscdimg.exe not found. Attempting to install via winget...',
+            'oscdimg.exe não encontrado. Tentando instalar via winget...',
             'Install-WinUtilWinget',
             'Get-Command winget',
             '$env:ProgramFiles\WinGet\Packages',
             '$env:ProgramFiles\WinGet\Links\oscdimg.exe',
             'install -e --id Microsoft.OSCDIMG --accept-package-agreements --accept-source-agreements',
-            'oscdimg.exe still not found after install attempt.',
-            'oscdimg Not Found'
+            'oscdimg.exe ainda não encontrado após a tentativa de instalação.',
+            'oscdimg Não Encontrado'
         )) {
             $content | Should -Match ([regex]::Escape($expectedText))
         }
 
         ([regex]::Matches($content, 'function Get-WinUtilOscdimgPath', 'IgnoreCase')).Count | Should -Be 1
-        $content | Should -Match ([regex]::Escape('Write-WinUtilISOLog -Level "WARN" -Message "oscdimg.exe still not found after install attempt."'))
+        $content | Should -Match ([regex]::Escape('Write-WinUtilISOLog -Level "WARN" -Message "oscdimg.exe ainda não encontrado após a tentativa de instalação."'))
 
         # O job de exportação para no diálogo em vez de executar oscdimg sem o binário
         $exportOscdimgIndex = $script:exportFunction.IndexOf('$oscdimg = Get-WinUtilOscdimgPath')
-        $exportDialogIndex = $script:exportFunction.IndexOf('oscdimg Not Found', $exportOscdimgIndex)
-        $exportRunIndex = $script:exportFunction.IndexOf('Running oscdimg...', $exportOscdimgIndex)
+        $exportDialogIndex = $script:exportFunction.IndexOf('oscdimg Não Encontrado', $exportOscdimgIndex)
+        $exportRunIndex = $script:exportFunction.IndexOf('Executando oscdimg...', $exportOscdimgIndex)
 
         $exportOscdimgIndex | Should -BeGreaterThan -1
         $exportDialogIndex | Should -BeGreaterThan $exportOscdimgIndex

@@ -172,7 +172,7 @@ Describe "Invoke-WinUtilCurrentSystem aplicativos instalados" {
             "winget failed"
         }
 
-        { Invoke-WinUtilCurrentSystem -CheckBox "winget" } | Should -Throw "winget list failed with exit code 1."
+        { Invoke-WinUtilCurrentSystem -CheckBox "winget" } | Should -Throw "winget list falhou com o código de saída 1."
     }
 
     It "corresponde ao ID de pacote primário do Chocolatey em uma única chamada de listagem" {
@@ -224,7 +224,7 @@ Describe "Invoke-WinUtilCurrentSystem aplicativos instalados" {
         $result = @(Invoke-WinUtilCurrentSystem -CheckBox "choco")
 
         $result | Should -Be @("WPFInstallGit")
-        Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter { $Message -like "*WinGet*exit code 1*" }
+        Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter { $Message -like "*WinGet*código de saída 1*" }
     }
 
     It "não executa o WinGet no modo Chocolatey quando nenhum aplicativo precisa dele" {
@@ -388,7 +388,7 @@ Describe "Set-WinUtilRegistry" {
         Should -Invoke -CommandName Remove-ItemProperty -Times 0 -Exactly
         Should -Invoke -CommandName Write-Warning -Times 0 -Exactly
         Should -Invoke -CommandName Write-WinUtilLog -Times 0 -Exactly -ParameterFilter { $Level -eq "ERROR" }
-        Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter { $Message -like "*already absent*" }
+        Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter { $Message -like "*já está ausente*" }
     }
 
     It "relata uma falha de consulta em vez de tratar o valor como ausente" {
@@ -401,9 +401,9 @@ Describe "Set-WinUtilRegistry" {
 
         Should -Invoke -CommandName New-Item -Times 0 -Exactly
         Should -Invoke -CommandName Remove-ItemProperty -Times 0 -Exactly
-        Should -Invoke -CommandName Write-WinUtilLog -Times 0 -Exactly -ParameterFilter { $Message -like "*already absent*" }
+        Should -Invoke -CommandName Write-WinUtilLog -Times 0 -Exactly -ParameterFilter { $Message -like "*já está ausente*" }
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
-            $Level -eq "ERROR" -and $Message -like "Unauthorized while changing $registryPath\Protected*"
+            $Level -eq "ERROR" -and $Message -like "Sem autorização ao alterar $registryPath\Protected*"
         }
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly
     }
@@ -470,7 +470,7 @@ Describe "Set-WinUtilService" {
         }
         Should -Invoke -CommandName Set-Service -Times 0 -Exactly
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Service MissingService was not found."
+            $Message -eq "O serviço MissingService não foi encontrado."
         }
     }
 }

@@ -32,7 +32,7 @@ Describe "Invoke-WPFSystemRepair códigos de saída do chkdsk" {
 
         { Invoke-WPFSystemRepair } | Should -Not -Throw
         Should -Invoke -CommandName Write-Warning -ParameterFilter {
-            $Message -like "*errors were found and fixed*"
+            $Message -like "*erros foram encontrados e corrigidos*"
         }
     }
 
@@ -43,7 +43,7 @@ Describe "Invoke-WPFSystemRepair códigos de saída do chkdsk" {
 
         { Invoke-WPFSystemRepair } | Should -Not -Throw
         Should -Invoke -CommandName Write-Warning -ParameterFilter {
-            $Message -like "*cleanup was performed*"
+            $Message -like "*a limpeza foi realizada*"
         }
     }
 
@@ -52,7 +52,7 @@ Describe "Invoke-WPFSystemRepair códigos de saída do chkdsk" {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3 } else { 0 }) }
         }
 
-        { Invoke-WPFSystemRepair } | Should -Throw "*Checking the disk for errors failed with exit code 3*"
+        { Invoke-WPFSystemRepair } | Should -Throw "*Verificando o disco em busca de erros falhou com o código de saída 3*"
     }
 
     It "não executa as etapas seguintes após a falha do chkdsk" {
@@ -79,7 +79,7 @@ Describe "Invoke-WPFSystemRepair códigos por etapa" {
 
         { Invoke-WPFSystemRepair } | Should -Not -Throw
         Should -Invoke -CommandName Write-Warning -ParameterFilter {
-            $Message -like "*a restart is needed*"
+            $Message -like "*é necessário reiniciar*"
         }
     }
 
@@ -88,7 +88,7 @@ Describe "Invoke-WPFSystemRepair códigos por etapa" {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3010 } else { 0 }) }
         }
 
-        { Invoke-WPFSystemRepair } | Should -Throw "*exit code 3010*"
+        { Invoke-WPFSystemRepair } | Should -Throw "*código de saída 3010*"
     }
 
     It "falha em qualquer valor diferente de zero do sfc, que não tem códigos de sucesso próprios" {
@@ -96,6 +96,6 @@ Describe "Invoke-WPFSystemRepair códigos por etapa" {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "sfc") { 1 } else { 0 }) }
         }
 
-        { Invoke-WPFSystemRepair } | Should -Throw "*Scanning protected system files failed with exit code 1*"
+        { Invoke-WPFSystemRepair } | Should -Throw "*Verificando arquivos protegidos do sistema falhou com o código de saída 1*"
     }
 }

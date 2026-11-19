@@ -130,7 +130,7 @@ Describe "Falhas na inicialização da interface" {
     }
 
     It "lança erro quando o XAML não pode criar a janela" {
-        { Start-WinUtilUserInterface } | Should -Throw "Failed to parse the XAML content*"
+        { Start-WinUtilUserInterface } | Should -Throw "Falha ao analisar o conteúdo XAML*"
 
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "ERROR" -and $Component -eq "UI"
@@ -228,9 +228,9 @@ Describe "Documento XAML" {
         $updatesTab = $script:xaml.SelectSingleNode('//*[local-name()="TabItem"][@Name="WPFTab4"]')
         $profileGrid = $updatesTab.SelectSingleNode('.//*[local-name()="UniformGrid"]')
         $expectedButtons = @{
-            WPFUpdatessecurity = "Apply Recommended"
-            WPFUpdatesdefault = "Restore Defaults"
-            WPFUpdatesdisable = "Disable Updates"
+            WPFUpdatessecurity = "Aplicar recomendado"
+            WPFUpdatesdefault = "Restaurar padrões"
+            WPFUpdatesdisable = "Desativar atualizações"
         }
 
         $profileGrid.GetAttribute("Columns") | Should -Be "3"
@@ -303,11 +303,11 @@ Describe "Documento XAML" {
         $tabItems = @($script:xaml.SelectNodes('//*[local-name()="TabControl"][@Name="WPFTabNav"]/*[local-name()="TabItem"]'))
         $actualTabs = @($tabItems | ForEach-Object { "$($_.GetAttribute("Name")):$($_.GetAttribute("Header"))" })
         $expectedTabs = @(
-            "WPFTab1:Install",
-            "WPFTab2:Tweaks",
-            "WPFTab3:Config",
-            "WPFTab4:Updates",
-            "WPFTab5:Win11ISO",
+            "WPFTab1:Instalar",
+            "WPFTab2:Ajustes",
+            "WPFTab3:Configurações",
+            "WPFTab4:Atualizações",
+            "WPFTab5:Criar Win11",
             "WPFTab6:AppX"
         )
 

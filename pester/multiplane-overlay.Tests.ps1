@@ -78,7 +78,7 @@ Describe "Get-WinUtilRegistryComboState" {
             [pscustomobject]@{ DisableOverlays = 1 }
         }
 
-        { Get-WinUtilRegistryComboState -Registry $script:states } | Should -Throw "Registry values do not match a supported state."
+        { Get-WinUtilRegistryComboState -Registry $script:states } | Should -Throw "Os valores do registro não correspondem a nenhum estado suportado."
     }
 }
 
@@ -131,7 +131,7 @@ Describe "Set-WinUtilRegistryComboState" {
             }
         }
 
-        { Set-WinUtilRegistryComboState -Registry $script:states -State "Fully Disabled" } | Should -Throw "Unable to apply registry state*"
+        { Set-WinUtilRegistryComboState -Registry $script:states -State "Fully Disabled" } | Should -Throw "Não foi possível aplicar o estado de registro*"
         $script:registryValues.OverlayTestMode | Should -Be 0
         $script:registryValues.DisableOverlays | Should -Be 0
     }
@@ -150,7 +150,7 @@ Describe "Set-WinUtilRegistryComboState" {
             }
         }
 
-        { Set-WinUtilRegistryComboState -Registry $script:states -State "Fully Disabled" } | Should -Throw "Unable to apply registry state*"
+        { Set-WinUtilRegistryComboState -Registry $script:states -State "Fully Disabled" } | Should -Throw "Não foi possível aplicar o estado de registro*"
         $script:registryValues.ContainsKey("OverlayTestMode") | Should -BeFalse
         $script:registryValues.ContainsKey("DisableOverlays") | Should -BeFalse
     }
@@ -168,6 +168,6 @@ Describe "Set-WinUtilRegistryComboState" {
             }
         }
 
-        { Set-WinUtilRegistryComboState -Registry $script:states -State "Fully Disabled" } | Should -Throw "*previous registry state could not be restored*"
+        { Set-WinUtilRegistryComboState -Registry $script:states -State "Fully Disabled" } | Should -Throw "*O estado anterior do registro não pôde ser restaurado*"
     }
 }
