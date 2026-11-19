@@ -25,7 +25,7 @@ function Invoke-WPFUpdatessecurity {
     Remove-ItemProperty -Path $automaticUpdatePolicyPath -Name "NoAutoUpdate" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -ErrorAction SilentlyContinue
 
-    # Win11 Creator blocks Windows Update until its first-logon cleanup runs. Clear anything left of that block,
+    # O Criar Win11 bloqueia o Windows Update atÃ© a limpeza de primeiro logon rodar. Limpa o que sobrou desse bloqueio,
     # but keep a real WSUS server.
     Remove-ItemProperty -Path $windowsUpdatePolicyPath -Name "DisableWindowsUpdateAccess" -ErrorAction SilentlyContinue
     if ((Get-ItemProperty -Path $windowsUpdatePolicyPath -Name "WUServer" -ErrorAction SilentlyContinue).WUServer -eq "http://localhost:8080") {

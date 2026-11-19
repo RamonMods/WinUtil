@@ -1,14 +1,14 @@
 function Get-WinUtilTweakDisplayName {
     <#
         .SYNOPSIS
-            Returns the user-facing label for a tweak key
+            Retorna o rótulo voltado ao usuário para uma chave de ajuste
 
         .DESCRIPTION
-            Status text should read the way the checkbox does ("Activity
-            History - Disable"), not the preset key ("WPFTweaksActivity"). Falls
-            back to the key itself when configs are unavailable (headless runs,
-            tests) or the entry has no label, so callers need no existence
-            checks. Pure data lookup, safe to call from a job worker.
+            O texto de status deve ser lido como a caixa de seleção ("Activity
+            History - Disable"), não como a chave de predefinição ("WPFTweaksActivity"). Recai
+            na própria chave quando as configurações não estão disponíveis (execuções sem interface,
+            testes) ou quando a entrada não tem rótulo, para que os chamadores não precisem de
+            verificações de existência. Consulta pura de dados, segura para chamar de um worker de job.
     #>
     param(
         [Parameter(Mandatory)]

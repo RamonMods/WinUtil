@@ -9,8 +9,8 @@ export default defineConfig({
 	site: 'https://github.com/RamonMods/WinUtil/',
 	integrations: [
 		starlight({
-			title: 'WinUtil',
-			description: "Ramon's Windows Utility — install apps, apply tweaks, run fixes, and manage Windows from one place.",
+			title: 'WinUtil — Utilitário para Windows',
+			description: 'O utilitário do Ramon para Windows — instale aplicativos, aplique ajustes, rode correções e gerencie o Windows em um só lugar.',
 			logo: {
 				src: './src/assets/branding/navlogo.png',
 				replacesTitle: true,
@@ -26,9 +26,9 @@ export default defineConfig({
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RamonMods/WinUtil' },
 				{ icon: 'discord', label: 'Discord', href: 'https://github.com/RamonMods/WinUtil' },
 			],
-			// Global theme overrides (colors, fonts, landing-page section styles).
+			// Sobrescritas de tema globais (cores, fontes, estilos das seções da página inicial).
 			customCss: ['./src/styles/theme.css'],
-			// Component overrides, all under src/components/overrides/.
+			// Sobrescritas de componentes, todas em src/components/overrides/.
 			components: {
 				ThemeProvider: './src/components/overrides/ThemeProvider.astro',
 				Header: './src/components/overrides/Header.astro',
@@ -45,50 +45,50 @@ export default defineConfig({
 			editLink: {
 				baseUrl: 'https://github.com/RamonMods/WinUtil/edit/main/docs/',
 			},
-			// Sidebar groups, top to bottom: User Guide, Code Reference, Help, Tools.
+			// Grupos da barra lateral, de cima para baixo: Guia do Usuário, Referência de código, Ajuda, Ferramentas.
 			sidebar: [
 				{
-					label: 'User Guide',
+					label: 'Guia do Usuário',
 					items: [
-						{ label: 'Overview', slug: 'guides' },
-						{ label: 'Getting Started', slug: 'guides/getting-started' },
-						{ label: 'Applications', slug: 'guides/application' },
-						{ label: 'Tweaks', slug: 'guides/tweaks' },
-						{ label: 'Features', slug: 'guides/features' },
-						{ label: 'Updates', slug: 'guides/updates' },
-						{ label: 'Automation', slug: 'guides/automation' },
-						{ label: 'Win11 Creator', slug: 'guides/win11creator' },
+						{ label: 'Visão geral', slug: 'guides' },
+						{ label: 'Primeiros passos', slug: 'guides/getting-started' },
+						{ label: 'Aplicativos', slug: 'guides/application' },
+						{ label: 'Ajustes', slug: 'guides/tweaks' },
+						{ label: 'Recursos', slug: 'guides/features' },
+						{ label: 'Atualizações', slug: 'guides/updates' },
+						{ label: 'Automação', slug: 'guides/automation' },
+						{ label: 'Criador do Win11', slug: 'guides/win11creator' },
 					],
 				},
 				{
-					label: 'Code Reference',
+					label: 'Referência de código',
 					items: [
-						{ label: 'Architecture & Design', slug: 'code-reference/architecture' },
-						{ label: 'Issue Triage Commands', slug: 'code-reference/issue-triage' },
-						{ label: 'Tweaks Reference', items: [{ autogenerate: { directory: 'code-reference/tweaks' } }] },
-						{ label: 'Features Reference', items: [{ autogenerate: { directory: 'code-reference/features' } }] },
+						{ label: 'Arquitetura e design', slug: 'code-reference/architecture' },
+						{ label: 'Comandos de triagem de issues', slug: 'code-reference/issue-triage' },
+						{ label: 'Referência de ajustes', items: [{ autogenerate: { directory: 'code-reference/tweaks' } }] },
+						{ label: 'Referência de recursos', items: [{ autogenerate: { directory: 'code-reference/features' } }] },
 					],
 				},
 				{
-					label: 'Help',
+					label: 'Ajuda',
 					items: [
-						{ label: 'FAQ', slug: 'faq' },
-						{ label: 'Known Issues', slug: 'knownissues' },
-						{ label: 'Contributing', slug: 'contributing' },
+						{ label: 'Perguntas frequentes', slug: 'faq' },
+						{ label: 'Problemas conhecidos', slug: 'knownissues' },
+						{ label: 'Como contribuir', slug: 'contributing' },
 						{ label: siteLinks.forums.label, link: siteLinks.forums.href, attrs: { target: '_blank', rel: 'noreferrer' } },
 					],
 				},
 				{
-					label: 'Tools',
+					label: 'Ferramentas',
 					items: [
-						{ label: 'Config Builder', slug: 'config-builder' },
-						{ label: 'Tweak Explorer', slug: 'tweak-explorer' },
+						{ label: 'Construtor de configuração', slug: 'config-builder' },
+						{ label: 'Explorador de ajustes', slug: 'tweak-explorer' },
 					],
 				},
 				{ label: siteLinks.store.label, link: siteLinks.store.href, attrs: { target: '_blank', rel: 'noreferrer' } },
 			],
 		}),
-		// React components for the docs UI and landing page.
+		// Componentes React para a interface dos docs e a página inicial.
 		react(),
 	],
 });

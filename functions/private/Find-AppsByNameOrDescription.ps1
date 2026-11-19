@@ -1,28 +1,28 @@
 function Find-AppsByNameOrDescription {
     <#
         .SYNOPSIS
-            Filters the Install tab entries by search text and by category
+            Filtra as entradas da aba Instalar por texto de busca e por categoria
 
         .DESCRIPTION
-            Search text and categories are independent filters that both have to pass. An entry is
-            shown when its name, description, or application preset key matches the search text, and
-            when its category is in the selected set. An empty search matches everything, and an empty
-            category set matches every category.
+            Texto de busca e categorias são filtros independentes que precisam passar juntos. Uma entrada
+            é exibida quando seu nome, descrição ou chave de predefinição do aplicativo corresponde ao texto
+            buscado, e quando sua categoria está no conjunto selecionado. Uma busca vazia corresponde a
+            tudo, e um conjunto de categorias vazio corresponde a todas as categorias.
 
-            While either filter is active the matching categories are expanded, since a collapsed
-            category would otherwise hide the very results that were asked for. With no filter at
-            all the collapsed state the user set is restored.
+            Enquanto um dos filtros está ativo, as categorias correspondentes são expandidas, já que uma
+            categoria recolhida esconderia justamente os resultados pedidos. Sem nenhum filtro,
+            o estado recolhido definido pelo usuário é restaurado.
 
         .PARAMETER SearchString
-            The string to search for. Wildcards are treated as literal characters.
+            O texto a buscar. Curingas são tratados como caracteres literais.
 
         .PARAMETER Categories
-            The categories to show. An empty or missing array shows all of them.
+            As categorias a exibir. Uma matriz vazia ou ausente exibe todas.
 
         .NOTES
-            - Uses module-scope $sync (no parameter needed; inherits from caller's scope)
-            - Safely handles missing hashtable keys and null UI elements
-            - Protected by try/catch to prevent UI thread crashes
+            - Usa $sync no escopo do módulo (sem parâmetro; herda do escopo do chamador)
+            - Trata com segurança chaves ausentes na hashtable e elementos de interface nulos
+            - Protegido por try/catch para evitar quedas da thread de interface
     #>
     param(
         [Parameter(Mandatory = $false)]
@@ -32,23 +32,23 @@ function Find-AppsByNameOrDescription {
         [string[]]$Categories = @()
     )
 
-    # Validate that $sync exists and has required structure
+    # Valida que $sync existe e tem a estrutura necessária
     if ($null -eq $sync) {
-        Write-Warning "Find-AppsByNameOrDescription: Global `$sync not found. Aborting search."
+        Write-Warning "Find-AppsByNameOrDescription: `$sync global não encontrado. Abortando a busca."
         return
     }
 
     if ($null -eq $sync.ItemsControl) {
-        Write-Warning "Find-AppsByNameOrDescription: `$sync.ItemsControl not initialized. Aborting search."
+        Write-Warning "Find-AppsByNameOrDescription: `$sync.ItemsControl não inicializado. Abortando a busca."
         return
     }
 
     if ($null -eq $sync.configs -or $null -eq $sync.configs.applicationsHashtable) {
-        Write-Warning "Find-AppsByNameOrDescription: `$sync.configs.applicationsHashtable not initialized. Aborting search."
+        Write-Warning "Find-AppsByNameOrDescription: `$sync.configs.applicationsHashtable não inicializado. Abortando a busca."
         return
     }
 
-    # Categories that filtering expanded on the user's behalf, so clearing the filter can undo it
+    # Categorias que a filtragem expandiu em nome do usuário, para que limpar o filtro possa desfazer isso
     if ($null -eq $sync.AppCategoryAutoExpanded) {
         $sync.AppCategoryAutoExpanded = @{}
     }
@@ -58,7 +58,7 @@ function Find-AppsByNameOrDescription {
         $hasSearch = -not [string]::IsNullOrWhiteSpace($SearchString)
         $hasCategories = $activeCategories.Count -gt 0
 
-        # Nothing is filtered, so put every entry back and leave the collapsed categories collapsed
+        # Nada está filtrado, então devolve todas as entradas e deixa as categorias recolhidas recolhidas
         if (-not $hasSearch -and -not $hasCategories) {
             $sync.ItemsControl.Items | ForEach-Object {
                 $_.Visibility = [Windows.Visibility]::Visible
@@ -69,7 +69,7 @@ function Find-AppsByNameOrDescription {
 
                     $categoryLabel.Visibility = [Windows.Visibility]::Visible
 
-                    # A category that filtering expanded goes back to how the user left it
+                    # Uma categoria que a filtragem expandiu volta a como o usuário a deixou
                     $categoryName = $categoryLabel.Content -replace '^[+-] ', ''
                     if ($sync.AppCategoryAutoExpanded.ContainsKey($categoryName)) {
                         $categoryLabel.Content = $categoryLabel.Content -replace "^- ", "+ "
@@ -91,7 +91,7 @@ function Find-AppsByNameOrDescription {
             return
         }
 
-        # IndexOf with OrdinalIgnoreCase is faster than -like with wildcard escaping
+        # IndexOf com OrdinalIgnoreCase é mais rápido que -like com escape de curinga
         $sync.ItemsControl.Items | ForEach-Object {
             if ($_.Children.Count -ge 2) {
                 $categoryLabel = $_.Children[0]
@@ -127,8 +127,8 @@ function Find-AppsByNameOrDescription {
                 if ($categoryHasMatch) {
                     $wrapPanel.Visibility = [Windows.Visibility]::Visible
                     $_.Visibility = [Windows.Visibility]::Visible
-                    # Expand it, otherwise the matches stay hidden behind a collapsed header.
-                    # Remember that it was collapsed so clearing the filter can put it back.
+                    # Expande, senão os resultados ficam escondidos atrás de um cabeçalho recolhido.
+                    # Lembra que estava recolhida para que limpar o filtro possa restaurá-la.
                     if ($categoryLabel.Content -like "+*") {
                         $categoryLabel.Content = $categoryLabel.Content -replace "^\+ ", "- "
                         $sync.AppCategoryAutoExpanded[($categoryLabel.Content -replace '^- ', '')] = $true
@@ -141,8 +141,8 @@ function Find-AppsByNameOrDescription {
         }
     }
     catch {
-        Write-Warning "Find-AppsByNameOrDescription: An error occurred during search: $_"
-        # Fail gracefully - do not crash the UI thread
+        Write-Warning "Find-AppsByNameOrDescription: ocorreu um erro durante a busca: $_"
+        # Falha com elegância - não derrube a thread da interface
         return
     }
 }

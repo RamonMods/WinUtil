@@ -6,7 +6,7 @@ function Set-WinUtilWorkingView {
         .DESCRIPTION
             Enquanto uma execução longa está em andamento, o conteúdo da aba é substituído
             pela seta giratória centralizada e pelo status atual abaixo dela, espelhando
-            a página de trabalho do Criador do Win11. A barra de progresso inferior continua
+            a página de trabalho do Criar Win11. A barra de progresso inferior continua
             reportando como antes.
 
             As áreas mapeiam nomes de job para abas: Install cobre Install/Uninstall/

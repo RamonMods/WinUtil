@@ -1,29 +1,29 @@
 ---
-title: Documentation
-description: Ramon's Windows Utility — install apps, apply tweaks, run fixes, and manage Windows from one place.
+title: Documentação
+description: O utilitário Windows do Ramon — instale apps, aplique ajustes, execute correções e gerencie o Windows em um só lugar.
 template: splash
 editUrl: false
-heroEyebrow: Open Source Windows Setup Utility
-heroCaption: Free. Open source. No installer, no telemetry, no bloat.
+heroEyebrow: Utilitário de configuração do Windows de código aberto
+heroCaption: Gratuito. Código aberto. Sem instalador, sem telemetria, sem excesso de programas.
 heroBadges:
   - src: https://img.shields.io/github/v/release/RamonMods/winutil?color=%230567ff&label=Latest%20Release&style=for-the-badge
-    alt: Latest release
+    alt: Última versão
     href: https://github.com/RamonMods/WinUtil/releases/latest
   - src: https://img.shields.io/github/downloads/RamonMods/winutil/winutil.ps1?label=Total%20Downloads&style=for-the-badge
-    alt: Total downloads
+    alt: Total de downloads
   - src: https://github.com/RamonMods/WinUtil
-    alt: Discord community server
+    alt: Comunidade no GitHub
     href: https://github.com/RamonMods/WinUtil
 hero:
-  title: Set up Windows the way you actually want it
-  tagline: Install apps, apply tweaks, run fixes, and manage Windows updates — all from one script, one window, no fuss.
+  title: Configure o Windows do jeito que você realmente quer
+  tagline: Instale apps, aplique ajustes, execute correções e gerencie as atualizações do Windows — tudo em um script, uma janela, sem complicação.
   image:
     file: ../../assets/branding/title-screen.png
   actions:
-    - text: Get Started
+    - text: Começar
       link: /guides/
       icon: right-arrow
-    - text: View on GitHub
+    - text: Ver no GitHub
       link: https://github.com/RamonMods/WinUtil
       icon: external
       variant: secondary
@@ -31,12 +31,12 @@ head:
   - tag: meta
     attrs:
       property: og:title
-      content: Documentation | WinUtil
+      content: Documentação | WinUtil
   - tag: meta
     attrs:
       name: twitter:title
-      content: Documentation | WinUtil
-  # Lets the hero start hidden for its entrance animation; see "Landing motion" in theme.css.
+      content: Documentação | WinUtil
+  # Deixa o hero começar oculto para a animação de entrada; veja "Landing motion" em theme.css.
   - tag: script
     content: |
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('wu-motion');
@@ -48,7 +48,7 @@ head:
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "WinUtil",
-        "description": "Ramon's Windows Utility — install apps, apply tweaks, run fixes, and manage Windows from one place.",
+        "description": "O utilitário Windows do Ramon — instale apps, aplique ajustes, execute correções e gerencie o Windows em um só lugar.",
         "url": "https://github.com/RamonMods/WinUtil/",
         "downloadUrl": "https://github.com/RamonMods/WinUtil",
         "operatingSystem": "Windows",
@@ -72,180 +72,180 @@ import LandingGlowCard from '../../components/landing/LandingGlowCard.jsx';
 import LandingMotion from '../../components/landing/LandingMotion.astro';
 import LandingStats from '../../components/landing/LandingStats.astro';
 
-{/* Trust bar: icon + label chips under the hero. */}
+{/* Barra de confiança: chips com ícone + rótulo sob o hero. */}
 <section class="wu-section wu-section--trust">
 	<div class="wu-trust-bar">
-		<span class="wu-trust-item"><Icon name="github" /> Open source</span>
-		<span class="wu-trust-item"><Icon name="download" /> No installer</span>
-		<span class="wu-trust-item"><Icon name="padlock" /> No telemetry added</span>
-		<span class="wu-trust-item"><Icon name="approve-check-circle" /> Review tweaks before applying</span>
-		<span class="wu-trust-item"><Icon name="desktop" /> Windows 11 ready</span>
+		<span class="wu-trust-item"><Icon name="github" /> Código aberto</span>
+		<span class="wu-trust-item"><Icon name="download" /> Sem instalador</span>
+		<span class="wu-trust-item"><Icon name="padlock" /> Nenhuma telemetria adicionada</span>
+		<span class="wu-trust-item"><Icon name="approve-check-circle" /> Revise os ajustes antes de aplicar</span>
+		<span class="wu-trust-item"><Icon name="desktop" /> Pronto para o Windows 11</span>
 	</div>
 </section>
 
-{/* Stats row: reference-page counts. */}
+{/* Linha de estatísticas: contagens das páginas de referência. */}
 <section class="wu-section wu-section--stats">
 	<LandingStats />
 </section>
 
-{/* Problem section: pain points WinUtil solves. */}
+{/* Seção de problemas: dores que o WinUtil resolve. */}
 <section class="wu-section wu-section--tint">
 	<div class="wu-section-inner wu-text-narrow">
 		<div class="wu-section-head wu-align-left">
-			<h2>Windows setup is easy to start and tedious to finish</h2>
-			<p>A fresh install works fine out of the box. Getting it configured the way you actually want takes an afternoon of registry edits, forum posts, and forgotten steps.</p>
+			<h2>Configurar o Windows é fácil de começar e chato de terminar</h2>
+			<p>Uma instalação limpa funciona bem logo de cara. Deixá-la configurada do jeito que você realmente quer leva uma tarde inteira de edições no registro, posts em fóruns e passos esquecidos.</p>
 		</div>
 		<ul class="wu-problem-list">
-			<li><span class="wu-bullet"><Icon name="warning" /></span> Essential apps mean a dozen separate installers, each with its own bundled toolbar to decline.</li>
-			<li><span class="wu-bullet"><Icon name="warning" /></span> Privacy and telemetry settings are scattered across half a dozen different settings panels.</li>
-			<li><span class="wu-bullet"><Icon name="warning" /></span> The tweaks worth applying live in year-old forum threads, mixed in with outdated or risky advice.</li>
-			<li><span class="wu-bullet"><Icon name="warning" /></span> Undoing a tweak means remembering exactly what you changed and how.</li>
-			<li><span class="wu-bullet"><Icon name="warning" /></span> Doing it all again on the next machine means starting from zero.</li>
+			<li><span class="wu-bullet"><Icon name="warning" /></span> Apps essenciais significam uma dúzia de instaladores separados, cada um com sua própria barra de ferramentas empacotada para recusar.</li>
+			<li><span class="wu-bullet"><Icon name="warning" /></span> As configurações de privacidade e telemetria estão espalhadas por meia dúzia de painéis de configuração diferentes.</li>
+			<li><span class="wu-bullet"><Icon name="warning" /></span> Os ajustes que valem a pena estão em tópicos de fórum de anos atrás, misturados com conselhos desatualizados ou arriscados.</li>
+			<li><span class="wu-bullet"><Icon name="warning" /></span> Desfazer um ajuste significa lembrar exatamente o que você mudou e como.</li>
+			<li><span class="wu-bullet"><Icon name="warning" /></span> Fazer tudo de novo na próxima máquina significa começar do zero.</li>
 		</ul>
 	</div>
 </section>
 
-{/* Solution grid: how WinUtil addresses each problem above. */}
+{/* Grade de soluções: como o WinUtil resolve cada problema acima. */}
 <section class="wu-section">
 	<div class="wu-section-inner">
 		<div class="wu-section-head">
-			<h2>WinUtil puts a real control panel on top of Windows</h2>
-			<p>Instead of stitching together installers, registry hacks, and forum wisdom, you manage the whole setup from one window.</p>
+			<h2>O WinUtil coloca um painel de controle de verdade sobre o Windows</h2>
+			<p>Em vez de juntar instaladores, truques de registro e sabedoria de fórum, você gerencia a configuração inteira em uma única janela.</p>
 		</div>
 		<div class="wu-solution-grid">
 			<LandingGlowCard client:visible className="wu-solution">
 				<div class="wu-solution-icon"><Icon name="download" /></div>
-				<h3>Install without the bloat</h3>
-				<p>WinGet and Chocolatey install clean builds of your everyday apps, with no bundled toolbars or bundled offers.</p>
+				<h3>Instale sem o excesso de programas</h3>
+				<p>WinGet e Chocolatey instalam versões limpas dos seus apps do dia a dia, sem barras de ferramentas nem ofertas empacotadas.</p>
 			</LandingGlowCard>
 			<LandingGlowCard client:visible className="wu-solution">
 				<div class="wu-solution-icon"><Icon name="setting" /></div>
-				<h3>Tweak with a checkbox</h3>
-				<p>Essential and advanced tweaks for privacy, performance, and UI behavior are one click away, grouped by what they actually do.</p>
+				<h3>Ajuste com uma caixa de seleção</h3>
+				<p>Ajustes essenciais e avançados de privacidade, desempenho e comportamento da interface estão a um clique, agrupados pelo que realmente fazem.</p>
 			</LandingGlowCard>
 			<LandingGlowCard client:visible className="wu-solution">
 				<div class="wu-solution-icon"><Icon name="approve-check-circle" /></div>
-				<h3>Undo what you don't like</h3>
-				<p>Nearly every tweak can be reverted from the same panel, so trying something risky doesn't mean a full reinstall.</p>
+				<h3>Desfaça o que você não gostou</h3>
+				<p>Quase todo ajuste pode ser revertido no mesmo painel, então testar algo arriscado não significa reinstalar tudo.</p>
 			</LandingGlowCard>
 			<LandingGlowCard client:visible className="wu-solution">
 				<div class="wu-solution-icon"><Icon name="server" /></div>
-				<h3>Fix what's broken</h3>
-				<p>One-click repairs for networking, Windows Update, and WinGet handle the fixes people usually paste from a forum thread.</p>
+				<h3>Conserte o que está quebrado</h3>
+				<p>Correções em um clique para rede, Windows Update e WinGet resolvem o que as pessoas normalmente copiam de um tópico de fórum.</p>
 			</LandingGlowCard>
 			<LandingGlowCard client:visible className="wu-solution">
 				<div class="wu-solution-icon"><Icon name="cloud-download" /></div>
-				<h3>Manage updates your way</h3>
-				<p>Switch between full updates, security-only updates, or fully paused — and back again — without digging through Group Policy.</p>
+				<h3>Gerencie atualizações do seu jeito</h3>
+				<p>Alterne entre atualizações completas, somente de segurança ou totalmente pausadas — e volte atrás — sem mexer na Diretiva de Grupo.</p>
 			</LandingGlowCard>
 			<LandingGlowCard client:visible className="wu-solution">
 				<div class="wu-solution-icon"><Icon name="desktop" /></div>
-				<h3>Build your own ISO</h3>
-				<p>Win11 Creator debloats and preconfigures an official Microsoft image, so new installs start from your baseline.</p>
+				<h3>Crie sua própria ISO</h3>
+				<p>O Criador do Win11 remove programas indesejados e pré-configura uma imagem oficial da Microsoft, para que novas instalações comecem da sua base.</p>
 			</LandingGlowCard>
 		</div>
 	</div>
 </section>
 
-{/* Feature grid: CornerCard highlights. */}
+{/* Grade de recursos: destaques dos CornerCard. */}
 <section class="wu-section wu-section--tint wu-section--features">
 	<div class="wu-section-inner">
 		<div class="wu-section-head">
-			<h2>Everything you need to set up a machine, once</h2>
+			<h2>Tudo o que você precisa para configurar uma máquina, de uma vez</h2>
 		</div>
 		<div class="wu-feature-grid">
-			<CornerCard icon="padlock" title="Nothing phones home">
-				WinUtil doesn't collect or transmit anything. It's a script that runs, makes the changes you selected, and exits.
+			<CornerCard icon="padlock" title="Nada liga para casa">
+				O WinUtil não coleta nem transmite nada. É um script que roda, faz as alterações que você selecionou e termina.
 			</CornerCard>
-			<CornerCard icon="approve-check-circle" title="Reversible by default">
-				Tweaks are applied through documented, undoable actions instead of one-way registry edits.
+			<CornerCard icon="approve-check-circle" title="Reversível por padrão">
+				Os ajustes são aplicados por ações documentadas e reversíveis, em vez de edições de registro sem volta.
 			</CornerCard>
-			<CornerCard icon="setting" title="Grouped presets">
-				Minimal, Standard, and Advanced presets give you a sane starting point instead of picking through every tweak individually.
+			<CornerCard icon="setting" title="Predefinições agrupadas">
+				As predefinições Mínimo, Padrão e Avançado dão um ponto de partida sensato em vez de obrigar você a escolher cada ajuste individualmente.
 			</CornerCard>
-			<CornerCard icon="cloud-download" title="WinGet & Chocolatey">
-				Application installs go through package managers you can audit, not opaque bundled installers.
+			<CornerCard icon="cloud-download" title="WinGet e Chocolatey">
+				As instalações de aplicativos passam por gerenciadores de pacotes que você pode auditar, não por instaladores opacos empacotados.
 			</CornerCard>
-			<CornerCard icon="server" title="Automation-friendly">
-				Drive WinUtil unattended with config files and parameters for repeatable rollouts across machines.
+			<CornerCard icon="server" title="Compatível com automação">
+				Controle o WinUtil sem assistência com arquivos de configuração e parâmetros, para implantações repetíveis em várias máquinas.
 			</CornerCard>
-			<CornerCard icon="desktop" title="Custom Win11 ISOs">
-				Debloat and preconfigure a Windows 11 image before it's ever installed.
+			<CornerCard icon="desktop" title="ISOs do Win11 personalizadas">
+				Remova programas indesejados e pré-configure uma imagem do Windows 11 antes mesmo de instalá-la.
 			</CornerCard>
 		</div>
 	</div>
 </section>
 
-{/* Step timeline: quick-start walkthrough + secondary CTA. */}
+{/* Linha do tempo: guia de início rápido + CTA secundário. */}
 <section class="wu-section">
 	<div class="wu-section-inner">
 		<div class="wu-section-head">
-			<h2>From a blank terminal to a configured PC</h2>
+			<h2>De um terminal vazio a um PC configurado</h2>
 		</div>
 		<div class="wu-timeline">
 			<div class="wu-timeline-progress" aria-hidden="true"></div>
 			<div class="wu-timeline-step">
 				<span class="wu-timeline-number">1</span>
-				<h3>Open PowerShell as Administrator</h3>
-				<p>Right-click the Start button and choose Terminal (Admin), or launch PowerShell and elevate manually.</p>
+				<h3>Abra o PowerShell como Administrador</h3>
+				<p>Clique com o botão direito no botão Iniciar e escolha Terminal (Admin), ou abra o PowerShell e eleve manualmente.</p>
 			</div>
 			<div class="wu-timeline-step">
 				<span class="wu-timeline-number">2</span>
-				<h3>Run the launch command</h3>
-				<p>Downloads and starts the latest release.</p>
+				<h3>Execute o comando de inicialização</h3>
+				<p>Baixa e inicia a versão mais recente.</p>
 				<Code code={'irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1" | iex'} lang="powershell" />
 			</div>
 			<div class="wu-timeline-step">
 				<span class="wu-timeline-number">3</span>
-				<h3>Install, tweak, fix, update</h3>
-				<p>Work through the Install, Tweaks, Config, and Updates tabs — everything is undoable.</p>
+				<h3>Instale, ajuste, corrija, atualize</h3>
+				<p>Passe pelas abas Instalar, Ajustes, Configurações e Atualizações — tudo pode ser desfeito.</p>
 			</div>
 		</div>
 		<div class="wu-cta" style="margin-top: 3rem;">
 			<a class="wu-btn wu-btn-secondary" href="/guides/">
-				{'Read the Docs'}
+				{'Ler a documentação'}
 				<Icon name="right-arrow" size="1.5em" class="wu-icon-arrow" />
 			</a>
 		</div>
 	</div>
 </section>
 
-{/* Benefit checklist. */}
+{/* Checklist de benefícios. */}
 <section class="wu-section wu-section--tint">
 	<div class="wu-section-inner wu-text-narrow">
 		<div class="wu-section-head wu-align-left">
-			<h2>Built for the gap between a fresh install and a finished machine</h2>
-			<p>Registry edits and PowerShell one-liners work. WinUtil makes them repeatable.</p>
+			<h2>Feito para o intervalo entre uma instalação limpa e uma máquina pronta</h2>
+			<p>Edições de registro e comandos de uma linha em PowerShell funcionam. O WinUtil os torna repetíveis.</p>
 		</div>
 		<ul class="wu-benefit-list">
-			<li><span class="wu-check"><Icon name="approve-check" /></span> You keep full control — every tweak is visible, documented, and reversible.</li>
-			<li><span class="wu-check"><Icon name="approve-check" /></span> You gain a single interface for installs, tweaks, fixes, and updates instead of five different tools.</li>
-			<li><span class="wu-check"><Icon name="approve-check" /></span> You avoid the bundled toolbars and bloat that come with most software installers.</li>
+			<li><span class="wu-check"><Icon name="approve-check" /></span> Você mantém o controle total — cada ajuste é visível, documentado e reversível.</li>
+			<li><span class="wu-check"><Icon name="approve-check" /></span> Você ganha uma única interface para instalações, ajustes, correções e atualizações em vez de cinco ferramentas diferentes.</li>
+			<li><span class="wu-check"><Icon name="approve-check" /></span> Você evita as barras de ferramentas e o excesso de programas que vêm com a maioria dos instaladores de software.</li>
 		</ul>
 	</div>
 </section>
 
-{/* Final CTA. */}
+{/* CTA final. */}
 <section class="wu-section wu-section--cta">
 	<div class="wu-cta-beams" aria-hidden="true"><CtaBeams client:visible /></div>
 	<div class="wu-section-inner wu-text-narrow wu-cta">
-		<h2>Stop hunting for the same fixes every time</h2>
-		<p>Get a script that installs, tweaks, fixes, and updates Windows from one window.</p>
+		<h2>Pare de procurar as mesmas correções toda vez</h2>
+		<p>Tenha um script que instala, ajusta, corrige e atualiza o Windows em uma única janela.</p>
 		<div class="wu-btn-row">
 			<a class="wu-btn wu-btn-primary" href="/guides/">
-				{'Get Started'}
+				{'Começar'}
 				<Icon name="right-arrow" size="1.5em" class="wu-icon-arrow" />
 			</a>
 			<a class="wu-btn wu-btn-secondary" href="https://github.com/RamonMods/WinUtil">
 				<Icon name="github" />
-				{' View on GitHub'}
+				{' Ver no GitHub'}
 			</a>
 		</div>
-		<p class="wu-cta-footnote">Free and open source. No installer, no telemetry, no account required.</p>
+		<p class="wu-cta-footnote">Gratuito e de código aberto. Sem instalador, sem telemetria, sem conta.</p>
 	</div>
 </section>
 
-{/* Closing wordmark. */}
+{/* Marca final. */}
 <div class="wu-outro" aria-hidden="true">
 	<span class="wu-outro-stroke">WinUtil</span>
 	<span class="wu-outro-fill">WinUtil</span>

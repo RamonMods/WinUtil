@@ -1,64 +1,64 @@
 ---
-title: Features
-description: Install optional Windows components and run common repair tasks from the Features and Fixes sections.
+title: Recursos
+description: Instale componentes opcionais do Windows e execute tarefas comuns de reparo nas seções Recursos e Correções.
 sidebar:
   order: 4
 ---
 
-Use the **Features** and **Fixes** sections to install optional Windows components and run common repair tasks.
+Use as seções **Recursos** e **Correções** para instalar componentes opcionais do Windows e executar tarefas comuns de reparo.
 
-This page maps to the **Config** tab in WinUtil. Some actions complete immediately, while others may prompt, download files from Microsoft, or require a restart before the change is fully available.
+Esta página corresponde à aba **Configurações** do WinUtil. Algumas ações terminam na hora, enquanto outras podem pedir confirmação, baixar arquivos da Microsoft ou exigir uma reinicialização antes que a mudança fique totalmente disponível.
 
-![Config tab with features and fixes](../../../assets/screenshots/config-tab-new.png)
+![Aba Configurações com recursos e correções](../../../assets/screenshots/config-tab-new.png)
 
-## Windows Features
+## Recursos do Windows
 
-Install common **Windows features** by selecting the feature checkboxes and clicking **Install Features**.
+Instale **recursos do Windows** comuns marcando as caixas de seleção dos recursos e clicando em **Instalar recursos**.
 
-If a feature depends on Windows installation media or optional downloads, Windows may take longer to finish or request a reboot.
+Se um recurso depender da mídia de instalação do Windows ou de downloads opcionais, o Windows pode levar mais tempo para concluir ou pedir uma reinicialização.
 
-* All .NET Frameworks (2, 3, 4)
-* Hyper-V Virtualization
-* Legacy Media (WMP, DirectPlay)
-* NFS - Network File System
-* Enable Daily Registry Backup Task 12:30 AM
-* Enable Legacy F8 Boot Recovery
-* Disable Legacy F8 Boot Recovery
-* Windows Subsystem for Linux
+* Todos os .NET Frameworks (2, 3, 4)
+* Virtualização Hyper-V
+* Mídia herdada (WMP, DirectPlay)
+* NFS - Sistema de Arquivos de Rede
+* Habilitar tarefa diária de backup do registro às 00:30
+* Habilitar recuperação de inicialização herdada F8
+* Desabilitar recuperação de inicialização herdada F8
+* Subsistema do Windows para Linux
 * Windows Sandbox
 
-## Fixes
+## Correções
 
-Use these one-click fixes for common system problems.
+Use estas correções em um clique para problemas comuns do sistema.
 
-Use these when you have a specific issue to correct, not as a routine cleanup step.
+Use-as quando tiver um problema específico a corrigir, e não como uma etapa de limpeza de rotina.
 
-* Set Up Autologin
-* Reset Windows Update
-* Reset Network
-* System Corruption Scan
-* WinGet Reinstall
+* Configurar login automático
+* Redefinir Windows Update
+* Redefinir rede
+* Verificação de corrupção do sistema
+* Reinstalar o WinGet
 
-## Legacy Windows Panels
+## Painéis herdados do Windows
 
-Open old-school Windows panels directly from WinUtil. Available panels include:
+Abra painéis antigos do Windows diretamente pelo WinUtil. Os painéis disponíveis incluem:
 
-* Control Panel
-* Network Connections
-* Power Panel
-* Region
-* Sound Settings
-* System Properties
-* User Accounts
+* Painel de Controle
+* Conexões de Rede
+* Painel de Energia
+* Região
+* Configurações de Som
+* Propriedades do Sistema
+* Contas de Usuário
 
-## Remote Access
+## Acesso remoto
 
-Enable an OpenSSH server on your Windows machine for remote access.
+Habilite um servidor OpenSSH na sua máquina Windows para acesso remoto.
 
-Only enable this if you intend to use remote shell access. After turning it on, verify your firewall rules and account permissions before exposing the machine to other devices.
+Habilite isso apenas se você pretende usar acesso remoto por shell. Depois de ativá-lo, verifique suas regras de firewall e permissões de conta antes de expor a máquina a outros dispositivos.
 
-Because WinUtil runs elevated, the account it sets up is an administrator, and sshd reads administrator keys from `C:\ProgramData\ssh\administrators_authorized_keys` rather than from your profile. WinUtil creates that file and restricts it to Administrators and SYSTEM, which is what sshd requires. Add your public keys there. If an earlier WinUtil version changed `sshd_config` to read administrator keys from `%USERPROFILE%\.ssh\authorized_keys`, that is undone and any keys in it are copied across, so key auth keeps working.
+Como o WinUtil é executado com privilégios elevados, a conta que ele configura é de administrador, e o sshd lê as chaves de administrador em `C:\ProgramData\ssh\administrators_authorized_keys`, em vez do seu perfil. O WinUtil cria esse arquivo e o restringe a Administradores e SYSTEM, que é o que o sshd exige. Adicione suas chaves públicas lá. Se uma versão anterior do WinUtil alterou o `sshd_config` para ler as chaves de administrador de `%USERPROFILE%\.ssh\authorized_keys`, isso é desfeito e as chaves existentes nele são copiadas, para que a autenticação por chave continue funcionando.
 
-Non-administrator accounts keep using `%USERPROFILE%\.ssh\authorized_keys` and need no extra setup.
+Contas que não são de administrador continuam usando `%USERPROFILE%\.ssh\authorized_keys` e não precisam de configuração extra.
 
-If an optional Windows feature is unavailable or fails to enable, WinUtil logs the failure and continues with the remaining optional features. Dependent setup scripts for that selection are skipped when an optional feature fails. The final job status still reports errors.
+Se um recurso opcional do Windows não estiver disponível ou falhar ao ser habilitado, o WinUtil registra a falha e continua com os recursos opcionais restantes. Os scripts de configuração dependentes dessa seleção são ignorados quando um recurso opcional falha. O status final da tarefa ainda relata os erros.

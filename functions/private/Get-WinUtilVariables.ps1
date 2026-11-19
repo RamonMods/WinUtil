@@ -2,10 +2,10 @@ function Get-WinUtilVariables {
 
     <#
     .SYNOPSIS
-        Gets every form object of the provided type
+        Obtém todos os objetos de formulário do tipo fornecido
 
     .OUTPUTS
-        List containing every object that matches the provided type
+        Lista contendo todos os objetos que correspondem ao tipo fornecido
     #>
     param (
         [Parameter()]

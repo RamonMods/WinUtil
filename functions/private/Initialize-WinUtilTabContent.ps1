@@ -3,8 +3,8 @@ function Initialize-WinUtilTabContent {
         [Parameter(Mandatory = $true)]
         [string]$TabName,
 
-        # Build in batches, letting the interface answer in between. Used by the warmup, which
-        # nobody is waiting on. A tab the user just clicked is built in one go.
+        # Constrói em lotes, deixando a interface responder entre eles. Usado pelo aquecimento, que
+        # ninguém está aguardando. Uma aba que o usuário acabou de clicar é construída de uma vez.
         [switch]$Yield
     )
 
@@ -16,17 +16,17 @@ function Initialize-WinUtilTabContent {
         return
     }
 
-    # Claimed before building, not after: a yielding build lets a click through, and that click
-    # would otherwise start building the same tab a second time.
+    # Reservado antes de construir, não depois: uma construção que cede a vez deixa um clique passar, e esse clique
+    # começaria a construir a mesma aba uma segunda vez.
     $sync.InitializedTabs[$TabName] = $true
 
     try {
         switch ($TabName) {
             "Install" {
-                Measure-WinUtilStep -Scope "UI" -Name "Install tab: category area" -ScriptBlock {
+                Measure-WinUtilStep -Scope "UI" -Name "Aba Instalar: área de categorias" -ScriptBlock {
                     Initialize-WPFUI -targetGridName "appscategory"
                 }
-                Measure-WinUtilStep -Scope "UI" -Name "Install tab: app area" -ScriptBlock {
+                Measure-WinUtilStep -Scope "UI" -Name "Aba Instalar: área de apps" -ScriptBlock {
                     Initialize-WPFUI -targetGridName "appspanel"
                 }
                 Initialize-WinUtilInstallTabControls
@@ -46,11 +46,11 @@ function Initialize-WinUtilTabContent {
                 }
             }
         }
-        # Controls built just now start unchecked, so anything already chosen by an import or a
-        # preset has to be applied to them once they exist
+        # Controles recém-construídos começam desmarcados, então o que já foi escolhido por uma importação ou
+        # predefinição precisa ser aplicado a eles depois que existirem
         Reset-WPFCheckBoxes -doToggles $true
     } catch {
-        # A half built tab must be allowed to rebuild rather than staying empty forever
+        # Uma aba construída pela metade deve poder ser reconstruída em vez de ficar vazia para sempre
         $sync.InitializedTabs[$TabName] = $false
         throw
     }

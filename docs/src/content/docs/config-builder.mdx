@@ -1,6 +1,6 @@
 ---
 title: Config Builder
-description: Pick apps to install, tweaks, features, and AppX packages to remove in the browser and download a config file to run with WinUtil's -Config option.
+description: Escolha apps para instalar, ajustes, recursos e pacotes AppX para remover no navegador e baixe um arquivo de configuração para rodar com a opção -Config do WinUtil.
 template: splash
 prev: false
 next: false
@@ -8,15 +8,15 @@ next: false
 
 import ConfigBuilder from '../../components/config-builder/ConfigBuilder.jsx';
 
-Build a WinUtil configuration file without opening WinUtil. Select what you want, download the file, then run WinUtil with `-Config` as described in [Automation](/guides/automation/).
+Monte um arquivo de configuração do WinUtil sem abrir o WinUtil. Selecione o que quiser, baixe o arquivo e execute o WinUtil com `-Config`, conforme descrito em [Automação](/guides/automation/).
 
-The list is loaded from the latest stable WinUtil release on GitHub. The generated command runs that exact release, so the selected keys remain compatible even if a newer release is published before you run it.
+A lista é carregada da versão estável mais recente do WinUtil no GitHub. O comando gerado executa exatamente essa versão, então as chaves selecionadas continuam compatíveis mesmo que uma versão mais nova seja publicada antes de você executá-lo.
 
 <ConfigBuilder client:load />
 
-- **Standard**, **Minimal**, and **Advanced** replace the selected tweaks with that preset, the same as the preset buttons in WinUtil. Your toggles and other selections stay as they are.
-- Toggles under **Customize Preferences** are switched on when the config runs. A config cannot switch a toggle off.
-- **AppX removal** selects packages to remove when the config runs. **Default removals** selects WinUtil's default removal list; it does not install or keep those apps.
-- **Share link** copies a link with your selections in it. Opening the link selects the same items, so it's an easy way to post a setup without passing a file around.
-- **Open a config** loads an exported file so you can change it. Keys that the current release does not have are listed and left out, which is also a quick way to fix an `Unknown selection key` error.
-- If your browser saves downloads somewhere other than your `Downloads` folder, change the path in the command to match.
+- **Padrão**, **Mínimo** e **Avançado** substituem os ajustes selecionados por essa predefinição, igual aos botões de predefinição no WinUtil. Seus interruptores e outras seleções continuam como estão.
+- Os interruptores em **Personalizar preferências** são ativados quando a configuração é executada. Uma configuração não consegue desativar um interruptor.
+- **Remoção de AppX** seleciona os pacotes a remover quando a configuração é executada. **Remoções padrão** seleciona a lista de remoção padrão do WinUtil; ela não instala nem mantém esses apps.
+- **Compartilhar link** copia um link com suas seleções. Abrir o link seleciona os mesmos itens, o que é um jeito fácil de divulgar uma configuração sem passar um arquivo adiante.
+- **Abrir uma configuração** carrega um arquivo exportado para você alterá-lo. As chaves que a versão atual não possui são listadas e descartadas, o que também é uma forma rápida de corrigir um erro `Unknown selection key`.
+- Se o seu navegador salva downloads em outro lugar que não a pasta `Downloads`, altere o caminho no comando para corresponder.

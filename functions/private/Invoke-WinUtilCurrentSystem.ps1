@@ -3,7 +3,7 @@ Function Invoke-WinUtilCurrentSystem {
     <#
 
     .SYNOPSIS
-        Checks to see what tweaks have already been applied and what programs are installed, and checks the according boxes
+        Verifica quais ajustes já foram aplicados e quais programas estão instalados, e marca as caixas de seleção correspondentes
 
     .EXAMPLE
         InvokeWinUtilCurrentSystem -Checkbox "winget"
@@ -24,8 +24,8 @@ Function Invoke-WinUtilCurrentSystem {
             }
         }
 
-        # Apps without a Chocolatey package are installed through WinGet (see Get-WinUtilSelectedPackages),
-        # so check those against one winget list
+        # Aplicativos sem pacote Chocolatey são instalados pelo WinGet (veja Get-WinUtilSelectedPackages),
+        # então verifique-os com um único winget list
         $wingetFallbackKeys = @($sync.configs.applicationsHashtable.GetEnumerator() | Where-Object {
             ([string]::IsNullOrWhiteSpace([string]$_.Value.choco) -or $_.Value.choco -eq "na") -and
             -not ([string]::IsNullOrWhiteSpace([string]$_.Value.winget) -or $_.Value.winget -eq "na")
@@ -34,7 +34,7 @@ Function Invoke-WinUtilCurrentSystem {
             try {
                 Invoke-WinUtilCurrentSystem -CheckBox "winget" | Where-Object { $_ -in $wingetFallbackKeys }
             } catch {
-                Write-Warning "Could not check apps installed through WinGet: $($_.Exception.Message)"
+                Write-Warning "Não foi possível verificar os aplicativos instalados pelo WinGet: $($_.Exception.Message)"
             }
         }
     }
@@ -45,15 +45,15 @@ Function Invoke-WinUtilCurrentSystem {
             [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
             $installedProgramOutput = @(winget list --accept-source-agreements --disable-interactivity 2>&1)
             if ($LASTEXITCODE -ne 0) {
-                throw "winget list failed with exit code $LASTEXITCODE."
+                throw "winget list falhou com o código de saída $LASTEXITCODE."
             }
         } finally {
             [Console]::OutputEncoding = $originalEncoding
         }
         $installedProgramText = $installedProgramOutput -join "`n"
 
-        # winget pads each column to its widest value plus one space, so the row with the widest Name or Id
-        # has only one space next to its Id. Take the Id column position from the header above the dashes.
+        # o winget preenche cada coluna até o valor mais largo mais um espaço, então a linha com o Name ou Id
+        # mais largo tem apenas um espaço ao lado do seu Id. Pegue a posição da coluna Id do cabeçalho acima dos traços.
         $idColumnStart = 0
         if ($installedProgramText -match '(?m)^(\S+[^\S\r\n]+)\S[^\r\n]*\r?\n-{3,}') {
             $idColumnStart = $Matches[1].Length
@@ -67,7 +67,7 @@ Function Invoke-WinUtilCurrentSystem {
 
             $escapedPackageId = [regex]::Escape($packageId)
             $packagePattern = "(?im)[^\S\r\n]{2,}$escapedPackageId(?=[^\S\r\n]{2,}|$)"
-            # Skip rows whose Name has combining marks or emoji: they are more characters than columns and shift the offset
+            # Ignora linhas cujo Name tenha marcas combinantes ou emoji: são mais caracteres que colunas e deslocam o offset
             $idColumnPattern = "(?im)(?<=^[^\r\n\p{M}\p{Cs}\p{Cf}]{$($idColumnStart - 1)}[^\S\r\n])$escapedPackageId(?=[^\S\r\n]|$)"
             if ($installedProgramText -match $packagePattern -or ($idColumnStart -and $installedProgramText -match $idColumnPattern)) {
                 Write-Output $app.Key
@@ -138,8 +138,8 @@ Function Invoke-WinUtilCurrentSystem {
                             $Service = Get-Service -Name $tweak.Name -ErrorAction $readErrorAction
                         } catch {
                             if ($StopOnReadError -and $_.FullyQualifiedErrorId -like "NoServiceFoundForGivenName*") {
-                                # A removed optional service means this tweak is not applied; it does
-                                # not make the registry and service state for every other tweak unknown.
+                                # Um serviço opcional removido significa que este ajuste não está aplicado; isso
+                                # não torna o estado de registro e de serviço de todos os outros ajustes desconhecido.
                                 $allMatch = $false
                                 continue
                             }

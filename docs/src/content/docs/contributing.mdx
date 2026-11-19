@@ -1,57 +1,57 @@
 ---
-title: Contributing
-description: How to test, report issues, and contribute code to WinUtil.
+title: Contribuindo
+description: Como testar, relatar problemas e contribuir com código para o WinUtil.
 ---
 
-## Testing
+## Testes
 
-* Test the latest changes to WinUtil by running the pre-release and reporting issues you are encountering to help us continually improve WinUtil!
+* Teste as mudanças mais recentes do WinUtil executando a pré-versão e relatando os problemas que encontrar, para nos ajudar a melhorar o WinUtil continuamente!
 
-#### Run the latest pre-release
+#### Execute a pré-versão mais recente
 
 ```ps1
 irm https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1dev | iex
 ```
 
 :::caution
-**Keep in mind** That this is a pre-release and should be treated as such. It exists for developers to test the utility and report or fix bugs before they get added to the stable release. Don't use it in production!
+**Lembre-se** de que esta é uma pré-versão e deve ser tratada como tal. Ela existe para que os desenvolvedores testem o utilitário e relatem ou corrijam bugs antes que eles cheguem à versão estável. Não a use em produção!
 :::
 
 ## Issues
 
-* If you encounter any challenges or problems with the script, I kindly request that you submit them via the "Issues" tab on the GitHub repository. By filling out the provided template, you can provide specific details about the issue, allowing me (and others in the community) to promptly address any bugs or consider feature requests.
+* Se você encontrar qualquer dificuldade ou problema com o script, peço gentilmente que o envie pela aba "Issues" do repositório no GitHub. Preenchendo o template fornecido, você pode dar detalhes específicos sobre o problema, permitindo que eu (e outras pessoas da comunidade) resolva rapidamente os bugs ou considere pedidos de recursos.
 
-## Contribute Code
+## Contribuir com código
 
-* Pull requests are now handled directly on the **MAIN branch**. This was done since we can now select specific releases to launch via releases in GitHub.
+* Os pull requests agora são tratados diretamente na **branch MAIN**. Isso foi feito porque agora podemos selecionar versões específicas para executar por meio das releases no GitHub.
 
-* If you're doing code changes, then you can submit a PR to the `main` branch.
+* Se você for fazer mudanças de código, pode enviar um PR para a branch `main`.
 
 :::caution
-Do not use a code formatter, make massive amounts of line changes, or make multiple feature changes. EACH FEATURE CHANGE SHOULD BE ITS OWN PULL REQUEST!
+Não use um formatador de código, não faça quantidades enormes de mudanças de linha nem faça várias mudanças de recursos de uma vez. CADA MUDANÇA DE RECURSO DEVE SER SEU PRÓPRIO PULL REQUEST!
 :::
 
 :::caution
-Do not open a pull request that adds support for other languages to WinUtil for now, until we decide how we want to move forward with language support.
+Não abra um pull request que adicione suporte a outros idiomas ao WinUtil por enquanto, até decidirmos como queremos seguir com o suporte a idiomas.
 :::
 
-* When creating pull requests, it is essential to thoroughly document all changes made. This includes, but is not limited to, documenting any additions made to the `tweaks` section and corresponding `undo tweak`, so users are able to remove the newly added tweaks if necessary, and comprehensive documentation is required for all code changes. Document your changes and briefly explain why you made your changes in your Pull Request Description. Failure to adhere to this format may result in the denial of the pull request. Additionally, any code lacking sufficient documentation may also be denied.
+* Ao criar pull requests, é essencial documentar detalhadamente todas as mudanças feitas. Isso inclui, mas não se limita a, documentar qualquer adição feita à seção `tweaks` e ao `undo tweak` correspondente, para que os usuários consigam remover os ajustes recém-adicionados se necessário, e uma documentação completa é obrigatória para todas as mudanças de código. Documente suas mudanças e explique brevemente por que as fez na descrição do Pull Request. O descumprimento desse formato pode resultar na recusa do pull request. Além disso, qualquer código sem documentação suficiente também pode ser recusado.
 
-* By following these guidelines, we can maintain a high standard of quality and ensure that the codebase remains organized and well-documented.
+* Seguindo estas diretrizes, mantemos um alto padrão de qualidade e garantimos que a base de código continue organizada e bem documentada.
 
 :::note
-When creating a function, please include "WPF" or "WinUtil" in the file name so it can be loaded into the runspace.
+Ao criar uma função, inclua "WPF" ou "WinUtil" no nome do arquivo para que ela seja carregada no runspace.
 :::
 
-## Walk through
+## Passo a passo
 
-* This is a guide for beginners. If you are still having issues, look at the following official GitHub documentation:
-    * [Commit through WEB](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/about-commits)
-    * [Commit through GitHub Desktop](https://docs.github.com/en/desktop/making-changes-in-a-branch/committing-and-reviewing-changes-to-your-project-in-github-desktop#about-commits)
-    * [Create a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
+* Este é um guia para iniciantes. Se você ainda tiver problemas, consulte a seguinte documentação oficial do GitHub:
+    * [Commit pela WEB](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/about-commits)
+    * [Commit pelo GitHub Desktop](https://docs.github.com/en/desktop/making-changes-in-a-branch/committing-and-reviewing-changes-to-your-project-in-github-desktop#about-commits)
+    * [Criar um Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
 
 
-### Overview
+### Visão geral
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "cardinal"}} }%%
@@ -71,55 +71,55 @@ graph TD
 ```
 
 :::note
-This is a diagram to guide you through the process. It may vary depending on the type of change you're making.
+Este é um diagrama para orientar você no processo. Ele pode variar conforme o tipo de mudança que você está fazendo.
 :::
 
-### Fork the Repo
-* Fork the WinUtil Repository [here](https://github.com/RamonMods/WinUtil) to create a copy that will be available in your repository list.
+### Faça um fork do repositório
+* Faça um fork do repositório do WinUtil [aqui](https://github.com/RamonMods/WinUtil) para criar uma cópia que ficará disponível na sua lista de repositórios.
 
 ![Fork Image](../../assets/contributing/Fork-Button-Dark.png)
 
-### Clone the Fork
+### Clone o fork
 :::tip
-While you can make your changes directly through the Web, we recommend cloning the repo to your device using the application GitHub Desktop (available in WinUtil) to test your fork easily.
+Embora você possa fazer suas mudanças direto pela Web, recomendamos clonar o repositório para o seu dispositivo usando o aplicativo GitHub Desktop (disponível no WinUtil) para testar seu fork com facilidade.
 :::
 
-* Install GitHub Desktop if it is not already installed.
-* Log in using the same GitHub account you used to fork WinUtil.
-* Choose the fork under "Your Repositories" and press "clone `{repo name}`"
-* Create a new branch and name it something relatable to your changes.
+* Instale o GitHub Desktop se ele ainda não estiver instalado.
+* Faça login com a mesma conta do GitHub que você usou para fazer o fork do WinUtil.
+* Escolha o fork em "Your Repositories" e pressione "clone `{repo name}`"
+* Crie uma nova branch e dê a ela um nome relacionado às suas mudanças.
 
-* Now you can modify WinUtil to your liking using your preferred text editor.
+* Agora você pode modificar o WinUtil como quiser usando seu editor de texto preferido.
 
 
-### Testing your changes
+### Testando suas mudanças
 
-* To test to see if your changes work as intended, run the following commands in a PowerShell terminal as admin:
+* Para testar se suas mudanças funcionam como esperado, execute os seguintes comandos em um terminal PowerShell como administrador:
 
-* Change the directory where you are running the commands to the forked project.
+* Mude o diretório em que você está executando os comandos para o projeto do fork.
 * `cd {path to the folder with the compile.ps1}`
-* Run the following command to compile and run WinUtil:
+* Execute o comando a seguir para compilar e rodar o WinUtil:
 * `.\Compile.ps1 -run`
 
 ![Compile](../../assets/contributing/Compile.png)
 
-* After seeing that your changes work properly, feel free to commit the changes to the repository and make a PR. For help on that, follow the documentation below.
+* Depois de ver que suas mudanças funcionam corretamente, fique à vontade para enviar as mudanças ao repositório e abrir um PR. Para ajuda nisso, siga a documentação abaixo.
 
-### Committing the changes
-* Before committing your changes, please discard changes made to the `winutil.ps1` file, like the following:
+### Enviando as mudanças
+* Antes de enviar suas mudanças, descarte as alterações feitas no arquivo `winutil.ps1`, como a seguir:
 
 ![Push Commit Image](../../assets/contributing/Discard-GHD.png)
 
-* Now, commit your changes once you are happy with the result.
+* Agora envie suas mudanças quando estiver satisfeito com o resultado.
 
 ![Commit Image](../../assets/contributing/Commit-GHD.png)
 
-* Push the changes to upload them to your fork on GitHub.
+* Faça push das mudanças para enviá-las ao seu fork no GitHub.
 
 ![Push Commit Image](../../assets/contributing/Push-Commit.png)
 
-### Making a PR
-* To make a PR on your repo under a new branch linking to the main branch, a button will show and say Preview and Create pull request. Click that button and fill in all the information that is provided on the template. Once all the information is filled in correctly, check your PR to make sure there is no WinUtil.ps1 file attached to the PR. Once everything is good, make the PR and wait for Chris (the maintainer) to accept or deny your PR. Once it is accepted by Chris, you will be able to see your changes in the "/windev" build.
-* Pay attention to comments that are present in template, some of them tell about proper presentation of your PR, which allows Github to properly label it
-* If you do not see your feature in the main "/win" build, that is fine. All new changes go into the /windev build to make sure everything is working OK before going fully public.
-* Congratulations! You just submitted your first PR. Thank you so much for contributing to WinUtil.
+### Abrindo um PR
+* Para abrir um PR no seu repositório a partir de uma nova branch ligada à branch main, um botão aparecerá dizendo Preview and Create pull request. Clique nesse botão e preencha todas as informações fornecidas no template. Depois de preencher tudo corretamente, verifique seu PR para garantir que não há nenhum arquivo WinUtil.ps1 anexado a ele. Quando tudo estiver certo, abra o PR e aguarde o Ramon (o mantenedor) aceitar ou recusar seu PR. Assim que for aceito pelo Ramon, você poderá ver suas mudanças na build "/windev".
+* Preste atenção aos comentários presentes no template, alguns deles falam sobre a apresentação adequada do seu PR, o que permite que o GitHub o rotule corretamente
+* Se você não vir seu recurso na build principal "/win", não há problema. Todas as novas mudanças vão para a build /windev para garantir que tudo funcione bem antes de ficar totalmente público.
+* Parabéns! Você acabou de enviar seu primeiro PR. Muito obrigado por contribuir com o WinUtil.

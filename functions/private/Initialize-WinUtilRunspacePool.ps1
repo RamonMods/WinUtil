@@ -1,7 +1,7 @@
 function Initialize-WinUtilRunspacePool {
     <#
         .SYNOPSIS
-            Opens the shared worker pool that Start-WinUtilJob runs job bodies in
+            Abre o pool de workers compartilhado em que Start-WinUtilJob executa os corpos dos jobs
     #>
 
     $poolLock = Get-WinUtilRunspacePoolLock
@@ -12,18 +12,18 @@ function Initialize-WinUtilRunspacePool {
         }
 
         if ($sync.runspace) {
-            # A replacement, not a shutdown
+            # Uma substituição, não um encerramento
             Close-WinUtilRunspacePool -Recycle
         }
 
-        # Set the maximum number of threads for the RunspacePool to the number of threads on the machine.
+        # Define o número máximo de threads do RunspacePool como o número de threads da máquina.
         $maxthreads = [Math]::Max([int]$env:NUMBER_OF_PROCESSORS, 1)
 
         $sync.runspace = [runspacefactory]::CreateRunspacePool(
-            1,                            # Minimum thread count
-            $maxthreads,                  # Maximum thread count
-            (New-WinUtilSessionState),    # Initial session state
-            $Host                         # Machine to create runspaces on
+            1,                            # Número mínimo de threads
+            $maxthreads,                  # Número máximo de threads
+            (New-WinUtilSessionState),    # Estado de sessão inicial
+            $Host                         # Máquina em que os runspaces serão criados
         )
 
         $sync.runspace.Open()

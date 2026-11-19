@@ -17,12 +17,12 @@ CCC::::::::::::C         T:::::::::T            T:::::::::T
   CCCCCCCCCCCCC          TTTTTTTTTTT            TTTTTTTTTTT
 
 ====Ramon=====
-=====Windows Toolbox=====
+=====Caixa de Ferramentas do Windows=====
 "@
 
 Write-WinUtilLog -Message "WinUtil $($sync.version) on PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition)), $([Environment]::OSVersion.VersionString), process $PID."
 
-# Load the configuration files
+# Carrega os arquivos de configuração
 
 $sync.configs.applicationsHashtable = @{}
 $sync.configs.applications.PSObject.Properties | ForEach-Object {
@@ -39,12 +39,12 @@ $sync.preferences.packagemanager = "Winget"
 function Remove-WinUtilTempScript {
     <#
     .SYNOPSIS
-        Removes the temporary script downloaded by windev.ps1.
+        Remove o script temporário baixado pelo windev.ps1.
 
     .DESCRIPTION
-        Deletes the current script only when it is a winutil-*.ps1 file in
-        the system temporary directory. This preserves normal file-backed
-        and in-memory WinUtil launches.
+        Exclui o script atual apenas quando ele é um arquivo winutil-*.ps1 no
+        diretório temporário do sistema. Isso preserva as inicializações normais
+        do WinUtil, tanto por arquivo quanto em memória.
     #>
 
     $scriptPath = $PSCommandPath
@@ -60,7 +60,7 @@ function Remove-WinUtilTempScript {
 }
 
 #===========================================================================
-# Headless runs never build a window
+# Execuções headless nunca criam janela
 #===========================================================================
 
 if ($Preset -or $Config) {
@@ -70,28 +70,28 @@ if ($Preset -or $Config) {
 
         if ($Preset) {
             if (-not $sync.configs.preset.$Preset) {
-                throw "There is no preset called '$Preset'. Available: $(($sync.configs.preset.PSObject.Properties.Name) -join ', ')"
+                throw "Não existe uma predefinição chamada '$Preset'. Disponíveis: $(($sync.configs.preset.PSObject.Properties.Name) -join ', ')"
             }
-            Write-WinUtilLog -Component "AutoRun" -Message "Applying preset '$Preset'."
-            # SkipUnknown so a retired entry in a preset is named and stepped over rather than
-            # ending a headless run that has nobody to read the error
+            Write-WinUtilLog -Component "AutoRun" -Message "Aplicando a predefinição '$Preset'."
+            # SkipUnknown para que uma entrada aposentada de uma predefinição seja nomeada e ignorada em vez de
+            # encerrar uma execução headless que não tem ninguém para ler o erro
             $skipped = @(Update-WinUtilSelections -flatJson $sync.configs.preset.$Preset -SkipUnknown)
             if ($skipped.Count -gt 0) {
-                Write-WinUtilLog -Level "WARN" -Component "AutoRun" -Message "Preset '$Preset' names $($skipped.Count) entr(y/ies) this version does not have: $($skipped -join ', ')"
+                Write-WinUtilLog -Level "WARN" -Component "AutoRun" -Message "A predefinição '$Preset' cita $($skipped.Count) entrada(s) que esta versão não possui: $($skipped -join ', ')"
             }
         }
 
-        # Both may be given: the preset sets a baseline and the config adds to it
+        # Os dois podem ser informados: a predefinição define uma base e a configuração acrescenta a ela
         if ($Config) {
-            Write-WinUtilLog -Component "AutoRun" -Message "Importing selections from '$Config'."
+            Write-WinUtilLog -Component "AutoRun" -Message "Importando as seleções de '$Config'."
             Invoke-WPFImpex -type "import" -Config $Config -Merge:([bool]$Preset) -ThrowOnError
         }
 
         $summary = Invoke-WinUtilAutoRun
         $headlessCode = Write-WinUtilAutoRunSummary -Summary $summary
     } catch {
-        Write-WinUtilErrorRecord -ErrorRecord $_ -Component "AutoRun" -Context "Headless run"
-        Write-Host "WinUtil could not complete the headless run: $($_.Exception.Message)" -ForegroundColor Red
+        Write-WinUtilErrorRecord -ErrorRecord $_ -Component "AutoRun" -Context "Execução headless"
+        Write-Host "O WinUtil não conseguiu concluir a execução headless: $($_.Exception.Message)" -ForegroundColor Red
         $headlessCode = 1
     } finally {
         Close-WinUtilRunspacePool
@@ -100,8 +100,8 @@ if ($Preset -or $Config) {
         Close-WinUtilLog
     }
 
-    # An isolated elevated child and an explicit file launch own their process. The documented
-    # in-memory invocation runs inside the caller's terminal and must return without closing it.
+    # Um processo filho elevado e isolado e uma execução explícita por arquivo são donos do próprio
+    # processo. A invocação documentada em memória roda dentro do terminal de quem chamou e deve retornar sem fechá-lo.
     if ($env:WINUTIL_HEADLESS_CHILD -eq "1" -or $script:WinUtilIsFileProcess) {
         exit $headlessCode
     }
@@ -110,13 +110,13 @@ if ($Preset -or $Config) {
 }
 
 #===========================================================================
-# Start the interface on its own thread and manage it from here
+# Inicia a interface em sua própria thread e faz o gerenciamento a partir daqui
 #===========================================================================
 #
-# The main thread stays out of the window's way. It creates the dedicated STA runspace the
-# interface lives on, waits for that window to close, and reports anything the interface
-# thread failed with. Work started from the interface goes to the worker pool through
-# Start-WinUtilJob, so neither the window nor this thread is ever blocked by it.
+# A thread principal fica fora do caminho da janela. Ela cria o runspace STA dedicado onde a
+# interface vive, espera essa janela fechar e relata qualquer falha da thread de interface.
+# O trabalho iniciado pela interface vai para o pool de workers via
+# Start-WinUtilJob, então nem a janela nem esta thread ficam bloqueadas por ele.
 
 $sync.UIRunspace = [runspacefactory]::CreateRunspace($Host, (New-WinUtilSessionState))
 $sync.UIRunspace.ApartmentState = "STA"
@@ -127,14 +127,14 @@ $uiShell = [powershell]::Create()
 $uiShell.Runspace = $sync.UIRunspace
 [void]$uiShell.AddScript({ Start-WinUtilUserInterface })
 
-Write-WinUtilLog -Component "UI" -Message "Starting the interface thread."
+Write-WinUtilLog -Component "UI" -Message "Iniciando a thread da interface."
 $uiHandle = $uiShell.BeginInvoke()
 
-# This thread has nothing to do but wait, so it pays for the overlay render rather than
-# leaving it to the thread that is building the window
+# Esta thread não tem nada a fazer além de esperar, então ela paga o custo da renderização da sobreposição
+# em vez de deixar isso para a thread que está construindo a janela
 Start-WinUtilAssetRendering | Out-Null
 
-# Log the UI thread's Write-Host output, warnings and errors while the window is open
+# Registra a saída do Write-Host, os avisos e os erros da thread de UI enquanto a janela estiver aberta
 while (-not $uiHandle.AsyncWaitHandle.WaitOne(250)) {
     Receive-WinUtilStreamOutput -PowerShell $uiShell -Component "UI"
 }
@@ -144,7 +144,7 @@ try {
     $uiShell.EndInvoke($uiHandle) | Out-Null
 } catch {
     $uiFailed = $true
-    Write-WinUtilErrorRecord -ErrorRecord $_ -Component "UI" -Context "Interface thread stopped"
+    Write-WinUtilErrorRecord -ErrorRecord $_ -Component "UI" -Context "A thread da interface parou"
 }
 
 Receive-WinUtilStreamOutput -PowerShell $uiShell -Component "UI"
@@ -153,15 +153,15 @@ $uiShell.Dispose()
 $sync.UIRunspace.Dispose()
 $sync.Remove("UIRunspace")
 
-# The window may have been closed over a job that the user chose to let finish. It is still on
-# the worker pool, so the pool cannot be closed until it is done.
+# A janela pode ter sido fechada sobre um job que o usuário escolheu deixar terminar. Ele ainda está no
+# pool de workers, então o pool não pode ser fechado antes de ele terminar.
 Wait-WinUtilRemainingWork
 
 Close-WinUtilRunspacePool
 [System.GC]::Collect()
 
 Remove-WinUtilTempScript
-Write-Host "Bye bye!" -ForegroundColor Cyan
+Write-Host "Até logo!" -ForegroundColor Cyan
 Close-WinUtilLog
 
 if ($uiFailed) {

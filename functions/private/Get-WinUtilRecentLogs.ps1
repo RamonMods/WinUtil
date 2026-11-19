@@ -1,14 +1,14 @@
 function Get-WinUtilRecentLogs {
     <#
     .SYNOPSIS
-        Concatenates WinUtil session logs from the last N days into a single text blob.
+        Concatena os logs de sessão do WinUtil dos últimos N dias em um único bloco de texto.
 
     .PARAMETER Days
-        How many days back to include. Defaults to 7, matching what the support forum/server
-        typically asks users for.
+        Quantos dias para trás incluir. O padrão é 7, igual ao que o fórum/servidor de suporte
+        normalmente pede aos usuários.
 
     .PARAMETER LogDirectory
-        Overrides the log directory (normally $sync.winutildir\logs). Mainly for testing.
+        Substitui o diretório de logs (normalmente $sync.winutildir\logs). Principalmente para testes.
     #>
     param(
         [int]$Days = 7,

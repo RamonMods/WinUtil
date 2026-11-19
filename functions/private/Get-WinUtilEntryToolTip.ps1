@@ -1,13 +1,13 @@
 function Get-WinUtilEntryToolTip {
     <#
         .SYNOPSIS
-            Builds the tooltip string for an app/tweak/feature entry: its description plus its preset JSON key
+            Monta o texto da dica de uma entrada de app/ajuste/recurso: sua descrição mais sua chave JSON de predefinição
 
         .PARAMETER Description
-            The entry's description from the config JSON. May be null or empty.
+            A descrição da entrada vinda do JSON de configuração. Pode ser nula ou vazia.
 
         .PARAMETER Key
-            The entry's JSON key as used in preset files (e.g. WPFInstallbrave, WPFTweaksTele).
+            A chave JSON da entrada, como usada nos arquivos de predefinição (ex.: WPFInstallbrave, WPFTweaksTele).
     #>
     param(
         [Parameter(Mandatory = $false)]

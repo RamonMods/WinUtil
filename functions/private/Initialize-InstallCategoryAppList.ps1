@@ -1,14 +1,14 @@
 function Initialize-InstallCategoryAppList {
     <#
         .SYNOPSIS
-            Clears the Target Element and sets up a "Loading" message. This is done, because loading of all apps can take a bit of time in some scenarios
-            Iterates through all Categories and Apps and adds them to the UI
-            Used to as part of the Install Tab UI generation
+            Limpa o Elemento de Destino e configura uma mensagem de "Carregando". Isso é feito porque carregar todos os apps pode levar um tempo em alguns cenários
+            Percorre todas as Categorias e Apps e os adiciona à interface
+            Usado como parte da geração da interface da aba Instalar
         .PARAMETER TargetElement
-            The Element into which the Categories and Apps should be placed
+            O Elemento no qual as Categorias e os Apps devem ser colocados
         .PARAMETER Apps
-            The Hashtable of Apps to be added to the UI
-            The Categories are also extracted from the Apps Hashtable
+            A Hashtable de Apps a serem adicionados à interface
+            As Categorias também são extraídas da Hashtable de Apps
 
     #>
         param(
@@ -16,11 +16,11 @@ function Initialize-InstallCategoryAppList {
             $Apps
         )
 
-        # Pre-group apps by category before creating WPF controls. Lists, because appending to
-        # an array copies it and there are several hundred apps.
+        # Pré-agrupa os apps por categoria antes de criar controles WPF. Listas, porque anexar a
+        # um array o copia e existem várias centenas de apps.
         $appsByCategory = @{}
-        # Indexed, not dynamic member, lookup: the latter goes through the PSObject adapter and
-        # costs about seventy times as much per app.
+        # Consulta indexada, não por membro dinâmico: esta última passa pelo adaptador PSObject e
+        # custa cerca de setenta vezes mais por app.
         foreach ($appKey in $Apps.Keys) {
             $category = $Apps[$appKey].Category
             if (-not $appsByCategory.ContainsKey($category)) {
@@ -31,20 +31,20 @@ function Initialize-InstallCategoryAppList {
         $sync.InstallAppRenderQueue = [System.Collections.Queue]::new()
 
         foreach ($category in $($appsByCategory.Keys | Sort-Object)) {
-            # Create a container for category label + apps
+            # Cria um contêiner para o rótulo da categoria + apps
             $categoryContainer = New-Object Windows.Controls.StackPanel
             $categoryContainer.Orientation = "Vertical"
             $categoryContainer.Margin = New-Object Windows.Thickness(0, 0, 0, 0)
             $categoryContainer.HorizontalAlignment = [Windows.HorizontalAlignment]::Stretch
             [System.Windows.Automation.AutomationProperties]::SetName($categoryContainer, $Category)
 
-            # Bind Width to the ItemsControl's ActualWidth to force full-row layout in WrapPanel
+            # Vincula Width ao ActualWidth do ItemsControl para forçar o layout de linha inteira no WrapPanel
             $binding = New-Object Windows.Data.Binding
             $binding.Path = New-Object Windows.PropertyPath("ActualWidth")
             $binding.RelativeSource = New-Object Windows.Data.RelativeSource([Windows.Data.RelativeSourceMode]::FindAncestor, [Windows.Controls.ItemsControl], 1)
             [void][Windows.Data.BindingOperations]::SetBinding($categoryContainer, [Windows.FrameworkElement]::WidthProperty, $binding)
 
-            # Add category label to container
+            # Adiciona o rótulo da categoria ao contêiner
             $toggleButton = New-Object Windows.Controls.Label
             $toggleButton.Content = "- $Category"
             $toggleButton.Tag = "CategoryToggleButton"
@@ -55,29 +55,29 @@ function Initialize-InstallCategoryAppList {
             $toggleButton.HorizontalAlignment = [Windows.HorizontalAlignment]::Stretch
             $sync.$Category = $toggleButton
 
-            # Add click handler to toggle category visibility
+            # Adiciona um tratador de clique para alternar a visibilidade da categoria
             $toggleButton.Add_MouseLeftButtonUp({
                 param($categoryToggle)
 
-                # Find the parent StackPanel (categoryContainer)
+                # Encontra o StackPanel pai (categoryContainer)
                 $categoryContainer = $categoryToggle.Parent
                 if ($categoryContainer -and $categoryContainer.Children.Count -ge 2) {
-                    # The WrapPanel is the second child
+                    # O WrapPanel é o segundo filho
                     $wrapPanel = $categoryContainer.Children[1]
 
-                    # An explicit click wins over anything filtering expanded automatically
+                    # Um clique explícito tem prioridade sobre o que a filtragem expandiu automaticamente
                     if ($sync.AppCategoryAutoExpanded) {
                         $sync.AppCategoryAutoExpanded.Remove(($categoryToggle.Content -replace '^[+-] ', ''))
                     }
 
-                    # Toggle visibility
+                    # Alterna a visibilidade
                     if ($wrapPanel.Visibility -eq [Windows.Visibility]::Visible) {
                         $wrapPanel.Visibility = [Windows.Visibility]::Collapsed
-                        # Change - to +
+                        # Muda - para +
                         $categoryToggle.Content = $categoryToggle.Content -replace "^- ", "+ "
                     } else {
                         $wrapPanel.Visibility = [Windows.Visibility]::Visible
-                        # Change + to -
+                        # Muda + para -
                         $categoryToggle.Content = $categoryToggle.Content -replace "^\+ ", "- "
                     }
                 }
@@ -85,7 +85,7 @@ function Initialize-InstallCategoryAppList {
 
             $null = $categoryContainer.Children.Add($toggleButton)
 
-            # Add wrap panel for apps to container
+            # Adiciona o painel de quebra de linha dos apps ao contêiner
             $wrapPanel = New-Object Windows.Controls.WrapPanel
             $wrapPanel.Orientation = "Horizontal"
             $wrapPanel.HorizontalAlignment = "Left"
@@ -94,7 +94,7 @@ function Initialize-InstallCategoryAppList {
             $wrapPanel.Visibility = [Windows.Visibility]::Visible
             $wrapPanel.Tag = "CategoryWrapPanel_$category"
 
-            # One set of handlers for every card in the category; events bubble up to here
+            # Um conjunto de tratadores para cada cartão da categoria; os eventos sobem até aqui
             $entryHandlers = Get-WinUtilAppEntryHandlers
             $wrapPanel.AddHandler([Windows.UIElement]::MouseLeftButtonUpEvent, $entryHandlers.BorderClick)
             $wrapPanel.AddHandler([Windows.UIElement]::MouseRightButtonUpEvent, $entryHandlers.RightClick)
@@ -103,7 +103,7 @@ function Initialize-InstallCategoryAppList {
 
             $null = $categoryContainer.Children.Add($wrapPanel)
 
-            # Add the entire category container to the target element
+            # Adiciona o contêiner inteiro da categoria ao elemento de destino
             $null = $TargetElement.Items.Add($categoryContainer)
 
             $sync.InstallAppRenderQueue.Enqueue([pscustomobject]@{

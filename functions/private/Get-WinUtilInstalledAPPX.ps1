@@ -2,13 +2,13 @@ function Get-WinUtilInstalledAPPX {
     <#
 
     .SYNOPSIS
-        Gets the names of AppX packages installed for all users
+        Obtém os nomes dos pacotes AppX instalados para todos os usuários
 
     #>
 
-    # AppX module auto-loading can leave PowerShell 7 dependent on a temporary Windows PowerShell
-    # compatibility proxy. Run the query in Windows PowerShell 5.1 so it remains available after
-    # those temporary proxy files are removed.
+    # O carregamento automático do módulo AppX pode deixar o PowerShell 7 dependente de um proxy
+    # de compatibilidade temporário do Windows PowerShell. Execute a consulta no Windows PowerShell 5.1
+    # para que ela continue disponível depois que esses arquivos de proxy temporários forem removidos.
     $ps5Command = {
         Get-AppxPackage -AllUsers -ErrorAction Stop | Select-Object -ExpandProperty Name
     }
@@ -16,7 +16,7 @@ function Get-WinUtilInstalledAPPX {
     $packageOutput = powershell.exe -NoProfile -NonInteractive -Command $ps5Command 2>&1
     if ($LASTEXITCODE -ne 0) {
         $failureDetails = ($packageOutput | Out-String).Trim()
-        Write-WinUtilLog -Level "ERROR" -Component "AppX" -Message "Failed to get installed AppX packages: $failureDetails"
+        Write-WinUtilLog -Level "ERROR" -Component "AppX" -Message "Falha ao obter os pacotes AppX instalados: $failureDetails"
         return @()
     }
 

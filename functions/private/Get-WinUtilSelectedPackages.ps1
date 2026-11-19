@@ -11,7 +11,7 @@ function Get-WinUtilSelectedPackages {
          [string] $Action = "Install"
      )
 
-    # A single package has no meaningful percentage to show
+    # Um único pacote não tem porcentagem significativa para mostrar
     if ($PackageList.count -eq 1) {
         Step-WinUtilJob -State "Indeterminate"
     }
@@ -29,11 +29,11 @@ function Get-WinUtilSelectedPackages {
             $PackageId
         )
 
-        # A config field may hold several IDs separated by ";" (e.g. a dependency;the package).
-        # Detection splits the same way, so install and detection agree on what gets installed.
+        # Um campo da configuração pode conter vários IDs separados por ";" (ex.: uma dependência;o pacote).
+        # A detecção divide da mesma forma, então instalação e detecção concordam sobre o que será instalado.
         $ids = [string]$PackageId -split ";"
         if ($Action -eq "Uninstall") {
-            # Detection identifies the last ID as the app; preceding IDs are dependencies.
+            # A detecção identifica o último ID como o app; os IDs anteriores são dependências.
             $ids = @($ids[-1])
         }
         foreach ($id in $ids) {

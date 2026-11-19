@@ -1,33 +1,33 @@
 function Invoke-WinUtilFeatureInstall ($CheckBox) {
-    Write-WinUtilLog -Component "Feature" -Message "Applying feature action: $CheckBox"
+    Write-WinUtilLog -Component "Feature" -Message "Aplicando ação de recurso: $CheckBox"
 
     $featureFailed = $false
     if ($sync.configs.feature.$CheckBox.feature) {
         foreach ($feature in $sync.configs.feature.$CheckBox.feature) {
-            Write-Host "Installing $feature"
-            Write-WinUtilLog -Component "Feature" -Message "Enabling Windows optional feature: $feature"
+            Write-Host "Instalando $feature"
+            Write-WinUtilLog -Component "Feature" -Message "Habilitando recurso opcional do Windows: $feature"
             try {
                 Enable-WindowsOptionalFeature -Online -FeatureName $feature -All -NoRestart -ErrorAction Stop
-                Write-WinUtilLog -Component "Feature" -Message "Enabled Windows optional feature: $feature"
+                Write-WinUtilLog -Component "Feature" -Message "Recurso opcional do Windows habilitado: $feature"
             } catch {
                 $featureFailed = $true
-                # A feature missing on this edition (e.g. Windows Sandbox on Home) must not
-                # abort the remaining selected features
-                Write-Warning "Unable to enable feature $feature`: $($_.Exception.Message)"
-                Write-WinUtilLog -Level "ERROR" -Component "Feature" -Message "Unable to enable feature $feature`: $($_.Exception.Message)"
+                # Um recurso ausente nesta edição (ex.: Windows Sandbox no Home) não deve
+                # abortar os demais recursos selecionados
+                Write-Warning "Não foi possível habilitar o recurso $feature`: $($_.Exception.Message)"
+                Write-WinUtilLog -Level "ERROR" -Component "Feature" -Message "Não foi possível habilitar o recurso $feature`: $($_.Exception.Message)"
             }
         }
     }
 
     if ($featureFailed) {
-        Write-WinUtilLog -Level "WARN" -Component "Feature" -Message "Skipping dependent scripts after an optional feature failed: $CheckBox"
+        Write-WinUtilLog -Level "WARN" -Component "Feature" -Message "Ignorando scripts dependentes após a falha de um recurso opcional: $CheckBox"
     } elseif ($sync.configs.feature.$CheckBox.InvokeScript) {
         foreach ($script in $sync.configs.feature.$CheckBox.InvokeScript) {
-            Write-Host "Running Script for $CheckBox"
-            Write-WinUtilLog -Component "Feature" -Message "Running feature script for: $CheckBox"
+            Write-Host "Executando script de $CheckBox"
+            Write-WinUtilLog -Component "Feature" -Message "Executando script de recurso para: $CheckBox"
             Invoke-Command -ScriptBlock ([scriptblock]::Create($script)) -ErrorAction Stop
-            Write-WinUtilLog -Component "Feature" -Message "Completed feature script for: $CheckBox"
+            Write-WinUtilLog -Component "Feature" -Message "Script de recurso concluído para: $CheckBox"
         }
     }
-    Write-WinUtilLog -Component "Feature" -Message "Feature action completed: $CheckBox"
+    Write-WinUtilLog -Component "Feature" -Message "Ação de recurso concluída: $CheckBox"
 }

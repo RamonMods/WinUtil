@@ -1,7 +1,7 @@
 <#
     .DESCRIPTION
-    Generates Astro/Starlight markdown docs from config/tweaks.json and config/feature.json.
-    Run by the GitHub Actions docs workflow before the Astro build.
+    Gera a documentação em markdown do Astro/Starlight a partir de config/tweaks.json e config/feature.json.
+    Executado pelo workflow de docs do GitHub Actions antes do build do Astro.
 #>
 
 function Update-Progress {
@@ -12,11 +12,11 @@ function Update-Progress {
         [ValidateRange(0,100)]
         [int]$Percent
     )
-    Write-Progress -Activity "Generating Dev Docs" -Status $StatusMessage -PercentComplete $Percent
+    Write-Progress -Activity "Gerando a documentação de desenvolvimento" -Status $StatusMessage -PercentComplete $Percent
 }
 
 function Get-RawJsonBlock {
-    # Returns the raw JSON text and 1-based start line for an item, excluding the "link" property.
+    # Retorna o texto JSON bruto e a linha inicial (base 1) de um item, sem a propriedade "link".
     param (
         [Parameter(Mandatory)]
         [string]$ItemName,
@@ -36,17 +36,17 @@ function Get-RawJsonBlock {
     }
 
     if ($startIndex -eq -1) {
-        Write-Warning "Could not find '$ItemName' in JSON"
+        Write-Warning "Não foi possível encontrar '$ItemName' no JSON"
         return $null
     }
 
-    # Use brace-depth tracking to find the closing brace
+    # Usa o rastreamento de profundidade de chaves para encontrar a chave de fechamento
     $endIndex = -1
-    $depth = 1  # We're starting inside the opening brace
+    $depth = 1  # Estamos começando dentro da chave de abertura
     for ($i = ($startIndex + 1); $i -lt $JsonLines.Count; $i++) {
         $line = $JsonLines[$i]
 
-        # Count braces in this line, ignoring those in strings
+        # Conta as chaves nesta linha, ignorando as que estão dentro de strings
         $inString = $false
         $chars = $line.ToCharArray()
         for ($k = 0; $k -lt $chars.Count; $k++) {
@@ -58,7 +58,7 @@ function Get-RawJsonBlock {
             }
         }
 
-        # Found the closing brace of the item
+        # Encontrou a chave de fechamento do item
         if ($depth -eq 0) {
             $endIndex = $i
             break
@@ -66,11 +66,11 @@ function Get-RawJsonBlock {
     }
 
     if ($endIndex -eq -1) {
-        Write-Warning "Could not find closing brace for '$ItemName'"
+        Write-Warning "Não foi possível encontrar a chave de fechamento de '$ItemName'"
         return $null
     }
 
-    # Strip trailing "link" property and blank lines before returning
+    # Remove a propriedade "link" final e as linhas em branco antes de retornar
     $lastContentIndex = $endIndex - 1
     while ($lastContentIndex -gt $startIndex) {
         $trimmed = $JsonLines[$lastContentIndex].Trim()
@@ -81,8 +81,8 @@ function Get-RawJsonBlock {
         }
     }
 
-    # Include the item's own closing brace, stripped of the trailing comma that
-    # only exists to separate it from the next sibling in the parent object.
+    # Inclui a própria chave de fechamento do item, sem a vírgula final que
+    # existe apenas para separá-lo do próximo irmão no objeto pai.
     $closingLine = $JsonLines[$endIndex] -replace ',\s*$', ''
 
     return @{
@@ -92,7 +92,7 @@ function Get-RawJsonBlock {
 }
 
 function Get-GeneratedFromNote {
-    # Builds the Starlight ":::note" aside pointing back at the source file for an entry.
+    # Monta o aviso ":::note" do Starlight apontando de volta para o arquivo de origem de uma entrada.
     param (
         [Parameter(Mandatory)]
         [string]$SourceRelativePath
@@ -100,13 +100,13 @@ function Get-GeneratedFromNote {
 
     $githubUrl = "https://github.com/RamonMods/WinUtil/blob/main/$SourceRelativePath"
     $note  = ":::note`r`n"
-    $note += "This page is generated from [``$SourceRelativePath``]($githubUrl). Do not edit this page directly.`r`n"
+    $note += "Esta página é gerada a partir de [``$SourceRelativePath``]($githubUrl). Não edite esta página diretamente.`r`n"
     $note += ":::`r`n`r`n"
     return $note
 }
 
 function Get-ButtonFunctionMapping {
-    # Parses Invoke-WPFButton.ps1 and returns a hashtable of button name -> function name.
+    # Analisa Invoke-WPFButton.ps1 e retorna uma hashtable de nome do botão -> nome da função.
     param (
         [Parameter(Mandatory)]
         [string]$ButtonFilePath
@@ -122,8 +122,8 @@ function Get-ButtonFunctionMapping {
 }
 
 function Add-LinkAttributeToJson {
-    # Updates only the "link" property for each entry in a JSON config file.
-    # Reads via ConvertFrom-Json for metadata, then edits lines directly to avoid reformatting.
+    # Atualiza apenas a propriedade "link" de cada entrada em um arquivo de configuração JSON.
+    # Lê via ConvertFrom-Json para metadados e depois edita as linhas diretamente para evitar reformatação.
     param (
         [Parameter(Mandatory)]
         [string]$JsonFilePath,
@@ -143,7 +143,7 @@ function Add-LinkAttributeToJson {
         $newLink     = "$UrlPrefix/$($category.ToLower())/$($displayName.ToLower())"
         $escapedName = [regex]::Escape($itemName)
 
-        # Find item start line
+        # Encontra a linha inicial do item
         $startIdx = -1
         for ($i = 0; $i -lt $lines.Count; $i++) {
             if ($lines[$i] -match "^\s*`"$escapedName`"\s*:\s*\{") {
@@ -153,8 +153,8 @@ function Add-LinkAttributeToJson {
         }
         if ($startIdx -eq -1) { continue }
 
-        # Derive indentation used by top-level properties in the item.
-        # Prefer existing property indentation to avoid inheriting bad key indentation.
+        # Deduz a indentação usada pelas propriedades de nível superior do item.
+        # Prefere a indentação de propriedade existente para não herdar a indentação errada da chave.
         $null       = $lines[$startIdx] -match '^(\s*)'
         $propIndent = $matches[1] + '  '
 
@@ -181,23 +181,23 @@ function Add-LinkAttributeToJson {
             if ($depthProbe -eq 0) { break }
         }
 
-        # Scan forward: remove any existing "link" property and find the closing brace.
-        # Use brace-depth tracking to properly handle nested structures like arrays.
+        # Percorre adiante: remove qualquer propriedade "link" existente e encontra a chave de fechamento.
+        # Usa o rastreamento de profundidade de chaves para tratar corretamente estruturas aninhadas como arrays.
         $closeBraceIdx = -1
-        $depth         = 1  # We're starting inside the opening brace of the item
+        $depth         = 1  # Estamos começando dentro da chave de abertura do item
         $linesToRemove  = @()
 
         for ($j = $startIdx + 1; $j -lt $lines.Count; $j++) {
             $line = $lines[$j]
 
-            # Check for existing "link" property at top-level (depth 1 before processing braces on this line)
-            # Match at any indentation level (user may have manually changed indentation)
+            # Verifica se existe uma propriedade "link" no nível superior (profundidade 1 antes de processar as chaves desta linha)
+            # Casa em qualquer nível de indentação (o usuário pode ter alterado a indentação manualmente)
             if ($depth -eq 1 -and $line -match '^\s*"link"\s*:') {
-                # Mark this line for removal
+                # Marca esta linha para remoção
                 $linesToRemove += $j
             }
 
-            # Count braces in this line, ignoring those in strings
+            # Conta as chaves nesta linha, ignorando as que estão dentro de strings
             $inString = $false
             $chars = $line.ToCharArray()
             for ($k = 0; $k -lt $chars.Count; $k++) {
@@ -209,16 +209,16 @@ function Add-LinkAttributeToJson {
                 }
             }
 
-            # Found the closing brace of the item
+            # Encontrou a chave de fechamento do item
             if ($depth -eq 0) {
                 $closeBraceIdx = $j
                 break
             }
         }
 
-        # Remove old "link" lines in reverse order to preserve indices
+        # Remove as linhas antigas de "link" em ordem inversa para preservar os índices
         foreach ($idx in ($linesToRemove | Sort-Object -Descending)) {
-            # If the line before had a trailing comma (from the link property), remove it
+            # Se a linha anterior tinha uma vírgula final (da propriedade link), remove-a
             if ($idx -gt $startIdx) {
                 $prevLine = $lines[$idx - 1]
                 if ($prevLine -match ',\s*$' -and $lines[$idx].Trim() -match '^}') {
@@ -231,7 +231,7 @@ function Add-LinkAttributeToJson {
             }
         }
 
-        # Now insert "link" before the closing brace (consistent position for all items)
+        # Agora insere "link" antes da chave de fechamento (posição consistente para todos os itens)
         if ($closeBraceIdx -ne -1) {
             $prevPropIdx = $closeBraceIdx - 1
             while ($prevPropIdx -gt $startIdx -and $lines[$prevPropIdx].Trim() -eq '') { $prevPropIdx-- }
@@ -247,7 +247,7 @@ function Add-LinkAttributeToJson {
 }
 
 # ==============================================================================
-# Main
+# Principal
 # ==============================================================================
 
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
@@ -263,7 +263,7 @@ $privateFunctionsDir = "$repoRoot/functions/private"
 $itemnametocut = 'WPF(WinUtil|Toggle|Features?|Tweaks?|Panel|Fix(es)?)?'
 $baseUrl       = "https://github.com/RamonMods/WinUtil"
 
-# Categories with generated docs
+# Categorias com documentação gerada
 $documentedCategories = @(
     "Essential Tweaks",
     "z__Advanced Tweaks - CAUTION",
@@ -276,18 +276,18 @@ $documentedCategories = @(
     "Remote Access"
 )
 
-# Categories where Button entries embed a PS function instead of raw JSON
+# Categorias em que as entradas Button embutem uma função PS em vez de JSON bruto
 $functionEmbedCategories = @(
     "Fixes",
     "Powershell Profile Powershell 7+ Only",
     "Remote Access"
 )
 
-Update-Progress "Loading JSON files" 10
+Update-Progress "Carregando os arquivos JSON" 10
 $tweaks   = Get-Content -Path $tweaksJsonPath   -Raw | ConvertFrom-Json
 $features = Get-Content -Path $featuresJsonPath -Raw | ConvertFrom-Json
 
-Update-Progress "Loading function files" 20
+Update-Progress "Carregando os arquivos de funções" 20
 $functionFiles = @{}
 Get-ChildItem -Path $publicFunctionsDir  -Filter *.ps1 | ForEach-Object {
     $functionFiles[$_.BaseName] = @{ Content = (Get-Content -Path $_.FullName -Raw).TrimEnd(); RelativePath = "functions/public/$($_.Name)" }
@@ -296,37 +296,37 @@ Get-ChildItem -Path $privateFunctionsDir -Filter *.ps1 | ForEach-Object {
     $functionFiles[$_.BaseName] = @{ Content = (Get-Content -Path $_.FullName -Raw).TrimEnd(); RelativePath = "functions/private/$($_.Name)" }
 }
 
-Update-Progress "Building button-to-function mapping" 30
+Update-Progress "Montando o mapa de botão para função" 30
 $buttonFunctionMap = Get-ButtonFunctionMapping -ButtonFilePath "$publicFunctionsDir/Invoke-WPFButton.ps1"
 
-Update-Progress "Updating documentation links in JSON" 40
+Update-Progress "Atualizando os links de documentação no JSON" 40
 Add-LinkAttributeToJson -JsonFilePath $tweaksJsonPath   -UrlPrefix "$baseUrl/code-reference/tweaks"   -ItemNameToCut $itemnametocut
 Add-LinkAttributeToJson -JsonFilePath $featuresJsonPath -UrlPrefix "$baseUrl/code-reference/features" -ItemNameToCut $itemnametocut
 
-# Reload lines after link update so line numbers in docs are accurate
+# Recarrega as linhas após a atualização dos links para que os números de linha na documentação fiquem corretos
 $tweaksLines   = Get-Content -Path $tweaksJsonPath
 $featuresLines = Get-Content -Path $featuresJsonPath
 
 # ==============================================================================
-# Clean up old generated .mdx files
+# Limpa os arquivos .mdx gerados antigos
 # ==============================================================================
 
-Update-Progress "Cleaning up old generated docs" 45
+Update-Progress "Limpando a documentação gerada antiga" 45
 foreach ($dir in @($tweaksOutputDir, $featuresOutputDir)) {
     if (-Not (Test-Path -Path $dir)) { continue }
     Get-ChildItem -Path $dir -Recurse -Filter *.mdx | Where-Object {
-        # No category index.mdx pages exist yet. If one is added later as a
-        # category landing page, uncomment this line to keep it from being wiped.
+        # Ainda não existem páginas index.mdx de categoria. Se uma for adicionada depois como
+        # página de entrada da categoria, descomente esta linha para impedir que ela seja apagada.
         # $_.Name -ne "index.mdx"
         $true
     } | Remove-Item -Force
 }
 
 # ==============================================================================
-# Generate Tweak Documentation
+# Gera a documentação dos ajustes
 # ==============================================================================
 
-Update-Progress "Generating tweak documentation" 50
+Update-Progress "Gerando a documentação dos ajustes" 50
 
 $tweakNames  = $tweaks.PSObject.Properties.Name
 $totalTweaks = $tweakNames.Count
@@ -345,7 +345,7 @@ foreach ($itemName in $tweakNames) {
 
     if (-Not (Test-Path -Path $categoryDir)) { New-Item -ItemType Directory -Path $categoryDir | Out-Null }
 
-    # JSON string scalars are valid YAML and escape Windows paths and control characters.
+    # Escalares de string do JSON são YAML válido e escapam caminhos do Windows e caracteres de controle.
     $title       = ConvertTo-Json -InputObject ([string]$item.Content) -Compress
     $description = ConvertTo-Json -InputObject ([string]$item.Description) -Compress
     $content     = "---`r`ntitle: $title`r`ndescription: $description`r`neditUrl: false`r`n---`r`n`r`n"
@@ -369,23 +369,23 @@ foreach ($itemName in $tweakNames) {
         }
 
         if ($item.registry) {
-            $content += "`r`n## Registry Changes`r`n`r`n"
-            $content += "Applications and System Components store and retrieve configuration data to modify Windows settings, so we can use the registry to change many settings in one place.`r`n`r`n"
-            $content += "You can find information about the registry on [Wikipedia](https://en.wikipedia.org/wiki/Windows_Registry) and [Microsoft's Website](https://learn.microsoft.com/en-us/windows/win32/sysinfo/registry).`r`n"
+            $content += "`r`n## Alterações no Registro`r`n`r`n"
+            $content += "Aplicativos e componentes do sistema armazenam e recuperam dados de configuração para modificar as configurações do Windows, então podemos usar o registro para alterar muitas configurações em um só lugar.`r`n`r`n"
+            $content += "Você pode encontrar informações sobre o registro na [Wikipedia](https://en.wikipedia.org/wiki/Windows_Registry) e no [site da Microsoft](https://learn.microsoft.com/en-us/windows/win32/sysinfo/registry).`r`n"
         }
     }
 
     Set-Content -Path $filename -Value $content -Encoding utf8 -NoNewline
 
     $percent = [Math]::Min(70, 50 + [int](($tweakCount / $totalTweaks) * 20))
-    Update-Progress "Generating tweak documentation ($tweakCount/$totalTweaks)" $percent
+    Update-Progress "Gerando a documentação dos ajustes ($tweakCount/$totalTweaks)" $percent
 }
 
 # ==============================================================================
-# Generate Feature Documentation
+# Gera a documentação dos recursos
 # ==============================================================================
 
-Update-Progress "Generating feature documentation" 70
+Update-Progress "Gerando a documentação dos recursos" 70
 
 $featureNames  = $features.PSObject.Properties.Name
 $totalFeatures = $featureNames.Count
@@ -405,7 +405,7 @@ foreach ($itemName in $featureNames) {
 
     if (-Not (Test-Path -Path $categoryDir)) { New-Item -ItemType Directory -Path $categoryDir | Out-Null }
 
-    # JSON string scalars are valid YAML and escape Windows paths and control characters.
+    # Escalares de string do JSON são YAML válido e escapam caminhos do Windows e caracteres de controle.
     $title       = ConvertTo-Json -InputObject ([string]$item.Content) -Compress
     $description = ConvertTo-Json -InputObject ([string]$item.Description) -Compress
     $content     = "---`r`ntitle: $title`r`ndescription: $description`r`neditUrl: false`r`n---`r`n`r`n"
@@ -432,8 +432,8 @@ foreach ($itemName in $featureNames) {
     Set-Content -Path $filename -Value $content -Encoding utf8 -NoNewline
 
     $percent = [Math]::Min(90, 70 + [int](($featureCount / $totalFeatures) * 20))
-    Update-Progress "Generating feature documentation ($featureCount/$totalFeatures)" $percent
+    Update-Progress "Gerando a documentação dos recursos ($featureCount/$totalFeatures)" $percent
 }
 
-Update-Progress "Process Completed" 100
-Write-Host "Documentation generation complete."
+Update-Progress "Processo concluído" 100
+Write-Host "Geração da documentação concluída."

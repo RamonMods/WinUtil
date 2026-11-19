@@ -1,16 +1,17 @@
 function Start-WinUtilAssetRendering {
     <#
         .SYNOPSIS
-            Renders the taskbar overlay bitmaps on a thread of their own
+            Renderiza os bitmaps de sobreposição da barra de tarefas em uma thread própria
 
         .DESCRIPTION
-            Rasterising the overlays costs the interface thread time it could spend getting the
-            window up. The bitmaps are frozen before publication, so they can be built anywhere.
+            Rasterizar as sobreposições consome tempo da thread da interface que ela poderia usar
+            para levantar a janela. Os bitmaps são congelados antes da publicação, então podem ser
+            construídos em qualquer lugar.
 
-            Nothing waits on this: if the render has not finished when an overlay is asked for,
-            Set-WinUtilTaskbaritem renders it in place.
+            Nada espera por isto: se a renderização não tiver terminado quando uma sobreposição for
+            solicitada, Set-WinUtilTaskbaritem a renderiza na hora.
 
-            Needs STA for RenderTargetBitmap, which the shared worker pool is not.
+            Precisa de STA para RenderTargetBitmap, o que o pool de workers compartilhado não é.
     #>
 
     $runspace = [runspacefactory]::CreateRunspace((New-WinUtilSessionState))
@@ -21,13 +22,13 @@ function Start-WinUtilAssetRendering {
     $shell = [powershell]::Create()
     $shell.Runspace = $runspace
     [void]$shell.AddScript({
-        # A new runspace does not inherit assemblies loaded by the interface runspace. On a cold
-        # process these types otherwise fail before the off-thread render can do any work.
+        # Um novo runspace não herda os assemblies carregados pelo runspace da interface. Em um
+        # processo frio esses tipos falham antes que a renderização fora da thread faça qualquer trabalho.
         Add-Type -AssemblyName WindowsBase
         Add-Type -AssemblyName PresentationCore
         Add-Type -AssemblyName PresentationFramework
 
-        Measure-WinUtilStep -Scope "UI" -Name "render taskbar overlays (off thread)" -ScriptBlock {
+        Measure-WinUtilStep -Scope "UI" -Name "renderizar sobreposições da barra de tarefas (fora da thread)" -ScriptBlock {
             Initialize-WinUtilTaskbarOverlayAssets -IncludeLogo $true -IncludeStatusAssets $true
         }
     })

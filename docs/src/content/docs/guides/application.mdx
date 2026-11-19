@@ -1,87 +1,87 @@
 ---
-title: Applications
-description: Use the Applications tab in WinUtil to install, upgrade, uninstall, and review supported apps.
+title: Aplicativos
+description: Use a aba Aplicativos do WinUtil para instalar, atualizar, desinstalar e revisar os apps compatíveis.
 sidebar:
   order: 2
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-Use the Applications tab to install, upgrade, uninstall, and review supported apps from one place. WinUtil relies on package manager support for these actions, so the available results depend on what WinGet can detect and manage on your system.
+Use a aba Aplicativos para instalar, atualizar, desinstalar e revisar os apps compatíveis em um só lugar. O WinUtil depende do suporte do gerenciador de pacotes para essas ações, então os resultados disponíveis dependem do que o WinGet consegue detectar e gerenciar no seu sistema.
 
-Application cards use bundled icons so they can display without a network request, and resize to share the available row width. If an icon is missing, WinUtil tries the application's website favicon and shows a letter if that lookup fails.
+Os cartões de aplicativo usam ícones incluídos, para aparecerem sem requisição de rede, e se redimensionam para dividir a largura disponível da linha. Se faltar um ícone, o WinUtil tenta o favicon do site do aplicativo e mostra uma letra se essa busca falhar.
 
-While installing, uninstalling, or upgrading applications, the tab shows a spinner and live status. The application list returns when the job finishes; the progress bar keeps its final result.
+Durante a instalação, desinstalação ou atualização de aplicativos, a aba mostra um indicador de carregamento e o status ao vivo. A lista de aplicativos volta quando a tarefa termina; a barra de progresso mantém o resultado final.
 
 <Tabs>
-<TabItem label="Install & Upgrade">
-* Choose the applications you want to install or upgrade.
-    * For programs not currently installed, this action will install them.
-    * For programs already installed, this action will update them to the latest version.
-* Click the `Install/Upgrade Selected` button to start the installation or upgrade process.
+<TabItem label="Instalar e atualizar">
+* Escolha os aplicativos que deseja instalar ou atualizar.
+    * Para programas que não estão instalados, esta ação os instalará.
+    * Para programas já instalados, esta ação os atualizará para a versão mais recente.
+* Clique no botão `Instalar/atualizar selecionados` para iniciar o processo de instalação ou atualização.
 
-![Install or upgrade selected applications](../../../assets/screenshots/install-pics/installation&upgrade.png)
+![Instalar ou atualizar aplicativos selecionados](../../../assets/screenshots/install-pics/installation&upgrade.png)
 </TabItem>
-<TabItem label="Uninstall">
-* Select the programs you wish to uninstall.
-* Click the `Uninstall Selected` button to remove them.
+<TabItem label="Desinstalar">
+* Selecione os programas que deseja desinstalar.
+* Clique no botão `Desinstalar selecionados` para removê-los.
 
-![Uninstall selected applications](../../../assets/screenshots/install-pics/uninstall-apps.png)
+![Desinstalar aplicativos selecionados](../../../assets/screenshots/install-pics/uninstall-apps.png)
 </TabItem>
-<TabItem label="Upgrade All">
-* Simply press the `Upgrade All` button.
-* This upgrades every supported installed program without individual selection.
+<TabItem label="Atualizar tudo">
+* Basta pressionar o botão `Atualizar tudo`.
+* Isso atualiza todos os programas instalados compatíveis, sem seleção individual.
 
-![Upgrade all applications](../../../assets/screenshots/install-pics/upgrade-all.png)
+![Atualizar todos os aplicativos](../../../assets/screenshots/install-pics/upgrade-all.png)
 </TabItem>
-<TabItem label="Clear Selection">
-* Click the `Clear Selection` button.
-* This clears all current selections.
+<TabItem label="Limpar seleção">
+* Clique no botão `Limpar seleção`.
+* Isso limpa todas as seleções atuais.
 
-![Clear app selections](../../../assets/screenshots/install-pics/clear-selected-apps.png)
+![Limpar seleções de apps](../../../assets/screenshots/install-pics/clear-selected-apps.png)
 </TabItem>
-<TabItem label="Collapse & Expand Categories">
-* Click `Collapse All Categories` to close every category and shrink the list to just the category headers.
-* Click `Expand All Categories` to reopen every category and show all applications again.
+<TabItem label="Recolher e expandir categorias">
+* Clique em `Recolher todas as categorias` para fechar todas as categorias e reduzir a lista apenas aos cabeçalhos das categorias.
+* Clique em `Expandir todas as categorias` para reabrir todas as categorias e mostrar todos os aplicativos novamente.
 
-![Collapse or expand all categories](../../../assets/screenshots/install-pics/Collapse&ExpandCat.png)
+![Recolher ou expandir todas as categorias](../../../assets/screenshots/install-pics/Collapse&ExpandCat.png)
 </TabItem>
-<TabItem label="Category Filters">
-* Click a category chip at the top of the tab to show only that category. The chip stays highlighted while its filter is active.
-* Hold `Ctrl` and click to add more categories to the filter, or to remove one again.
-* Click `All`, or click the highlighted category again while it is the only one selected, to clear the filter.
-* Categories with matching results open while a filter is active. Ones that filtering opened for you go back to collapsed when you clear it, ones you opened yourself stay open.
+<TabItem label="Filtros de categoria">
+* Clique em um chip de categoria no topo da aba para mostrar apenas aquela categoria. O chip fica destacado enquanto o filtro estiver ativo.
+* Segure `Ctrl` e clique para adicionar mais categorias ao filtro, ou para remover uma delas.
+* Clique em `Tudo`, ou clique de novo na categoria destacada quando for a única selecionada, para limpar o filtro.
+* Categorias com resultados correspondentes abrem enquanto um filtro está ativo. As que a filtragem abriu para você voltam a ficar recolhidas quando você limpa o filtro; as que você abriu por conta própria continuam abertas.
 </TabItem>
-<TabItem label="Selected Apps Counter">
-* The `Selected Apps` counter in the sidebar shows how many applications are currently selected.
-* Use it to keep track of your selection as you browse categories.
+<TabItem label="Contador de apps selecionados">
+* O contador `Apps selecionados` na barra lateral mostra quantos aplicativos estão selecionados no momento.
+* Use-o para acompanhar sua seleção enquanto navega pelas categorias.
 
-![Selected apps counter](../../../assets/screenshots/install-pics/Selected-Apps.png)
+![Contador de apps selecionados](../../../assets/screenshots/install-pics/Selected-Apps.png)
 </TabItem>
-<TabItem label="Show Installed Apps">
-* Click the `Show Installed Apps` button.
-* This scans for and selects installed applications supported by WinGet.
+<TabItem label="Mostrar apps instalados">
+* Clique no botão `Mostrar apps instalados`.
+* Isso procura e seleciona os aplicativos instalados compatíveis com o WinGet.
 
-![Show installed apps](../../../assets/screenshots/install-pics/show-installed-apps.png)
+![Mostrar apps instalados](../../../assets/screenshots/install-pics/show-installed-apps.png)
 </TabItem>
 </Tabs>
 
 :::tip
-If you have trouble finding an application, press `Ctrl + F` and search for its name. The list filters as you type. The search and the category chips work together, so you can search inside the categories you picked.
+Se tiver dificuldade para encontrar um aplicativo, pressione `Ctrl + F` e busque pelo nome dele. A lista é filtrada conforme você digita. A busca e os chips de categoria funcionam juntos, então você pode buscar dentro das categorias que escolheu.
 :::
 
 :::note
-`Show Installed Apps` only selects software that the selected package manager can identify. With Chocolatey selected, apps that have no Chocolatey package are checked with WinGet instead. Apps installed outside supported package sources may not appear.
+`Mostrar apps instalados` seleciona apenas softwares que o gerenciador de pacotes selecionado consegue identificar. Com o Chocolatey selecionado, os apps que não têm pacote no Chocolatey são verificados pelo WinGet. Apps instalados fora das fontes de pacotes compatíveis podem não aparecer.
 :::
 
 :::caution
-Before uninstalling or upgrading apps, close any running programs first. Some packages may still prompt for input or fail if their source is unavailable.
+Antes de desinstalar ou atualizar apps, feche primeiro qualquer programa em execução. Alguns pacotes ainda podem pedir entrada ou falhar se a origem deles não estiver disponível.
 :::
 
-When an app lists multiple package IDs, installation includes its listed dependencies. Uninstall removes only the selected app; a dependency is removed only when selected separately.
+Quando um app lista vários IDs de pacote, a instalação inclui as dependências listadas. A desinstalação remove apenas o app selecionado; uma dependência só é removida quando selecionada separadamente.
 
-For an existing stable PowerShell 7 MSI installation, selecting PowerShell or using **Upgrade All** first checks the official PowerShell release and uses a signed MSI matching the installed executable architecture. MSI failures are reported separately; Upgrade All continues with the other WinGet packages. Installations without an MSI registration retain the normal WinGet behavior.
+Para uma instalação estável existente do PowerShell 7 em MSI, selecionar o PowerShell ou usar **Atualizar tudo** primeiro verifica a versão oficial do PowerShell e usa um MSI assinado compatível com a arquitetura do executável instalado. Falhas de MSI são relatadas separadamente; o Atualizar tudo continua com os outros pacotes do WinGet. Instalações sem registro de MSI mantêm o comportamento normal do WinGet.
 
-The direct MSI workaround conservatively skips PowerShell if WinGet reports any configured pins, or pin state cannot be checked. This avoids bypassing blocking or version-gating policies; Upgrade All still runs its normal WinGet operation, which honors those policies.
+O contorno de MSI direto ignora conservadoramente o PowerShell se o WinGet relatar quaisquer pins configurados, ou se o estado do pin não puder ser verificado. Isso evita contornar políticas de bloqueio ou de controle de versão; o Atualizar tudo ainda executa a operação normal do WinGet, que respeita essas políticas.
 
-If multiple stable PowerShell MSI installations are detected (for example x86 and x64 side by side), the direct updater reports that configuration as unsupported before changing either installation. Upgrade each manually. MSI restart-required and restart-started results are reported explicitly.
+Se forem detectadas várias instalações estáveis do PowerShell em MSI (por exemplo, x86 e x64 lado a lado), o atualizador direto relata essa configuração como não suportada antes de alterar qualquer uma das instalações. Atualize cada uma manualmente. Resultados de MSI que exigem reinicialização e de reinicialização iniciada são relatados explicitamente.

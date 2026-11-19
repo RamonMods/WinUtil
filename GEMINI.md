@@ -1,3 +1,3 @@
 # GEMINI.md
 
-Read `AGENTS.md` in the repository root for operating instructions before doing anything else.
+Leia `AGENTS.md` na raiz do repositório para obter as instruções operacionais antes de fazer qualquer outra coisa.

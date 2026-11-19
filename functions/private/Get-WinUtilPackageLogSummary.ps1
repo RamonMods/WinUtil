@@ -14,7 +14,7 @@ function Get-WinUtilPackageLogSummary {
             Select-Object -First 1
 
         if ([string]::IsNullOrWhiteSpace([string]$packageName)) {
-            $packageName = "Unknown package"
+            $packageName = "Pacote desconhecido"
         }
 
         if ($Preference -eq "Choco" -and -not [string]::IsNullOrWhiteSpace([string]$package.choco) -and $package.choco -ne "na") {
@@ -22,7 +22,7 @@ function Get-WinUtilPackageLogSummary {
         } elseif (-not [string]::IsNullOrWhiteSpace([string]$package.winget) -and $package.winget -ne "na") {
             "$packageName (winget: $($package.winget))"
         } else {
-            "$packageName (no package id)"
+            "$packageName (sem ID de pacote)"
         }
     })
 }

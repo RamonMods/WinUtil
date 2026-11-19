@@ -335,7 +335,7 @@ function Invoke-WPFUIElements {
                                 $comboBox.SelectedIndex = @($comboBox.Items.Content).IndexOf([string]$comboBox.Tag.State)
                             } catch {
                                 $unknownStateItem = New-Object Windows.Controls.ComboBoxItem
-                                $unknownStateItem.Content = "Custom / Unknown - select a state"
+                                $unknownStateItem.Content = "Personalizado / Desconhecido - escolha um estado"
                                 $unknownStateItem.IsEnabled = $false
                                 $unknownStateItem.ToolTip = "$($_.Exception.Message) Select one of the supported states to replace these values."
                                 $comboBox.Items.Add($unknownStateItem) | Out-Null

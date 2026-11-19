@@ -28,7 +28,7 @@ function Invoke-WinUtilRobocopy {
 function Write-WinUtilISOLog {
     <#
     .SYNOPSIS
-        Appends a line to the Win11 Creator status log and to the session log.
+        Acrescenta uma linha ao registro de status do Criar Win11 e ao log da sessÃ£o.
 
     .DESCRIPTION
         The status log is a UI control, so the append is posted to the UI thread rather than
@@ -54,7 +54,7 @@ function Write-WinUtilISOLog {
         $box = $sync["WPFWin11ISOStatusLog"]
         if ($null -eq $box) { return }
 
-        if ($box.Text -eq "Ready. Please select a Windows 11 ISO to begin.") {
+        if ($box.Text -eq "Pronto. Selecione uma ISO do Windows 11 para comeÃ§ar.") {
             $box.Text = $LogLine
         } else {
             $box.Text += "`n$LogLine"
@@ -67,7 +67,7 @@ function Write-WinUtilISOLog {
 function Set-WinUtilISOStep {
     <#
         .SYNOPSIS
-            Selects a page of the Win11 Creator wizard and sets which pages can be navigated back to
+            Escolhe uma pÃ¡gina do assistente do Criar Win11 e define para quais pÃ¡ginas dÃ¡ para voltar
 
         .PARAMETER Step
             Select, Modify, Working or Output
@@ -175,7 +175,7 @@ function Invoke-WinUtilISOBrowse {
     $fileSizeGB = [math]::Round((Get-Item $isoPath).Length / 1GB, 2)
 
     $sync["WPFWin11ISOPath"].Text           = $isoPath
-    $sync["WPFWin11ISOFileInfo"].Text       = "File size: $fileSizeGB GB"
+    $sync["WPFWin11ISOFileInfo"].Text       = "Tamanho do arquivo: $fileSizeGB GB"
     $sync["WPFWin11ISOFileInfo"].Visibility = "Visible"
     $sync["WPFWin11ISOVerifyResultPanel"].Visibility  = "Collapsed"
 
@@ -637,13 +637,13 @@ function Invoke-WinUtilISOCleanAndReset {
             $sync["Win11ISOUSBDisks"]    = $null
 
             Invoke-WPFUIThread -ScriptBlock {
-                $sync["WPFWin11ISOPath"].Text                    = "No ISO selected..."
+                $sync["WPFWin11ISOPath"].Text                    = "Nenhuma ISO selecionada..."
                 $sync["WPFWin11ISOFileInfo"].Visibility          = "Hidden"
                 $sync["WPFWin11ISOVerifyResultPanel"].Visibility = "Collapsed"
                 $sync["WPFWin11ISOOptionUSB"].Visibility         = "Collapsed"
                 $sync["WPFWin11ISODonePanel"].Visibility         = "Collapsed"
                 $sync["WPFWin11ISOModifyButton"].IsEnabled       = $true
-                $sync["WPFWin11ISOStatusLog"].Text               = "Ready. Please select a Windows 11 ISO to begin."
+                $sync["WPFWin11ISOStatusLog"].Text               = "Pronto. Selecione uma ISO do Windows 11 para comeÃ§ar."
                 Set-WinUtilISOStep -Step "Select"
             }
             Step-WinUtilJob -Hide
@@ -751,7 +751,7 @@ function Invoke-WinUtilISOExport {
             Invoke-WPFUIThread -Parameters @{ OutputISO = $outputISO } -ScriptBlock {
                 param($OutputISO)
 
-                $sync["WPFWin11ISODoneLabel"].Text        = "ISO saved to $OutputISO"
+                $sync["WPFWin11ISODoneLabel"].Text        = "ISO salva em $OutputISO"
                 $sync["WPFWin11ISODonePanel"].Visibility  = "Visible"
             }
             Set-WinUtilISOStep -Step "Output"

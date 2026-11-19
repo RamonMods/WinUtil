@@ -1,278 +1,276 @@
 ---
-title: Getting Started
-description: The safest way to get started with WinUtil and the first actions most users take.
+title: Primeiros passos
+description: A forma mais segura de começar com o WinUtil e as primeiras ações que a maioria dos usuários faz.
 sidebar:
   order: 1
 ---
 
-## Welcome to WinUtil!
+## Bem-vindo ao WinUtil!
 
-WinUtil helps you install apps, apply system tweaks, run common fixes, and manage Windows settings from one place. This guide covers the safest way to get started and the first actions most users take.
+O WinUtil ajuda você a instalar apps, aplicar ajustes no sistema, executar correções comuns e gerenciar configurações do Windows em um só lugar. Este guia cobre a forma mais segura de começar e as primeiras ações que a maioria dos usuários faz.
 
-## System requirements
+## Requisitos do sistema
 
-Before running WinUtil, ensure your system meets these requirements:
+Antes de executar o WinUtil, verifique se o seu sistema atende a estes requisitos:
 
 :::caution
-Windows 10 is not supported by WinUtil. Windows 10 reached the end of support on **October 14, 2025**.
+O Windows 10 não é suportado pelo WinUtil. O Windows 10 chegou ao fim do suporte em **14 de outubro de 2025**.
 :::
 
-- **Operating system**: Windows 11
-- **PowerShell**: Version 5.1 or later (included by default in Windows 11)
-- **Administrator access**: Required for system-level changes
-- **Internet connection**: Required for downloading applications and updates
-- **.NET Framework**: Version 4.5 or later (usually pre-installed)
+- **Sistema operacional**: Windows 11
+- **PowerShell**: Versão 5.1 ou superior (incluída por padrão no Windows 11)
+- **Acesso de Administrador**: Necessário para mudanças no nível do sistema
+- **Conexão com a internet**: Necessária para baixar aplicativos e atualizações
+- **.NET Framework**: Versão 4.5 ou superior (normalmente pré-instalada)
 
-## Installation
+## Instalação
 
-WinUtil doesn't require traditional installation. It runs directly from PowerShell as a script.
+O WinUtil não requer instalação tradicional. Ele é executado diretamente pelo PowerShell, como um script.
 
-### Step 1: Open PowerShell as Administrator
+### Passo 1: Abra o PowerShell como Administrador
 
-There are several ways to open PowerShell with admin rights:
+Existem várias formas de abrir o PowerShell com direitos de administrador:
 
-**Method 1: Start menu (recommended)**
+**Método 1: Menu Iniciar (recomendado)**
 
-1. Right-click the Windows Start button.
-2. Select "Terminal (Admin)".
+1. Clique com o botão direito no botão Iniciar do Windows.
+2. Selecione "Terminal (Admin)".
 
-**Method 2: Search method**
+**Método 2: Busca**
 
-1. Press the `Windows` key.
-2. Type "PowerShell" or "Terminal".
-3. Press `Ctrl + Shift + Enter` to launch as administrator.
-4. Or right-click and select "Run as administrator".
+1. Pressione a tecla `Windows`.
+2. Digite "PowerShell" ou "Terminal".
+3. Pressione `Ctrl + Shift + Enter` para abrir como administrador.
+4. Ou clique com o botão direito e selecione "Executar como administrador".
 
-**Method 3: Run dialog**
+**Método 3: Caixa Executar**
 
-1. Press `Windows + R`.
-2. Type `powershell`.
-3. Press `Ctrl + Shift + Enter`.
+1. Pressione `Windows + R`.
+2. Digite `powershell`.
+3. Pressione `Ctrl + Shift + Enter`.
 
-### Step 2: Run the launch command
+### Passo 2: Execute o comando de inicialização
 
-With PowerShell running as Administrator, run one of the following commands depending on the release channel you want.
+Com o PowerShell em execução como Administrador, execute um dos comandos a seguir, conforme o canal de versão que você quiser.
 
-**Stable release (recommended)**
+**Versão estável (recomendada)**
 
 ```powershell
 irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1" | iex
 ```
 
-**Development branch (bleeding edge — for testing only)**
+**Branch de desenvolvimento (bleeding edge — apenas para testes)**
 
 ```powershell
 irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1dev" | iex
 ```
 
 :::note
-- The `irm` command downloads the script, and `iex` executes it. This is safe when downloading from the official source.
-- The development branch may contain experimental changes and should only be used for testing on non-production systems.
+- O comando `irm` baixa o script e o `iex` o executa. Isso é seguro quando o download vem da fonte oficial.
+- A branch de desenvolvimento pode conter mudanças experimentais e deve ser usada apenas para testes em sistemas que não sejam de produção.
 :::
 
-### Step 3: Wait for WinUtil to load
+### Passo 3: Aguarde o WinUtil carregar
 
-The first time you run WinUtil, it may take a few moments to:
+Na primeira vez que você executa o WinUtil, pode levar alguns instantes para:
 
-- Download the latest version
-- Initialize the interface
-- Load all features and settings
+- Baixar a versão mais recente
+- Inicializar a interface
+- Carregar todos os recursos e configurações
 
-## First time setup
+## Configuração inicial
 
-### Understanding the interface
+### Entendendo a interface
 
-You can maximize WinUtil while keeping the title bar and window buttons inside the monitor work area. Restoring the window returns it to its normal layout.
+Você pode maximizar o WinUtil mantendo a barra de título e os botões da janela dentro da área útil do monitor. Restaurar a janela a devolve ao layout normal.
 
-WinUtil opens with a clean, tabbed interface:
+O WinUtil abre com uma interface limpa, organizada em abas:
 
-**Main tabs**:
+**Abas principais**:
 
-- **Install**: Browse and install applications
-- **Tweaks**: Apply system optimizations and customizations
-- **Config**: Access system tools and utilities
-- **Updates**: Manage Windows updates
-- **Win11 Creator**: Build a customized Windows 11 ISO from an official Microsoft image
+- **Instalar**: Navegue e instale aplicativos
+- **Ajustes**: Aplique otimizações e personalizações do sistema
+- **Configurações**: Acesse ferramentas e utilitários do sistema
+- **Atualizações**: Gerencie as atualizações do Windows
+- **Criador do Win11**: Crie uma ISO personalizada do Windows 11 a partir de uma imagem oficial da Microsoft
 
-**Running more than one action**: if you start an install, tweak or fix while another is running, it waits its turn instead of being refused. A clock button appears in the top bar with the number waiting; open it to see what is running, move waiting items up or down, or cancel them. Consecutive identical requests are queued once; repeating an action after a different request keeps your chosen order. Closing WinUtil discards anything still waiting.
+**Executando mais de uma ação**: se você iniciar uma instalação, ajuste ou correção enquanto outra está em andamento, ela espera a sua vez em vez de ser recusada. Um botão de relógio aparece na barra superior com o número de itens em espera; abra-o para ver o que está rodando, mover itens em espera para cima ou para baixo, ou cancelá-los. Pedidos idênticos consecutivos entram na fila uma única vez; repetir uma ação após um pedido diferente mantém a ordem que você escolheu. Fechar o WinUtil descarta tudo o que ainda estiver em espera.
 
-## Your first actions
+## Suas primeiras ações
 
-Here are some recommended first steps for new users:
+Aqui estão alguns primeiros passos recomendados para novos usuários:
 
-### 1. Create a restore point
+### 1. Crie um ponto de restauração
 
-Before making any changes, create a system restore point:
+Antes de fazer qualquer mudança, crie um ponto de restauração do sistema:
 
-1. Go to the **Tweaks** tab.
-2. Find "Create Restore Point" under Essential Tweaks.
-3. Check the box and click **Run Tweaks**.
+1. Vá para a aba **Ajustes**.
+2. Encontre "Criar ponto de restauração" em Ajustes essenciais.
+3. Marque a caixa de seleção e clique em **Executar ajustes**.
 
-This gives you a rollback point if needed.
+Isso cria um ponto de retorno caso seja necessário.
 
-### 2. Install essential applications
+### 2. Instale aplicativos essenciais
 
-1. Navigate to the **Install** tab.
-2. Browse categories or use the search bar.
-3. Check the applications you want to install.
-4. Click "Install/Upgrade Selected" at the bottom.
+1. Vá para a aba **Instalar**.
+2. Navegue pelas categorias ou use a barra de busca.
+3. Marque os aplicativos que deseja instalar.
+4. Clique em "Instalar/atualizar selecionados" na parte inferior.
 
-### 3. Apply basic tweaks
+### 3. Aplique ajustes básicos
 
-For a better Windows experience with minimal risk:
+Para uma experiência melhor no Windows com risco mínimo:
 
-1. Go to the **Tweaks** tab.
-2. Select the **Standard** preset for a balanced configuration.
-3. Review the selected tweaks.
-4. Click **Run Tweaks**.
+1. Vá para a aba **Ajustes**.
+2. Selecione a predefinição **Padrão** para uma configuração equilibrada.
+3. Revise os ajustes selecionados.
+4. Clique em **Executar ajustes**.
 
 :::note
-Some tweaks, fixes, and update changes may require a restart or sign-out before the full effect is visible.
+Alguns ajustes, correções e mudanças de atualização podem exigir reinicialização ou saída da conta para que o efeito completo apareça.
 :::
 
-## Common tasks
+## Tarefas comuns
 
-### Installing applications
+### Instalando aplicativos
 
-**Single application**:
+**Um único aplicativo**:
 
-1. Open the **Install** tab.
-2. Search for the application name.
-3. Check the box next to it.
-4. Click "Install/Upgrade Selected".
+1. Abra a aba **Instalar**.
+2. Busque pelo nome do aplicativo.
+3. Marque a caixa de seleção ao lado dele.
+4. Clique em "Instalar/atualizar selecionados".
 
-**Multiple applications**:
+**Vários aplicativos**:
 
-1. Check multiple application boxes.
-2. All checked apps will install in sequence.
-3. Install and uninstall progress is shown in the window-level bottom panel, including the current package or package-manager batch and overall completion.
+1. Marque as caixas de vários aplicativos.
+2. Todos os apps marcados serão instalados em sequência.
+3. O progresso de instalação e desinstalação aparece no painel inferior da janela, incluindo o pacote atual ou o lote do gerenciador de pacotes e a conclusão geral.
 
-### Applying tweaks
+### Aplicando ajustes
 
-**Essential tweaks** (safe for all users):
+**Ajustes essenciais** (seguros para todos os usuários):
 
-1. Go to the **Tweaks** tab.
-2. Select from the Essential Tweaks section.
-3. Click **Run Tweaks**.
+1. Vá para a aba **Ajustes**.
+2. Selecione na seção Ajustes essenciais.
+3. Clique em **Executar ajustes**.
 
-**Advanced tweaks** (use with caution):
+**Ajustes avançados** (use com cuidado):
 
-1. Only modify if you understand the implications.
-2. Always create a restore point first.
-3. Review documentation for each tweak.
+1. Modifique apenas se você entender as implicações.
+2. Sempre crie um ponto de restauração primeiro.
+3. Revise a documentação de cada ajuste.
 
-**Undoing tweaks**:
+**Desfazendo ajustes**:
 
-1. Select the same tweaks you applied.
-2. Click **Undo Selected Tweaks**.
-3. The system reverts to the previous state.
+1. Selecione os mesmos ajustes que você aplicou.
+2. Clique em **Desfazer ajustes selecionados**.
+3. O sistema volta ao estado anterior.
 
-### Using quick fixes
+### Usando correções rápidas
 
-For common Windows issues:
+Para problemas comuns do Windows:
 
-1. Go to the **Config** tab.
-2. Navigate to the **Fixes** section.
-3. Select the appropriate fix:
-   - **Reset Network**: Fixes network connectivity issues
-   - **Reset Windows Update**: Resolves update problems
-   - **System Corruption Scan**: Repairs corrupted system files
-   - **WinGet Reinstall**: Fixes package manager issues
+1. Vá para a aba **Configurações**.
+2. Navegue até a seção **Correções**.
+3. Selecione a correção adequada:
+   - **Redefinir rede**: Corrige problemas de conectividade de rede
+   - **Redefinir Windows Update**: Resolve problemas de atualização
+   - **Verificação de corrupção do sistema**: Repara arquivos de sistema corrompidos
+   - **Reinstalar o WinGet**: Corrige problemas do gerenciador de pacotes
 
-### Changing DNS servers
+### Alterando servidores DNS
 
-For improved privacy and speed:
+Para melhor privacidade e velocidade:
 
-1. Go to the **Tweaks** tab.
-2. Find the DNS section.
-3. Select a provider:
-   - **Cloudflare**: Fast and privacy-focused
-   - **Google**: Reliable and widely used
-   - **Quad9**: Security-focused with malware blocking
-   - **AdGuard**: Blocks ads and trackers
-4. Click **Apply**.
+1. Vá para a aba **Ajustes**.
+2. Encontre a seção DNS.
+3. Selecione um provedor:
+   - **Cloudflare**: Rápido e focado em privacidade
+   - **Google**: Confiável e amplamente usado
+   - **Quad9**: Focado em segurança, com bloqueio de malware
+   - **AdGuard**: Bloqueia anúncios e rastreadores
+4. Clique em **Aplicar**.
 
-## Understanding presets
+## Entendendo as predefinições
 
-WinUtil offers several preset configurations:
+O WinUtil oferece várias configurações predefinidas:
 
-- **Minimal**: Minimal changes that keep most Windows features
-- **Standard**: A good middle ground for most users
-- **Advanced**: Selects a focused set of safer advanced tweaks
+- **Mínimo**: Mudanças mínimas que mantêm a maioria dos recursos do Windows
+- **Padrão**: Um bom meio-termo para a maioria dos usuários
+- **Avançado**: Seleciona um conjunto focado de ajustes avançados mais seguros
 
-## Safety tips
+## Dicas de segurança
 
-✅ **Do**:
+✅ **Faça**:
 
-- Create restore points before major changes
-- Read tweak descriptions before applying
-- Start with Essential Tweaks
-- Keep Windows up to date
-- Back up important data
+- Crie pontos de restauração antes de mudanças grandes
+- Leia as descrições dos ajustes antes de aplicá-los
+- Comece pelos Ajustes essenciais
+- Mantenha o Windows atualizado
+- Faça backup dos dados importantes
 
-❌ **Don't**:
+❌ **Não faça**:
 
-- Apply all tweaks at once without understanding them
-- Skip creating restore points
-- Use Advanced Tweaks without research
-- Disable security features unless necessary
-- Run on production systems without testing
+- Aplicar todos os ajustes de uma vez sem entendê-los
+- Deixar de criar pontos de restauração
+- Usar Ajustes avançados sem pesquisar
+- Desabilitar recursos de segurança sem necessidade
+- Executar em sistemas de produção sem testar
 
-## Troubleshooting first run
+## Solução de problemas na primeira execução
 
-### Script won't download
+### O script não baixa
 
-If the launch command fails:
+Se o comando de inicialização falhar:
 
-- Make sure PowerShell or Terminal is running as Administrator.
-- Confirm the PC has internet access and can reach `RamonMods.com`.
-- Retry from a normal PowerShell session rather than a restricted enterprise shell profile.
-- If the command starts and then closes immediately, reopen Terminal as Administrator and run it again so you can read the error output.
+- Verifique se o PowerShell ou o Terminal está em execução como Administrador.
+- Confirme se o PC tem acesso à internet e consegue alcançar `github.com`.
+- Tente novamente a partir de uma sessão normal do PowerShell, e não de um perfil de shell corporativo restrito.
+- Se o comando iniciar e fechar imediatamente, reabra o Terminal como Administrador e execute-o de novo para conseguir ler a saída de erro.
 
-If it still fails, check the [Known Issues](/knownissues/) page.
+Se ainda assim falhar, consulte a página de [Problemas conhecidos](/knownissues/).
 
-## Next steps
+## Próximos passos
 
-Now that you're set up, explore these guides:
+Agora que está tudo configurado, explore estes guias:
 
-- [Applications Guide](/guides/application/) — Learn about installing, upgrading, and uninstalling software
-- [Tweaks Guide](/guides/tweaks/) — Understand system optimizations
-- [FAQ](/faq/) — Common questions and answers
+- [Guia de aplicativos](/guides/application/) — Saiba como instalar, atualizar e desinstalar softwares
+- [Guia de ajustes](/guides/tweaks/) — Entenda as otimizações do sistema
+- [FAQ](/faq/) — Perguntas e respostas comuns
 
-## Exporting a diagnostics report
+## Exportando um relatório de diagnóstico
 
-If you're reporting a problem, click the gear icon in the top-right corner and choose **Export Environment Report**. It saves a read-only JSON file with:
+Se você estiver relatando um problema, clique no ícone de engrenagem no canto superior direito e escolha **Exportar relatório do ambiente**. Ele salva um arquivo JSON somente leitura com:
 
-- Windows edition, version, build, and architecture
-- CPU model, logical processor count, and total memory
-- PowerShell edition, version, and execution policy
-- Whether WinGet and Chocolatey are installed, and their versions
-- Whether a reboot is pending
-- The current applied/not-applied state of every tweak and toggle
+- Edição, versão, build e arquitetura do Windows
+- Modelo da CPU, número de processadores lógicos e memória total
+- Edição, versão e política de execução do PowerShell
+- Se o WinGet e o Chocolatey estão instalados, e suas versões
+- Se há uma reinicialização pendente
+- O estado atual (aplicado/não aplicado) de cada ajuste e interruptor
 
-It does not include computer or user names, paths, IP or MAC addresses, serial numbers, installed-app inventories, services, raw registry paths or values, secrets, or logs. The tweak/toggle state is derived from a registry comparison, but only the resulting true/false per tweak is included, not any registry content itself. WinUtil never uploads the report — you choose where to save it and who to send it to.
+Ele não inclui nomes de computador ou de usuário, caminhos, endereços IP ou MAC, números de série, inventário de aplicativos instalados, serviços, caminhos ou valores brutos de registro, segredos ou logs. O estado de ajuste/interruptor é derivado de uma comparação de registro, mas apenas o resultado verdadeiro/falso por ajuste é incluído, e não o conteúdo do registro em si. O WinUtil nunca envia o relatório — você escolhe onde salvá-lo e para quem enviar.
 
-You'll be asked whether to also bundle the last 7 days of WinUtil logs into a companion `.txt` file, which maintainers often need alongside the report to diagnose an issue. This companion is raw log output and does not use the JSON report's privacy allowlist: it may contain local paths, commands, and error details. Review it before sharing.
+Será perguntado se você também quer agrupar os últimos 7 dias de logs do WinUtil em um arquivo `.txt` complementar, que os mantenedores costumam precisar junto do relatório para diagnosticar um problema. Esse complemento é saída de log bruta e não usa a lista de permissões de privacidade do relatório JSON: ele pode conter caminhos locais, comandos e detalhes de erros. Revise-o antes de compartilhar.
 
-## Getting help
+## Obtendo ajuda
 
-If you need assistance:
+Se precisar de assistência:
 
-- **Documentation**: Browse this documentation site
-- **Known Issues**: Check the [Known Issues](/knownissues/) page
-- **Discord**: Join the [community Discord server](https://github.com/RamonMods/WinUtil)
-- **GitHub Issues**: Report bugs on [GitHub](https://github.com/RamonMods/WinUtil/issues)
-- **YouTube**: Watch [video tutorials](https://github.com/RamonMods/WinUtil)
+- **Documentação**: Navegue por este site de documentação
+- **Problemas conhecidos**: Consulte a página de [Problemas conhecidos](/knownissues/)
+- **Issues do GitHub**: Relate bugs no [GitHub](https://github.com/RamonMods/WinUtil/issues)
 
-## Quick reference card
+## Cartão de referência rápida
 
-| Task | Location | Action |
+| Tarefa | Local | Ação |
 | ---- | -------- | ------ |
-| Install or upgrade apps | Install tab | Check boxes → Install/Upgrade Selected |
-| Uninstall apps | Install tab | Check boxes → Uninstall Selected |
-| Apply tweaks | Tweaks tab | Select tweaks → Run Tweaks |
-| Undo tweaks | Tweaks tab | Select tweaks → Undo Selected Tweaks |
-| Create restore point | Tweaks tab | Essential Tweaks section |
-| Fix network | Config tab | Fixes → Reset Network |
-| Change DNS | Tweaks tab | DNS section |
-| Open Control Panel | Config tab | Legacy Windows Panels |
+| Instalar ou atualizar apps | Aba Instalar | Marcar caixas → Instalar/atualizar selecionados |
+| Desinstalar apps | Aba Instalar | Marcar caixas → Desinstalar selecionados |
+| Aplicar ajustes | Aba Ajustes | Selecionar ajustes → Executar ajustes |
+| Desfazer ajustes | Aba Ajustes | Selecionar ajustes → Desfazer ajustes selecionados |
+| Criar ponto de restauração | Aba Ajustes | Seção Ajustes essenciais |
+| Corrigir rede | Aba Configurações | Correções → Redefinir rede |
+| Alterar DNS | Aba Ajustes | Seção DNS |
+| Abrir o Painel de Controle | Aba Configurações | Painéis herdados do Windows |

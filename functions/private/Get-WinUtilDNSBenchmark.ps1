@@ -2,13 +2,13 @@ function Get-WinUtilDNSBenchmark {
     <#
 
     .SYNOPSIS
-        Benchmarks neutral DNS providers by measuring TCP port 53 latency (RTT in ms) to determine the fastest DNS server.
+        Testa provedores DNS neutros medindo a latência da porta 53 via TCP (RTT em ms) para determinar o servidor DNS mais rápido.
 
     .PARAMETER TimeoutMs
-        Maximum timeout in milliseconds for each connection test. Default is 1500ms.
+        Tempo máximo de espera em milissegundos para cada teste de conexão. O padrão é 1500 ms.
 
     .OUTPUTS
-        Array of PSCustomObjects containing Provider, PrimaryIP, and LatencyMs sorted by lowest latency.
+        Matriz de PSCustomObjects contendo Provider, PrimaryIP e LatencyMs, ordenada pela menor latência.
 
     .EXAMPLE
         $results = Get-WinUtilDNSBenchmark
@@ -21,12 +21,12 @@ function Get-WinUtilDNSBenchmark {
         [int]$TimeoutMs = 1500
     )
 
-    Write-WinUtilLog -Component "DNS" -Message "Starting DNS latency benchmark scan (TCP port 53)..."
+    Write-WinUtilLog -Component "DNS" -Message "Iniciando a verificação de latência de DNS (porta 53 via TCP)..."
 
     $dnsConfigs = $sync.configs.dns
     if ($null -eq $dnsConfigs) {
-        Write-Warning "DNS configurations not found in `$sync.configs.dns."
-        Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "DNS configurations not found in `$sync.configs.dns."
+        Write-Warning "Configurações de DNS não encontradas em `$sync.configs.dns."
+        Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "Configurações de DNS não encontradas em `$sync.configs.dns."
         return @()
     }
 
@@ -37,7 +37,7 @@ function Get-WinUtilDNSBenchmark {
         $primaryIp = $prop.Value.Primary
         if (-not $primaryIp) { continue }
 
-        # Providers must explicitly opt in so new filtering services are never auto-selected.
+        # Os provedores precisam optar explicitamente, para que novos serviços de filtragem nunca sejam escolhidos automaticamente.
         if ($prop.Value.BenchmarkEligible -ne $true) {
             continue
         }
@@ -75,9 +75,9 @@ function Get-WinUtilDNSBenchmark {
     $sortedResults = @($results | Sort-Object LatencyMs)
     if ($sortedResults.Count -gt 0 -and $sortedResults[0].LatencyMs -lt 9999) {
         $fastest = $sortedResults[0]
-        Write-WinUtilLog -Component "DNS" -Message "DNS Benchmark completed. Fastest neutral provider: $($fastest.Provider) ($($fastest.LatencyMs) ms)"
+        Write-WinUtilLog -Component "DNS" -Message "Benchmark de DNS concluído. Provedor neutro mais rápido: $($fastest.Provider) ($($fastest.LatencyMs) ms)"
     } else {
-        Write-WinUtilLog -Component "DNS" -Message "DNS Benchmark completed. Could not determine latency for providers."
+        Write-WinUtilLog -Component "DNS" -Message "Benchmark de DNS concluído. Não foi possível determinar a latência dos provedores."
     }
 
     return $sortedResults

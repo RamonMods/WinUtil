@@ -1,19 +1,20 @@
 function Close-WinUtilRunspacePool {
     <#
         .SYNOPSIS
-            Stops anything still running and closes the worker pool
+            Para o que ainda estiver em execução e fecha o pool de workers
 
         .DESCRIPTION
-            Closing the pool with work still in it is what produced an unhandled
-            InvalidRunspaceStateException: a queued instance starts on a runspace that is already
-            closing, throws on a thread pool thread, and takes the process down. Whatever is in
-            flight is therefore asked to stop, and waited for, before the pool is closed.
+            Fechar o pool com trabalho ainda dentro dele é o que produzia uma exceção
+            InvalidRunspaceStateException não tratada: uma instância na fila começa em um runspace
+            que já está fechando, lança exceção em uma thread do pool de threads e derruba o
+            processo. Por isso, pede-se que o que estiver em andamento pare, e espera-se por isso,
+            antes de o pool ser fechado.
     #>
     param(
         [int]$StopTimeoutSeconds = 15,
 
-        # Leaves ShuttingDown clear: nothing resets it, so setting it here would refuse every
-        # later action for the rest of the session
+        # Deixa ShuttingDown limpo: nada o redefine, então defini-lo aqui recusaria toda
+        # ação posterior pelo resto da sessão
         [switch]$Recycle
     )
 
@@ -24,7 +25,7 @@ function Close-WinUtilRunspacePool {
     $poolLock = Get-WinUtilRunspacePoolLock
     [System.Threading.Monitor]::Enter($poolLock)
     try {
-        # Set before stopping, so nothing that is winding down queues fresh work behind us
+        # Definido antes de parar, para que nada que esteja terminando enfileire trabalho novo atrás de nós
         if (-not $Recycle) {
             $sync.ShuttingDown = $true
         }
@@ -38,7 +39,7 @@ function Close-WinUtilRunspacePool {
             $stopped = Stop-WinUtilActiveWork -TimeoutSeconds $StopTimeoutSeconds
         } catch {
             $stopped = $false
-            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Could not stop running work cleanly: $($_.Exception.Message)"
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Não foi possível parar o trabalho em execução de forma limpa: $($_.Exception.Message)"
         }
 
         $pool = $sync.runspace
@@ -51,8 +52,8 @@ function Close-WinUtilRunspacePool {
             )
 
             if (-not $stopped -and $poolState -notin $terminalStates) {
-                # Close and Dispose both wait for an invocation that ignored BeginStop. Hand
-                # cleanup to the thread pool so the timeout above remains a real upper bound.
+                # Close e Dispose aguardam uma invocação que ignorou BeginStop. Entrega
+                # a limpeza ao pool de threads para que o timeout acima continue sendo um limite superior real.
                 $cleanupDeferred = $true
                 if ($poolState -ne [System.Management.Automation.Runspaces.RunspacePoolState]::Closing) {
                     Register-WinUtilRunspacePoolCleanup -RunspacePool $pool
@@ -61,14 +62,14 @@ function Close-WinUtilRunspacePool {
                 $pool.Close()
             }
         } catch {
-            # A pool that will not close cleanly must not stop the window from closing
-            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Worker pool did not close cleanly: $($_.Exception.Message)"
+            # Um pool que não fecha de forma limpa não pode impedir a janela de fechar
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "O pool de workers não fechou de forma limpa: $($_.Exception.Message)"
         } finally {
             if (-not $cleanupDeferred) {
                 try {
                     $pool.Dispose()
                 } catch {
-                    Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Worker pool did not dispose cleanly: $($_.Exception.Message)"
+                    Write-WinUtilLog -Level "WARN" -Component "UI" -Message "O pool de workers não foi liberado de forma limpa: $($_.Exception.Message)"
                 }
             }
             $sync.Remove("runspace")
@@ -82,7 +83,7 @@ function Close-WinUtilRunspacePool {
 function Register-WinUtilRunspacePoolCleanup {
     <#
         .SYNOPSIS
-            Closes and disposes a worker pool without blocking the calling thread
+            Fecha e libera um pool de workers sem bloquear a thread chamadora
     #>
     param(
         [Parameter(Mandatory)]

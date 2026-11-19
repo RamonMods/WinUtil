@@ -1,7 +1,7 @@
 function Get-WinUtilEnvironmentReport {
     <#
     .SYNOPSIS
-        Collects the allowlisted data used by the WinUtil environment report.
+        Coleta os dados permitidos usados pelo relatório de ambiente do WinUtil.
     #>
 
     $reportWarnings = [System.Collections.Generic.List[string]]::new()
@@ -29,7 +29,7 @@ function Get-WinUtilEnvironmentReport {
             $hardware.totalMemoryGB = [math]::Round(([double]$operatingSystem.TotalVisibleMemorySize / 1MB), 2)
         }
     } catch {
-        $message = "Failed to collect Windows/memory info from Win32_OperatingSystem: $($_.Exception.Message)"
+        $message = "Falha ao coletar informações do Windows/memória de Win32_OperatingSystem: $($_.Exception.Message)"
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }
@@ -41,7 +41,7 @@ function Get-WinUtilEnvironmentReport {
             $hardware.logicalProcessorCount = [int](($processors | Measure-Object -Property NumberOfLogicalProcessors -Sum).Sum)
         }
     } catch {
-        $message = "Failed to collect CPU info from Win32_Processor: $($_.Exception.Message)"
+        $message = "Falha ao coletar informações da CPU de Win32_Processor: $($_.Exception.Message)"
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }
@@ -55,17 +55,17 @@ function Get-WinUtilEnvironmentReport {
     try {
         $powershell.executionPolicy = (Get-ExecutionPolicy).ToString()
     } catch {
-        $message = "Failed to read PowerShell execution policy: $($_.Exception.Message)"
+        $message = "Falha ao ler a política de execução do PowerShell: $($_.Exception.Message)"
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }
 
-    # Re-use built-in functionality
+    # Reutiliza a funcionalidade embutida
     $chocolatey = [ordered]@{ installed = $false; version = $null }
     try {
         $chocolatey.installed = (Test-WinUtilPackageManager -choco 6>$null) -eq "installed"
     } catch {
-        $message = "Failed to check Chocolatey availability: $($_.Exception.Message)"
+        $message = "Falha ao verificar a disponibilidade do Chocolatey: $($_.Exception.Message)"
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }
@@ -75,11 +75,11 @@ function Get-WinUtilEnvironmentReport {
             $global:LASTEXITCODE = 0
             $versionOutput = @(choco -v 2>&1)
             if ($LASTEXITCODE -ne 0) {
-                throw "Chocolatey version probe exited with code $LASTEXITCODE."
+                throw "A sondagem da versão do Chocolatey terminou com o código $LASTEXITCODE."
             }
             $chocolatey.version = ($versionOutput | Select-Object -First 1).ToString().Trim()
         } catch {
-            $message = "Failed to read Chocolatey version: $($_.Exception.Message)"
+            $message = "Falha ao ler a versão do Chocolatey: $($_.Exception.Message)"
             Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
             [void]$reportWarnings.Add($message)
         }
@@ -89,7 +89,7 @@ function Get-WinUtilEnvironmentReport {
     try {
         $winget.installed = (Test-WinUtilPackageManager -winget 6>$null) -eq "installed"
     } catch {
-        $message = "Failed to check WinGet availability: $($_.Exception.Message)"
+        $message = "Falha ao verificar a disponibilidade do WinGet: $($_.Exception.Message)"
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }
@@ -99,18 +99,18 @@ function Get-WinUtilEnvironmentReport {
             $global:LASTEXITCODE = 0
             $versionOutput = @(winget -v 2>&1)
             if ($LASTEXITCODE -ne 0) {
-                throw "WinGet version probe exited with code $LASTEXITCODE."
+                throw "A sondagem da versão do WinGet terminou com o código $LASTEXITCODE."
             }
             $winget.version = ($versionOutput | Select-Object -First 1).ToString().Trim()
         } catch {
-            $message = "Failed to read WinGet version: $($_.Exception.Message)"
+            $message = "Falha ao ler a versão do WinGet: $($_.Exception.Message)"
             Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
             [void]$reportWarnings.Add($message)
         }
     }
 
-    # Null means the registry state could not be read. Do not turn an access/provider failure into
-    # a misleading "no reboot required" result.
+    # Nulo significa que o estado do registro não pôde ser lido. Não transforme uma falha de acesso
+    # ou do provedor em um resultado enganoso de "nenhuma reinicialização necessária".
     $system = [ordered]@{ pendingRebootRequired = $null }
     try {
         $rebootPaths = @(
@@ -118,8 +118,8 @@ function Get-WinUtilEnvironmentReport {
             "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired"
         )
 
-        # A present-but-empty PendingFileRenameOperations value still returns a non-null object, so
-        # check the actual entries rather than just whether the property exists.
+        # Um valor PendingFileRenameOperations presente, mas vazio, ainda retorna um objeto não nulo, então
+        # verifique as entradas de verdade em vez de apenas a existência da propriedade.
         $pendingFileRenameOperations = @(
             (Get-ItemProperty -LiteralPath "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" `
                 -ErrorAction Stop).PendingFileRenameOperations |
@@ -130,14 +130,14 @@ function Get-WinUtilEnvironmentReport {
         }).Count -gt 0 -or
             $pendingFileRenameOperations.Count -gt 0
     } catch {
-        $message = "Failed to check pending-reboot registry state: $($_.Exception.Message)"
+        $message = "Falha ao verificar o estado de reinicialização pendente no registro: $($_.Exception.Message)"
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }
 
     $tweaksState = Get-WinUtilTweaksStateReport
     if ($tweaksState.collectionStatus -ne "collected") {
-        $message = "Failed to collect the complete tweak state for the environment report."
+        $message = "Falha ao coletar o estado completo dos ajustes para o relatório de ambiente."
         Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message $message
         [void]$reportWarnings.Add($message)
     }

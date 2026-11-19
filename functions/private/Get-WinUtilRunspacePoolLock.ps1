@@ -1,7 +1,7 @@
 function Get-WinUtilRunspacePoolLock {
     <#
         .SYNOPSIS
-            Returns the lock that serializes worker-pool startup and shutdown
+            Retorna o lock que serializa a inicialização e o encerramento do pool de workers
     #>
 
     [System.Threading.Monitor]::Enter($sync.SyncRoot)

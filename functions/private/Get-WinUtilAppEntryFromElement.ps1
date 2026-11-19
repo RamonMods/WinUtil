@@ -1,13 +1,13 @@
 function Get-WinUtilAppEntryFromElement {
     <#
         .SYNOPSIS
-            Finds the app entry (card) an element on the Install tab belongs to
+            Encontra a entrada (cartão) de app à qual um elemento da aba Instalar pertence
 
         .PARAMETER Element
-            The element an event came from, such as an icon, a name or the card itself
+            O elemento de onde veio um evento, como um ícone, um nome ou o próprio cartão
 
         .OUTPUTS
-            The nearest border tagged with an app key, or nothing when the element is not in a card
+            A borda mais próxima marcada com uma chave de app, ou nada quando o elemento não está em um cartão
     #>
     param($Element)
 

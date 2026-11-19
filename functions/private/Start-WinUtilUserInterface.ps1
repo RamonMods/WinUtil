@@ -367,16 +367,16 @@ function Start-WinUtilUserInterface {
     # Category filter chips. The chip carries its category in Tag, so one handler covers all of them.
     $sync.AppCategoryChips = @(
         @{ Name = "WPFSearchChipAll";             Category = "" }
-        @{ Name = "WPFSearchChipBrowsers";        Category = "Browsers" }
-        @{ Name = "WPFSearchChipCommunications";  Category = "Communications" }
-        @{ Name = "WPFSearchChipDevelopment";     Category = "Development" }
-        @{ Name = "WPFSearchChipDocument";        Category = "Document" }
-        @{ Name = "WPFSearchChipGames";           Category = "Games" }
-        @{ Name = "WPFSearchChipMicrosoftTools";  Category = "Microsoft Tools" }
-        @{ Name = "WPFSearchChipMultimediaTools"; Category = "Multimedia Tools" }
-        @{ Name = "WPFSearchChipProTools";        Category = "Pro Tools" }
-        @{ Name = "WPFSearchChipSelfhostedTools"; Category = "Selfhosted Tools" }
-        @{ Name = "WPFSearchChipUtilities";       Category = "Utilities" }
+        @{ Name = "WPFSearchChipBrowsers";        Category = "Navegadores" }
+        @{ Name = "WPFSearchChipCommunications";  Category = "Comunicação" }
+        @{ Name = "WPFSearchChipDevelopment";     Category = "Desenvolvimento" }
+        @{ Name = "WPFSearchChipDocument";        Category = "Documentos" }
+        @{ Name = "WPFSearchChipGames";           Category = "Jogos" }
+        @{ Name = "WPFSearchChipMicrosoftTools";  Category = "Ferramentas da Microsoft" }
+        @{ Name = "WPFSearchChipMultimediaTools"; Category = "Multimídia" }
+        @{ Name = "WPFSearchChipProTools";        Category = "Ferramentas Profissionais" }
+        @{ Name = "WPFSearchChipSelfhostedTools"; Category = "Ferramentas Auto-hospedadas" }
+        @{ Name = "WPFSearchChipUtilities";       Category = "Utilitários" }
     )
     $sync.SelectedAppCategories = [System.Collections.Generic.List[string]]::new()
 

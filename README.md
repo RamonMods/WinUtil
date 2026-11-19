@@ -1,4 +1,4 @@
-# WinUtil — utilitário para Windows em português
+# WinUtil
 
 [![Versão](https://img.shields.io/github/v/release/RamonMods/WinUtil?color=%230567ff&label=Última%20versão&style=for-the-badge)](https://github.com/RamonMods/WinUtil/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/RamonMods/WinUtil/winutil.ps1?label=Downloads&style=for-the-badge)](https://github.com/RamonMods/WinUtil/releases)
@@ -42,7 +42,7 @@ Rodando do código-fonte desta pasta:
 | **Configurações** | Conserta Windows Update, rede, winget e faz reparo do sistema | 6 correções |
 | **Atualizações** | Define se o Windows Update fica padrão, desligado ou só com segurança | 3 modos |
 | **Recursos** | Liga recursos opcionais do Windows (.NET, Hyper-V, WSL etc.) | por edição do Windows |
-| **Criador do Win11** | Monta uma ISO do Windows 11 com ajustes e programas embutidos | ISO + USB |
+| **Criar Win11** | Monta uma ISO do Windows 11 com ajustes e programas embutidos | ISO + USB |
 | **Aparência** | Tema claro/escuro e cor de destaque da interface | 2 temas |
 
 ---
@@ -106,4 +106,4 @@ Deixe uma ⭐ no repositório se o projeto te ajudou — é de graça e ajuda ba
 
 ## Créditos
 
-Este projeto é um fork traduzido e adaptado do [WinUtil de Chris Titus Tech](https://github.com/ChrisTitusTech/winutil), distribuído sob a licença MIT. O aviso de copyright original foi preservado no [`LICENSE`](LICENSE), como a licença exige.
+Baseado no [WinUtil de Chris Titus Tech](https://github.com/ChrisTitusTech/winutil), distribuído sob a licença MIT. O aviso de copyright original foi preservado no [`LICENSE`](LICENSE), como a licença exige.

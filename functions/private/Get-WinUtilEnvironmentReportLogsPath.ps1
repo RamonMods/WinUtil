@@ -1,15 +1,15 @@
 function Get-WinUtilEnvironmentReportLogsPath {
     <#
     .SYNOPSIS
-        Derives the companion logs .txt path from the environment report's JSON save path.
+        Deriva o caminho do .txt de logs companheiro a partir do caminho de salvamento do JSON do relatório de ambiente.
     #>
     param(
         [Parameter(Mandatory = $true)]
         [string]$JsonPath
     )
 
-    # ChangeExtension($JsonPath, $null) leaves a trailing dot instead of stripping it, so build the
-    # name from its parts instead.
+    # ChangeExtension($JsonPath, $null) deixa um ponto final em vez de removê-lo, então monte o
+    # nome a partir de suas partes.
     $directory = [System.IO.Path]::GetDirectoryName($JsonPath)
     $baseName = [System.IO.Path]::GetFileNameWithoutExtension($JsonPath)
     return [System.IO.Path]::Combine($directory, "${baseName}_logs.txt")

@@ -1,83 +1,83 @@
 {
     "WPFInstall": {
-        "Content": "Install/Upgrade Applications",
-        "Category": "____Actions",
+        "Content": "Instalar/Atualizar Aplicativos",
+        "Category": "____Ações",
         "Type": "Button",
         "Order": "1",
-        "Description": "Install or upgrade the selected applications"
+        "Description": "Instalar ou atualizar os aplicativos selecionados"
     },
     "WPFUninstall": {
-        "Content": "Uninstall Applications",
-        "Category": "____Actions",
+        "Content": "Desinstalar Aplicativos",
+        "Category": "____Ações",
         "Type": "Button",
         "Order": "2",
-        "Description": "Uninstall the selected applications"
+        "Description": "Desinstalar os aplicativos selecionados"
     },
     "WPFInstallUpgrade": {
-        "Content": "Upgrade all Applications",
-        "Category": "____Actions",
+        "Content": "Atualizar Todos os Aplicativos",
+        "Category": "____Ações",
         "Type": "Button",
         "Order": "3",
-        "Description": "Upgrade all applications to the latest version"
+        "Description": "Atualizar todos os aplicativos para a versão mais recente"
     },
     "WingetRadioButton": {
         "Content": "WinGet",
-        "Category": "__Package Manager",
+        "Category": "__Gerenciador de Pacotes",
         "Type": "RadioButton",
         "GroupName": "PackageManagerGroup",
         "Checked": true,
         "Order": "1",
-        "Description": "Use WinGet for package management"
+        "Description": "Usar o WinGet para gerenciar pacotes"
     },
     "ChocoRadioButton": {
         "Content": "Chocolatey",
-        "Category": "__Package Manager",
+        "Category": "__Gerenciador de Pacotes",
         "Type": "RadioButton",
         "GroupName": "PackageManagerGroup",
         "Checked": false,
         "Order": "2",
-        "Description": "Use Chocolatey for package management"
+        "Description": "Usar o Chocolatey para gerenciar pacotes"
     },
     "WPFCollapseAllCategories": {
-        "Content": "Collapse All Categories",
-        "Category": "__Selection",
+        "Content": "Recolher Todas as Categorias",
+        "Category": "__Seleção",
         "Type": "Button",
         "Order": "1",
-        "Description": "Collapse all application categories"
+        "Description": "Recolher todas as categorias de aplicativos"
     },
     "WPFExpandAllCategories": {
-        "Content": "Expand All Categories",
-        "Category": "__Selection",
+        "Content": "Expandir Todas as Categorias",
+        "Category": "__Seleção",
         "Type": "Button",
         "Order": "2",
-        "Description": "Expand all application categories"
+        "Description": "Expandir todas as categorias de aplicativos"
     },
     "WPFClearInstallSelection": {
-        "Content": "Clear Selection",
-        "Category": "__Selection",
+        "Content": "Limpar Seleção",
+        "Category": "__Seleção",
         "Type": "Button",
         "Order": "3",
-        "Description": "Clear the selection of applications"
+        "Description": "Limpar a seleção de aplicativos"
     },
     "WPFGetInstalled": {
-        "Content": "Show Installed Apps",
-        "Category": "__Selection",
+        "Content": "Mostrar Aplicativos Instalados",
+        "Category": "__Seleção",
         "Type": "Button",
         "Order": "4",
-        "Description": "Show installed applications"
+        "Description": "Mostrar os aplicativos instalados"
     },
     "WPFselectedAppsButton": {
-        "Content": "Selected Apps: 0",
-        "Category": "__Selection",
+        "Content": "Apps selecionados: 0",
+        "Category": "__Seleção",
         "Type": "Button",
         "Order": "5",
-        "Description": "Show the selected applications"
+        "Description": "Mostrar os aplicativos selecionados"
     },
     "WPFInstallFOSSInfo": {
-        "Content": "Free and Open Source Software",
-        "Category": "__Selection",
+        "Content": "Software Livre e de Código Aberto",
+        "Category": "__Seleção",
         "Type": "Note",
         "Order": "0",
-        "Description": "Information about the #FOSS label on application entries"
+        "Description": "Informações sobre o rótulo #FOSS nas entradas de aplicativos"
     }
 }

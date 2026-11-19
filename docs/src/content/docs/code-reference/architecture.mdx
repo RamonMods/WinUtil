@@ -1,13 +1,13 @@
 ---
-title: Architecture & Design
-description: How WinUtil's GUI, functions, and JSON configuration files fit together, plus a deep dive into the Win11 Creator subsystem.
+title: Arquitetura e design
+description: Como a interface gráfica, as funções e os arquivos de configuração JSON do WinUtil se encaixam, além de um mergulho no subsistema do Criador do Win11.
 ---
 
-## Overview
+## Visão geral
 
-WinUtil is a PowerShell-based Windows utility with a WPF (Windows Presentation Foundation) GUI. This document explains the architecture, code structure, and how different components work together.
+O WinUtil é um utilitário Windows baseado em PowerShell com uma interface gráfica WPF (Windows Presentation Foundation). Este documento explica a arquitetura, a estrutura do código e como os diferentes componentes trabalham juntos.
 
-## High-Level Architecture
+## Arquitetura de alto nível
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -35,9 +35,9 @@ WinUtil is a PowerShell-based Windows utility with a WPF (Windows Presentation F
     └─────────────────────────┘
 ```
 
-## Project Structure
+## Estrutura do projeto
 
-### Directory Layout
+### Layout de diretórios
 
 ```
 winutil/
@@ -65,106 +65,106 @@ winutil/
 └── docs/                     # Documentation
 ```
 
-### Key Components
+### Componentes principais
 
 #### 1. Compile.ps1
-**Purpose**: Combines all separate script files into a single `winutil.ps1` for distribution.
+**Propósito**: Combina todos os arquivos de script separados em um único `winutil.ps1` para distribuição.
 
-**Process**:
-1. Reads all function files from `/functions/`
-2. Includes configuration JSON files
-3. Embeds XAML GUI definition
-4. Combines into a single script
-5. Outputs `winutil.ps1`
+**Processo**:
+1. Lê todos os arquivos de função de `/functions/`
+2. Inclui os arquivos JSON de configuração
+3. Incorpora a definição da interface XAML
+4. Combina tudo em um único script
+5. Gera o `winutil.ps1`
 
-**Why**: Makes distribution easier (single file) and improves load time.
+**Por quê**: Facilita a distribuição (arquivo único) e melhora o tempo de carregamento.
 
 #### 2. scripts/main.ps1
-**Purpose**: Entry point that manages the run.
+**Propósito**: Ponto de entrada que gerencia a execução.
 
-**Responsibilities**:
-- Load configurations
-- Run the headless `-Preset` and `-Config` paths
-- Start the interface on a dedicated STA runspace and wait for it
-- Report anything the interface thread failed with, then clean up
+**Responsabilidades**:
+- Carregar as configurações
+- Executar os caminhos headless `-Preset` e `-Config`
+- Iniciar a interface em um runspace STA dedicado e aguardar
+- Relatar qualquer falha da thread da interface e então limpar
 
-The interface itself lives in `Start-WinUtilUserInterface`, not here. See [Threading Model](#threading-model).
+A interface em si fica em `Start-WinUtilUserInterface`, não aqui. Veja [Modelo de threads](#modelo-de-threads).
 
-`Update-WinUtilWindowInsets` keeps maximized content inside the current monitor work area. It measures native window bounds, converts the overhang to WPF units, and updates the main grid after size, position, DPI, or work-area changes. Restoring the window removes the inset.
+`Update-WinUtilWindowInsets` mantém o conteúdo maximizado dentro da área útil do monitor atual. Ele mede os limites nativos da janela, converte a sobra para unidades WPF e atualiza a grade principal após mudanças de tamanho, posição, DPI ou área útil. Restaurar a janela remove o recuo.
 
 #### 3. functions/public/
-**Purpose**: User-facing functions that implement main features.
+**Propósito**: Funções voltadas ao usuário que implementam os recursos principais.
 
-**Key Functions**:
-- `Initialize-WPFUI.ps1`: Sets up the GUI
-- `Invoke-WPFTweak*`: Applies system tweaks
-- `Invoke-WPFFeature*`: Enables Windows features
-- `Install-WinUtilProgram*`: Installs applications
+**Funções principais**:
+- `Initialize-WPFUI.ps1`: Configura a interface gráfica
+- `Invoke-WPFTweak*`: Aplica ajustes do sistema
+- `Invoke-WPFFeature*`: Habilita recursos do Windows
+- `Install-WinUtilProgram*`: Instala aplicativos
 
-**Naming Convention**: Functions start with `WPF` or `Winutil` to be loaded into the runspace.
+**Convenção de nomes**: As funções começam com `WPF` ou `Winutil` para serem carregadas no runspace.
 
 #### 4. functions/private/
-**Purpose**: Internal helper functions not directly called by users.
+**Propósito**: Funções auxiliares internas, não chamadas diretamente pelos usuários.
 
-**Key Functions**:
-- `Get-WinUtilVariables.ps1`: Retrieves UI element references
-- `Install-WinUtilWinget.ps1`: Ensures WinGet is installed
-- `Get-WinUtilCheckBoxes.ps1`: Gets checkbox states
-- `Invoke-WinUtilCurrentSystem.ps1`: Gets system information
+**Funções principais**:
+- `Get-WinUtilVariables.ps1`: Obtém referências a elementos da interface
+- `Install-WinUtilWinget.ps1`: Garante que o WinGet esteja instalado
+- `Get-WinUtilCheckBoxes.ps1`: Obtém o estado das caixas de seleção
+- `Invoke-WinUtilCurrentSystem.ps1`: Obtém informações do sistema
 
 #### 5. config/*.json
-**Purpose**: Define available applications, tweaks, and features declaratively.
+**Propósito**: Definir aplicativos, ajustes e recursos disponíveis de forma declarativa.
 
-**Files**:
-- `applications.json`: Application definitions with WinGet/Choco IDs
-- `tweaks.json`: Registry tweaks and their undo actions
-- `feature.json`: Windows features that can be enabled/disabled
-- `preset.json`: Predefined tweak combinations
-- `dns.json`: DNS provider configurations
+**Arquivos**:
+- `applications.json`: Definições de aplicativos com IDs de WinGet/Choco
+- `tweaks.json`: Ajustes de registro e suas ações de desfazer
+- `feature.json`: Recursos do Windows que podem ser habilitados/desabilitados
+- `preset.json`: Combinações de ajustes predefinidas
+- `dns.json`: Configurações de provedores de DNS
 
 #### 6. xaml/inputXML.xaml
-**Purpose**: WPF GUI layout and design.
+**Propósito**: Layout e design da interface WPF.
 
-**Structure**:
-- Buttons with event handlers
-- TextBoxes for input
-- CheckBoxes for options
-- ListBoxes for selections
+**Estrutura**:
+- Botões com manipuladores de eventos
+- TextBoxes para entrada
+- CheckBoxes para opções
+- ListBoxes para seleções
 
-## Win11 Creator Architecture
+## Arquitetura do Criador do Win11
 
-The **Win11 Creator** is a specialized subsystem within Winutil that creates customized Windows 11 ISOs. It operates independently of the main package installation and tweak system.
+O **Criador do Win11** é um subsistema especializado dentro do Winutil que cria ISOs personalizadas do Windows 11. Ele funciona independentemente do sistema principal de instalação de pacotes e de ajustes.
 
-### Win11 Creator Components
+### Componentes do Criador do Win11
 
-**Core Functions** (`functions/private/`):
-- `Invoke-WinUtilISO.ps1`: Main orchestrator containing ISO workflow and helper functions
-  - `Invoke-WinUtilISOBrowse`: ISO file selection dialog
-  - `Invoke-WinUtilISOMountAndVerify`: Validates and mounts ISO, verifies it is an official Windows 11 ISO
-  - `Invoke-WinUtilISOModify`: Launches modification in background runspace
-  - `Invoke-WinUtilISOExport`: Builds bootable ISO via `oscdimg.exe`
-  - `Invoke-WinUtilISOCheckExistingWork`: Recovers incomplete work sessions
-  - `Invoke-WinUtilISOCleanAndReset`: Cleans up temp directories and resets UI
-  - `Write-WinUtilISOLog`: Posts log messages to UI status box and session log
-  - `Set-WinUtilISOStep`: Controls wizard navigation state
-  - `Get-WinUtilEditionIdFromName`: Maps edition display names to setup edition IDs
-  - `Invoke-WinUtilRobocopy`: Copies files with exit code verification
-  - `Find-WinUtilOscdimg` / `Get-WinUtilOscdimgPath`: Locates or installs `oscdimg.exe`
+**Funções centrais** (`functions/private/`):
+- `Invoke-WinUtilISO.ps1`: Orquestrador principal, contendo o fluxo da ISO e funções auxiliares
+  - `Invoke-WinUtilISOBrowse`: Diálogo de seleção do arquivo ISO
+  - `Invoke-WinUtilISOMountAndVerify`: Valida e monta a ISO, verificando se é uma ISO oficial do Windows 11
+  - `Invoke-WinUtilISOModify`: Inicia a modificação em um runspace em segundo plano
+  - `Invoke-WinUtilISOExport`: Monta a ISO inicializável via `oscdimg.exe`
+  - `Invoke-WinUtilISOCheckExistingWork`: Recupera sessões de trabalho incompletas
+  - `Invoke-WinUtilISOCleanAndReset`: Limpa diretórios temporários e redefine a interface
+  - `Write-WinUtilISOLog`: Publica mensagens de log na caixa de status e no log da sessão
+  - `Set-WinUtilISOStep`: Controla o estado de navegação do assistente
+  - `Get-WinUtilEditionIdFromName`: Mapeia nomes de exibição de edição para IDs de edição da instalação
+  - `Invoke-WinUtilRobocopy`: Copia arquivos com verificação de código de saída
+  - `Find-WinUtilOscdimg` / `Get-WinUtilOscdimgPath`: Localiza ou instala o `oscdimg.exe`
 
-- `Invoke-WinUtilISOUSB.ps1`: USB drive detection and formatting
-  - `Invoke-WinUtilISORefreshUSBDrives`: Enumerates USB drives
-  - `Get-WinUtilFreeDriveLetter`: Finds available drive letters
-  - `Invoke-WinUtilISOWriteUSB`: Formats USB drive as GPT/FAT32, splits WIM if needed, and copies files
+- `Invoke-WinUtilISOUSB.ps1`: Detecção e formatação de pendrives
+  - `Invoke-WinUtilISORefreshUSBDrives`: Enumera os pendrives
+  - `Get-WinUtilFreeDriveLetter`: Encontra letras de unidade disponíveis
+  - `Invoke-WinUtilISOWriteUSB`: Formata o pendrive como GPT/FAT32, divide o WIM se necessário e copia os arquivos
 
-- `Invoke-WinUtilISOScript.ps1`: Prepares setup media and customizations
-  - Stages AppX removal (19 bloatware packages) into `autounattend.xml` for first logon
-  - Applies 50+ registry tweaks during Windows Setup and first logon; removes scheduled tasks at first logon
-  - Triggers OneDrive uninstall during first logon
-  - Stages setup script fallbacks to `sources\$OEM$\$$\Setup\Scripts\`
-  - Pins selected edition in `autounattend.xml` and writes `sources\ei.cfg`
-  - Injects eligible current system drivers into WIM images if enabled (WIM mount is only used for driver servicing)
+- `Invoke-WinUtilISOScript.ps1`: Prepara a mídia de instalação e as personalizações
+  - Prepara a remoção de AppX (19 pacotes de bloatware) no `autounattend.xml` para o primeiro logon
+  - Aplica mais de 50 ajustes de registro durante a Instalação do Windows e o primeiro logon; remove tarefas agendadas no primeiro logon
+  - Dispara a desinstalação do OneDrive no primeiro logon
+  - Prepara scripts de instalação de reserva em `sources\$OEM$\$$\Setup\Scripts\`
+  - Fixa a edição selecionada no `autounattend.xml` e grava `sources\ei.cfg`
+  - Injeta drivers elegíveis do sistema atual nas imagens WIM quando habilitado (a montagem do WIM é usada apenas para o serviço de drivers)
 
-### Win11 Creator Data Flow
+### Fluxo de dados do Criador do Win11
 
 ```
 User selects official Windows 11 ISO
@@ -217,91 +217,91 @@ Invoke-WinUtilISOCleanAndReset (optional)
     └─ Reset UI to initial state
 ```
 
-### Win11 Creator Validation & Safety
+### Validação e segurança do Criador do Win11
 
-**ISO Validation**:
-- Only accepts official Microsoft Windows 11 ISOs
-- Validates presence of install.wim or install.esd
-- Checks image metadata for "Windows 11" string
-- Rejects custom, modified, or non-Windows 11 ISOs
+**Validação da ISO**:
+- Aceita apenas ISOs oficiais do Windows 11 da Microsoft
+- Valida a presença de install.wim ou install.esd
+- Verifica nos metadados da imagem a string "Windows 11"
+- Rejeita ISOs personalizadas, modificadas ou que não sejam do Windows 11
 
-**WIM Metadata Validation**:
-- During driver injection, `Assert-WinUtilISOWimMetadata` validates critical fields (`Languages`, `Installation`, `Edition`, `ProductSuite`, `ProductType`) before and after WIM servicing
-- Driver injection stops before export if the required metadata is missing or changes
-- Without driver injection, WinUtil preserves the original installation image and skips WIM metadata validation
+**Validação de metadados do WIM**:
+- Durante a injeção de drivers, `Assert-WinUtilISOWimMetadata` valida campos críticos (`Languages`, `Installation`, `Edition`, `ProductSuite`, `ProductType`) antes e depois do serviço de WIM
+- A injeção de drivers para antes da exportação se os metadados necessários estiverem ausentes ou mudarem
+- Sem injeção de drivers, o WinUtil preserva a imagem de instalação original e ignora a validação de metadados do WIM
 
-**Edition Pinning & Setup Fallback**:
-- Writes `sources\ei.cfg` and removes `sources\PID.txt` so setup does not use mismatched OEM product keys
-- Pins the selected edition index in `autounattend.xml` (`/IMAGE/INDEX`)
-- Stages fallback setup scripts under `sources\$OEM$\$$\Setup\Scripts\` with `UseConfigurationSet` enabled
+**Fixação de edição e reserva da instalação**:
+- Grava `sources\ei.cfg` e remove `sources\PID.txt` para que a instalação não use chaves de produto OEM incompatíveis
+- Fixa o índice da edição selecionada no `autounattend.xml` (`/IMAGE/INDEX`)
+- Prepara scripts de instalação de reserva em `sources\$OEM$\$$\Setup\Scripts\` com `UseConfigurationSet` habilitado
 
-**Work Session Recovery**:
-- Auto-detects incomplete work from previous sessions
-- Allows resuming the export step without re-running selection and modification
-- Prevents redundant modifications
+**Recuperação de sessão de trabalho**:
+- Detecta automaticamente trabalho incompleto de sessões anteriores
+- Permite retomar a etapa de exportação sem repetir a seleção e a modificação
+- Evita modificações redundantes
 
-**Modification Safety**:
-- Windows PE and specialize set hardware bypass and setup safeguards; `WinUtil-PostInstall.ps1` applies additional registry changes at first logon
-- Original ISO never modified; only working copy
-- Logged to the shared `%LocalAppData%\winutil\logs\winutil_<timestamp>.log` session file and the live UI status panel, so the log survives cleanup
-- DISM handles image dismount with automatic cleanup and discard on error
+**Segurança da modificação**:
+- Windows PE e a fase de especialização definem a ignorância de hardware e as proteções da instalação; `WinUtil-PostInstall.ps1` aplica mudanças adicionais no registro no primeiro logon
+- A ISO original nunca é modificada; apenas a cópia de trabalho
+- Registrado no arquivo de sessão compartilhado `%LocalAppData%\winutil\logs\winutil_<timestamp>.log` e no painel de status ao vivo da interface, para que o log sobreviva à limpeza
+- O DISM cuida da desmontagem da imagem com limpeza automática e descarte em caso de erro
 
-### Win11 Creator Registry Tweaks
+### Ajustes de registro do Criador do Win11
 
-The `Invoke-WinUtilISOScript` function applies **50+ registry tweaks** during setup and first logon:
+A função `Invoke-WinUtilISOScript` aplica **mais de 50 ajustes de registro** durante a instalação e o primeiro logon:
 
-**Hardware Bypass**:
-- TPM 2.0 check bypass
-- Secure Boot requirement bypass
-- CPU compatibility bypass
-- RAM requirement bypass
-- Storage check bypass
+**Ignorância de hardware**:
+- Ignorar a verificação de TPM 2.0
+- Ignorar a exigência de Secure Boot
+- Ignorar a compatibilidade de CPU
+- Ignorar a exigência de RAM
+- Ignorar a verificação de armazenamento
 
-**Privacy & Telemetry**:
-- Disable advertising ID
-- Disable tailored experiences
-- Disable input personalization
-- Disable speech online privacy
-- Disable cloud content suggestions
-- Disable app suggestion subscriptions
-- Remove CEIP, Appraiser, WaaSMedic, etc.
+**Privacidade e telemetria**:
+- Desabilitar ID de publicidade
+- Desabilitar experiências personalizadas
+- Desabilitar personalização de entrada
+- Desabilitar privacidade online de fala
+- Desabilitar sugestões de conteúdo na nuvem
+- Desabilitar assinaturas de sugestão de apps
+- Remover CEIP, Appraiser, WaaSMedic etc.
 
-**OOBE & Setup**:
-- Enable local account setup
-- Skip Microsoft account requirement
-- Dark mode by default
-- Empty taskbar and Start Menu
+**OOBE e instalação**:
+- Habilitar configuração com conta local
+- Ignorar a exigência de conta da Microsoft
+- Modo escuro por padrão
+- Barra de tarefas e Menu Iniciar vazios
 
-**Post-Setup Installations**:
-- Prevent DevHome auto-installation
-- Prevent new Outlook Mail app installation
-- Prevent Teams auto-installation
+**Instalações pós-configuração**:
+- Impedir a instalação automática do DevHome
+- Impedir a instalação do novo app Outlook Mail
+- Impedir a instalação automática do Teams
 
-**System Features**:
-- Disable BitLocker and device encryption
-- Disable Chat icon from the Taskbar
-- Disable OneDrive folder backup
-- Disable Copilot
-- Disable Windows Update during OOBE (re-enabled at first login)
+**Recursos do sistema**:
+- Desabilitar BitLocker e criptografia de dispositivo
+- Desabilitar o ícone do Chat na barra de tarefas
+- Desabilitar o backup de pastas do OneDrive
+- Desabilitar o Copilot
+- Desabilitar o Windows Update durante a OOBE (reabilitado no primeiro login)
 
-### Driver Injection Feature
+### Recurso de injeção de drivers
 
-**Optional Enhancement**: When enabled, exports all drivers from the running system and injects them into:
-- `install.wim` (main OS image), excluding stale duplicates
-- `boot.wim` index 2 (Windows Setup PE environment), storage controllers only (`SCSIAdapter` / `HDC`)
+**Melhoria opcional**: quando habilitada, exporta todos os drivers do sistema em execução e os injeta em:
+- `install.wim` (imagem principal do sistema operacional), excluindo duplicados obsoletos
+- `boot.wim` índice 2 (ambiente PE da Instalação do Windows), apenas controladores de armazenamento (`SCSIAdapter` / `HDC`)
 
-**Use Case**: Enables offline installation on systems with missing drivers.
+**Caso de uso**: Permite instalação offline em sistemas com drivers ausentes.
 
-### Disk Space Requirements
+### Requisitos de espaço em disco
 
-- **Temporary working directory**: ~10-15 GB
-- **Original ISO**: 4-6 GB
-- **Modified ISO**: close to the source ISO size
-- **Total needed**: ~25 GB for safe operation
+- **Diretório de trabalho temporário**: ~10-15 GB
+- **ISO original**: 4-6 GB
+- **ISO modificada**: próxima do tamanho da ISO de origem
+- **Total necessário**: ~25 GB para operar com segurança
 
-## Data Flow
+## Fluxo de dados
 
-### Application Installation Flow
+### Fluxo de instalação de aplicativos
 
 ```
 User clicks "Install"
@@ -321,7 +321,7 @@ Update UI with progress
 Display completion message
 ```
 
-### Tweak Application Flow
+### Fluxo de aplicação de ajustes
 
 ```
 User selects tweaks and clicks "Run Tweaks"
@@ -343,7 +343,7 @@ Update UI
 Display completion
 ```
 
-### Undo Tweak Flow
+### Fluxo de desfazer ajustes
 
 ```
 User selects tweaks and clicks "Undo"
@@ -361,9 +361,9 @@ Remove from the applied tweaks log
 Update UI
 ```
 
-## Configuration File Format
+## Formato dos arquivos de configuração
 
-### applications.json Structure
+### Estrutura do applications.json
 
 ```json title="config/applications.json"
 {
@@ -378,15 +378,15 @@ Update UI
 }
 ```
 
-**Fields**:
-- `category`: Which section in the Install tab
-- `content`: Display name in GUI
-- `description`: Tooltip/description text
-- `winget`: WinGet package ID
-- `choco`: Chocolatey package name
-- `link`: Official website
+**Campos**:
+- `category`: Qual seção na aba Instalar
+- `content`: Nome exibido na interface
+- `description`: Texto da dica/descrição
+- `winget`: ID do pacote no WinGet
+- `choco`: Nome do pacote no Chocolatey
+- `link`: Site oficial
 
-### tweaks.json Structure
+### Estrutura do tweaks.json
 
 ```json title="config/tweaks.json"
 {
@@ -408,29 +408,29 @@ Update UI
 }
 ```
 
-**Fields**:
-- `Content`: Display name
-- `Description`: What it does
+**Campos**:
+- `Content`: Nome exibido
+- `Description`: O que faz
 - `category`: Essential/Advanced/Customize
-- `registry`: Registry changes to make
-- `registry[].Values`: Per-state values for a registry-backed combobox
-- `registry[].DefaultValue`: Effective value when the registry entry is absent
-- `service`: Services to change
-- `OriginalValue/State`: For undo functionality
+- `registry`: Mudanças de registro a fazer
+- `registry[].Values`: Valores por estado de uma combobox baseada em registro
+- `registry[].DefaultValue`: Valor efetivo quando a entrada de registro está ausente
+- `service`: Serviços a alterar
+- `OriginalValue/State`: Para a funcionalidade de desfazer
 
-## Threading Model
+## Modelo de threads
 
-WinUtil runs on three kinds of thread, and each has one job:
+O WinUtil roda em três tipos de thread, e cada uma tem uma função:
 
-| Thread | Runspace | Responsibility |
+| Thread | Runspace | Responsabilidade |
 | --- | --- | --- |
-| Main | The one the script started in | Start the interface, wait for it, surface its errors, clean up |
-| Interface | `$sync.UIRunspace`, a dedicated STA runspace | Own the window. Paint and dispatch, nothing else |
-| Workers | `$sync.runspace`, a shared pool | Run everything long: installs, tweaks, features, AppX, Win11 Creator |
+| Principal | Aquele em que o script foi iniciado | Iniciar a interface, aguardá-la, expor os erros dela, limpar |
+| Interface | `$sync.UIRunspace`, um runspace STA dedicado | Ser dono da janela. Desenhar e despachar, nada além |
+| Trabalhadores | `$sync.runspace`, um pool compartilhado | Rodar tudo que é longo: instalações, ajustes, recursos, AppX, Criador do Win11 |
 
-All three are created from the same starting point, `New-WinUtilSessionState`, which carries
-`$sync`, the compiled script's globals, and every WinUtil function. That is what lets any
-thread call any helper without the caller injecting function definitions.
+As três são criadas a partir do mesmo ponto de partida, `New-WinUtilSessionState`, que carrega o
+`$sync`, as variáveis globais do script compilado e todas as funções do WinUtil. É isso que permite que qualquer
+thread chame qualquer auxiliar sem que o chamador injete definições de função.
 
 ```powershell
 # main.ps1 - the interface gets its own thread
@@ -447,28 +447,30 @@ while (-not $uiHandle.AsyncWaitHandle.WaitOne(250)) {
 }
 ```
 
-**Why**: the window never blocks on work, and a failure on the interface thread is reported
-instead of disappearing.
+**Por quê**: a janela nunca bloqueia por causa de trabalho, e uma falha na thread da interface é
+relatada em vez de desaparecer.
 
-## Long-Running Work
+## Trabalho de longa duração
 
-Every long action goes through `Start-WinUtilJob`, which owns everything a running operation
-needs: refusing to start while another job runs, the busy flag (`$sync.ActiveJob`), the progress
-bar and taskbar item, the boxed console banner, a start/finish/failure line in the log, and
-restoring the interface in a `finally` whatever happens.
+Toda ação longa passa por `Start-WinUtilJob`, que centraliza tudo o que uma operação em execução
+precisa: recusar o início enquanto outro job roda, a flag de ocupado (`$sync.ActiveJob`), a barra
+de progresso e o item da barra de tarefas, o banner do console em caixa, uma linha de início/fim/falha no log e
+a restauração da interface em um `finally`, aconteça o que acontecer.
 
-`Invoke-WPFButton` decides what counts as a long action. Anything that changes the system gets a
-job; anything that only changes what the interface is showing runs on the interface thread.
-That single classification is why no workflow arranges its own progress, banner or busy state.
+`Invoke-WPFButton` decide o que conta como ação longa. Tudo o que muda o sistema ganha um
+job; tudo o que só muda o que a interface está mostrando roda na thread da interface.
+Essa classificação única é o motivo de nenhum fluxo de trabalho organizar o próprio progresso, banner ou estado de ocupado.
 
-**Queueing**: an action the user starts passes `-QueueIfBusy`, so while another job runs it waits
-in `$sync.JobQueue` instead of being refused. The busy test and the enqueue happen under one
-`$sync.SyncRoot` lock. When a job ends, successfully or not, `Clear-WinUtilActiveJob` posts
-`Start-WinUtilNextQueuedJob` to the interface thread, which starts the oldest entry. The queue
-compares only its last entry when suppressing identical requests, preserving repeated actions after intervening work. It holds the job's parameters as they were at click time, so later selection changes do not alter
-it. The clock button in the header lists the running and queued jobs and lets the user reorder
-or cancel the queued ones. Handoffs pause while the close question is open, so its answer cannot affect a different queued job. Closing the window discards whatever is still queued. The ISO and USB
-jobs do not pass the switch and still refuse.
+**Fila**: uma ação iniciada pelo usuário passa `-QueueIfBusy`, então, enquanto outro job roda, ela espera
+em `$sync.JobQueue` em vez de ser recusada. O teste de ocupado e a entrada na fila acontecem sob um único
+bloqueio `$sync.SyncRoot`. Quando um job termina, com sucesso ou não, `Clear-WinUtilActiveJob` publica
+`Start-WinUtilNextQueuedJob` na thread da interface, que inicia a entrada mais antiga. A fila
+compara apenas sua última entrada ao suprimir pedidos idênticos, preservando ações repetidas depois de trabalho
+intercalado. Ela guarda os parâmetros do job como estavam no momento do clique, então mudanças posteriores na seleção não a alteram.
+O botão de relógio no cabeçalho lista os jobs em execução e na fila e permite ao usuário reordenar
+ou cancelar os que estão na fila. As transferências pausam enquanto a pergunta de fechamento está aberta, então a resposta
+não pode afetar um job diferente na fila. Fechar a janela descarta tudo o que ainda estiver na fila. Os jobs de ISO e pendrive
+não passam a chave e continuam recusando.
 
 ```powershell
 Start-WinUtilJob -Name "Features" -Description "Installing Windows Features" -Parameters @{
@@ -486,15 +488,15 @@ Start-WinUtilJob -Name "Features" -Description "Installing Windows Features" -Pa
 }
 ```
 
-The body only has to do the work and call `Step-WinUtilJob`. Anything it throws is
-caught, logged, and shown on the taskbar as a failure.
+O corpo só precisa fazer o trabalho e chamar `Step-WinUtilJob`. Tudo o que ele lançar é
+capturado, registrado e mostrado na barra de tarefas como falha.
 
-**Values, not closures**: the body is rebuilt inside the worker from its text, so it receives
-what it needs through `-Parameters` rather than capturing the caller's variables.
+**Valores, não closures**: o corpo é reconstruído dentro do worker a partir do seu texto, então ele recebe
+o que precisa por `-Parameters`, em vez de capturar as variáveis do chamador.
 
-## WPF Event Handling
+## Tratamento de eventos WPF
 
-Events are wired up via XAML element names:
+Os eventos são conectados pelos nomes dos elementos XAML:
 
 ```powershell
 # Get all named elements
@@ -508,11 +510,11 @@ $sync.keys | ForEach-Object {
 }
 ```
 
-**Convention**: Button named `WPFInstallButton` calls function `Invoke-WPFInstallButton`.
+**Convenção**: Um botão chamado `WPFInstallButton` chama a função `Invoke-WPFInstallButton`.
 
-## Package Manager Integration
+## Integração com gerenciadores de pacotes
 
-### WinGet Integration
+### Integração com o WinGet
 
 ```powershell
 # Check if installed
@@ -524,7 +526,7 @@ if (!(Get-Command winget -ErrorAction SilentlyContinue)) {
 winget install --id $app.winget --silent --accept-source-agreements
 ```
 
-### Chocolatey Integration
+### Integração com o Chocolatey
 
 ```powershell
 # Check if installed
@@ -536,25 +538,25 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
 choco install $app.choco -y
 ```
 
-## Error Handling And Logging
+## Tratamento de erros e logging
 
-A job body does not need its own error handling. `Start-WinUtilJob` catches whatever the body
-throws, logs it, and marks the run as failed on the taskbar, so a failure can never leave the
-interface stuck busy. Only catch inside a body when you have something specific to do first,
-such as cleaning up a mounted image, and then rethrow.
+O corpo de um job não precisa do próprio tratamento de erro. `Start-WinUtilJob` captura tudo o que o corpo
+lança, registra no log e marca a execução como falha na barra de tarefas, então uma falha nunca deixa a
+interface presa em estado ocupado. Só capture dentro de um corpo quando você tiver algo específico a fazer antes,
+como limpar uma imagem montada, e então relance o erro.
 
 ```powershell
 Write-WinUtilLog -Level "ERROR" -Component "Install" -Message "winget install failed: $($_.Exception.Message)"
 ```
 
-Every thread writes to the same `%LocalAppData%\winutil\logs\winutil_<timestamp>.log` session
-file through one shared writer. `Start-WinUtilJob` logs a job's warnings, errors and `Write-Host`
-output, and the main thread logs the interface thread's while the window is open. Banners and
-progress go through `Write-WinUtilHost` instead of `Write-Host` so they stay out of the log.
+Toda thread escreve no mesmo arquivo de sessão `%LocalAppData%\winutil\logs\winutil_<timestamp>.log`
+por meio de um único escritor compartilhado. `Start-WinUtilJob` registra os avisos, erros e a saída de
+`Write-Host` de um job, e a thread principal registra os da thread da interface enquanto a janela está aberta. Banners e
+progresso passam por `Write-WinUtilHost` em vez de `Write-Host`, para ficarem fora do log.
 
-## Configuration Loading
+## Carregamento de configurações
 
-At startup, Winutil loads all configurations:
+Na inicialização, o Winutil carrega todas as configurações:
 
 ```powershell
 # Load JSON configs
@@ -564,12 +566,12 @@ $sync.configs.tweaks = Get-Content "config/tweaks.json" | ConvertFrom-Json
 $sync.configs.features = Get-Content "config/feature.json" | ConvertFrom-Json
 ```
 
-**Sync Hash**: `$sync` hashtable shares state across runspaces.
+**Sync Hash**: A hashtable `$sync` compartilha estado entre runspaces.
 
-## UI Update Pattern
+## Padrão de atualização da interface
 
-Controls may only be touched from the thread that owns the window, so background work reaches
-them through `Invoke-WPFUIThread`:
+Controles só podem ser acessados pela thread dona da janela, então o trabalho em segundo plano chega
+a eles por `Invoke-WPFUIThread`:
 
 ```powershell
 Invoke-WPFUIThread -Parameters @{ Count = $installed.Count } -ScriptBlock {
@@ -578,19 +580,19 @@ Invoke-WPFUIThread -Parameters @{ Count = $installed.Count } -ScriptBlock {
 }
 ```
 
-Add `-Async` to post the update instead of waiting for it. `Step-WinUtilJob` and the
-Win11 Creator status log use that so a per-item update never stalls the worker.
+Adicione `-Async` para publicar a atualização em vez de esperar por ela. `Step-WinUtilJob` e o
+log de status do Criador do Win11 usam isso para que uma atualização por item nunca trave o worker.
 
-**Values, not closures**: the body is rebuilt inside the interface runspace, so it takes what it
-needs through `-Parameters`. Handing over a scriptblock from a worker instead would keep that
-worker's session state, which loses the caller's variables on an async post and costs roughly
-twenty times as much per command - enough to turn a checkbox refresh into a visible freeze.
+**Valores, não closures**: o corpo é reconstruído dentro do runspace da interface, então ele recebe o que
+precisa por `-Parameters`. Entregar um scriptblock de um worker manteria o estado de sessão desse
+worker, o que perde as variáveis do chamador em uma publicação assíncrona e custa cerca de
+vinte vezes mais por comando — o suficiente para transformar uma atualização de caixa de seleção em um travamento visível.
 
-## Adding New Features
+## Adicionando novos recursos
 
-### Adding a New Application
+### Adicionando um novo aplicativo
 
-1. Edit `config/applications.json`:
+1. Edite `config/applications.json`:
 ```json title="config/applications.json"
 {
   "NewApp": {
@@ -603,13 +605,13 @@ twenty times as much per command - enough to turn a checkbox refresh into a visi
 }
 ```
 
-2. Add its icon as `config/icons/<key>.png`, named after the key in `applications.json` (`NewApp` above, `Compile.ps1` adds the `WPFInstall` prefix). Any square image works: `.\tools\New-WinUtilIcon.ps1 -Key NewApp -Path logo.png` scales it to the 48x48 size the tests expect. Without an icon file the app falls back to its website's favicon.
+2. Adicione o ícone como `config/icons/<key>.png`, com o nome da chave em `applications.json` (`NewApp` acima; o `Compile.ps1` adiciona o prefixo `WPFInstall`). Qualquer imagem quadrada serve: `.\tools\New-WinUtilIcon.ps1 -Key NewApp -Path logo.png` a redimensiona para o tamanho 48x48 que os testes esperam. Sem arquivo de ícone, o app usa o favicon do site como alternativa.
 3. Recompile: `.\Compile.ps1`
-4. The app appears automatically in the Install tab
+4. O app aparece automaticamente na aba Instalar
 
-### Adding a New Tweak
+### Adicionando um novo ajuste
 
-1. Edit `config/tweaks.json`:
+1. Edite `config/tweaks.json`:
 ```json title="config/tweaks.json"
 {
   "WPFTweaksNewTweak": {
@@ -630,11 +632,11 @@ twenty times as much per command - enough to turn a checkbox refresh into a visi
 ```
 
 2. Recompile: `.\Compile.ps1`
-3. Tweak appears in the Tweaks tab
+3. O ajuste aparece na aba Ajustes
 
-### Adding a New Function
+### Adicionando uma nova função
 
-1. Create file in `functions/public/` or `functions/private/`:
+1. Crie o arquivo em `functions/public/` ou `functions/private/`:
 ```powershell
 # functions/public/Invoke-WPFNewFeature.ps1
 function Invoke-WPFNewFeature {
@@ -646,114 +648,114 @@ function Invoke-WPFNewFeature {
 }
 ```
 
-2. File naming must include "WPF" or "Winutil" to load
+2. O nome do arquivo deve incluir "WPF" ou "Winutil" para ser carregado
 3. Recompile: `.\Compile.ps1`
 
-## Testing
+## Testes
 
-### Manual Testing
+### Testes manuais
 
 ```powershell
 # Compile and run with -run flag
 .\Compile.ps1 -run
 ```
 
-### Automated Tests
+### Testes automatizados
 
-Tests are in `/pester/`:
-- `configs.Tests.ps1`: Validates JSON configurations
-- `functions.Tests.ps1`: Tests PowerShell functions
+Os testes ficam em `/pester/`:
+- `configs.Tests.ps1`: Valida as configurações JSON
+- `functions.Tests.ps1`: Testa as funções PowerShell
 
-Run tests:
+Execute os testes:
 ```powershell
 Install-Module -Name Pester -RequiredVersion 5.8.0 -Scope CurrentUser -Force -SkipPublisherCheck
 Import-Module Pester -RequiredVersion 5.8.0 -Force
 Invoke-Pester -Path 'pester/*.Tests.ps1' -Output Detailed -CI
 ```
 
-## Build Process
+## Processo de build
 
-### Development Build
+### Build de desenvolvimento
 
 ```powershell
 .\Compile.ps1
 ```
 
-Outputs `winutil.ps1` in the root directory.
+Gera `winutil.ps1` no diretório raiz.
 
-### Production Release
+### Versão de produção
 
-1. Tag release in Git
-2. GitHub Actions builds and uploads `winutil.ps1`
-3. Release appears on GitHub Releases
-4. Users download via `irm RamonMods.com/win`
+1. Crie a tag da versão no Git
+2. O GitHub Actions compila e envia o `winutil.ps1`
+3. A versão aparece nas releases do GitHub
+4. Os usuários baixam por `irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1"`
 
-## Dependencies
+## Dependências
 
-**Required**:
+**Obrigatórias**:
 - PowerShell 5.1+
 - .NET Framework 4.5+
 - Windows 11
 
-**Optional (auto-installed)**:
+**Opcionais (instaladas automaticamente)**:
 - WinGet (Windows Package Manager)
 - Chocolatey
 
-## Performance Considerations
+## Considerações de desempenho
 
-**Optimization Strategies**:
-- Lazy-load configurations (only when needed)
-- Use runspaces for long operations
-- Cache expensive lookups
-- Minimize registry reads/writes
-- Batch operations when possible
+**Estratégias de otimização**:
+- Carregar configurações sob demanda (apenas quando necessário)
+- Usar runspaces para operações longas
+- Armazenar em cache consultas caras
+- Minimizar leituras/gravações no registro
+- Agrupar operações quando possível
 
-## Security Considerations
+## Considerações de segurança
 
-**Safety Measures**:
-- All operations logged
-- Registry backups for undo
-- No credential storage
-- Open source (auditable)
-- Digitally signed (future)
+**Medidas de segurança**:
+- Todas as operações são registradas em log
+- Backups de registro para desfazer
+- Nenhum armazenamento de credenciais
+- Código aberto (auditável)
+- Assinado digitalmente (futuro)
 
-## Contributing Guidelines
+## Diretrizes de contribuição
 
-**Code Standards**:
-- Use proper PowerShell cmdlet naming (Verb-Noun)
-- Include comment-based help
-- Follow existing code style
-- Test thoroughly before PR
-- Document significant changes
+**Padrões de código**:
+- Use a nomenclatura adequada de cmdlets do PowerShell (Verbo-Substantivo)
+- Inclua ajuda baseada em comentários
+- Siga o estilo de código existente
+- Teste bem antes do PR
+- Documente mudanças significativas
 
-**File Naming**:
-- Public functions: `Invoke-WPF*.ps1` or `Invoke-Winutil*.ps1`
-- Private functions: `Get-WinUtil*.ps1` or verb-WinUtil*.ps1`
-- Must include "WPF" or "Winutil" to load
+**Nomenclatura de arquivos**:
+- Funções públicas: `Invoke-WPF*.ps1` ou `Invoke-Winutil*.ps1`
+- Funções privadas: `Get-WinUtil*.ps1` ou verbo-WinUtil*.ps1`
+- Deve incluir "WPF" ou "Winutil" para carregar
 
-## Future Architecture Plans
+## Planos futuros de arquitetura
 
-**Roadmap Considerations**:
-- Plugin system for community extensions
-- Config import/export
-- Cloud sync for configurations
-- Enhanced logging dashboard
-- Modular compilation (choose features)
+**Considerações de roteiro**:
+- Sistema de plugins para extensões da comunidade
+- Importação/exportação de configurações
+- Sincronização de configurações na nuvem
+- Painel de logging aprimorado
+- Compilação modular (escolher recursos)
 
-## Related Documentation
+## Documentação relacionada
 
-- [Contributing Guide](/contributing/) - How to contribute code
-- [User Guide](/guides/) - End-user documentation
-- [Win11 Creator Guide](/guides/win11creator/) - Building customized Windows 11 ISOs
-- [FAQ](/faq/) - Common questions
+- [Guia de contribuição](/contributing/) - Como contribuir com código
+- [Guia do usuário](/guides/) - Documentação para usuários finais
+- [Guia do Criador do Win11](/guides/win11creator/) - Criando ISOs personalizadas do Windows 11
+- [FAQ](/faq/) - Perguntas comuns
 
-## Additional Resources
+## Recursos adicionais
 
-- **GitHub Repository**: [RamonMods/winutil](https://github.com/RamonMods/WinUtil)
-- **PowerShell Docs**: [Microsoft Docs](https://docs.microsoft.com/powershell/)
-- **WPF Guide**: [WPF Documentation](https://docs.microsoft.com/dotnet/desktop/wpf/)
+- **Repositório no GitHub**: [RamonMods/winutil](https://github.com/RamonMods/WinUtil)
+- **Documentação do PowerShell**: [Microsoft Docs](https://docs.microsoft.com/powershell/)
+- **Guia de WPF**: [Documentação do WPF](https://docs.microsoft.com/dotnet/desktop/wpf/)
 
 ---
 
-**Last Updated**: January 2026
-**Maintainers**: Ramon and contributors
+**Última atualização**: Janeiro de 2026
+**Mantenedores**: Ramon e colaboradores

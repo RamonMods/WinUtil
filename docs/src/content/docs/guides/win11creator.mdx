@@ -1,169 +1,169 @@
 ---
-title: Win11 Creator
-description: Build a custom, debloated Windows 11 ISO from an official Microsoft image using WinUtil's Win11 Creator tool.
+title: Criador do Win11
+description: Crie uma ISO personalizada do Windows 11, sem bloatware, a partir de uma imagem oficial da Microsoft usando a ferramenta Criador do Win11 do WinUtil.
 sidebar:
   order: 7
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-## Using WinUtil's Win11 Creator
+## Usando o Criador do Win11 do WinUtil
 
-WinUtil includes a built-in **Win11 Creator** tool that lets you take an official Windows 11 ISO and produce a customized, debloated version. The resulting image can remove telemetry, bypass hardware requirement checks, and enable local account setup out of the box. You can export the result as a new ISO file or write it directly to a USB drive.
+O WinUtil inclui uma ferramenta **Criador do Win11** que permite pegar uma ISO oficial do Windows 11 e produzir uma versão personalizada, sem bloatware. A imagem resultante pode remover telemetria, ignorar as verificações de requisitos de hardware e habilitar a configuração com conta local de fábrica. Você pode exportar o resultado como um novo arquivo ISO ou gravá-lo diretamente em um pendrive.
 
-![Win11 Creator tab in WinUtil](../../../assets/screenshots/win11creator-tab-new.png)
+![Aba Criador do Win11 no WinUtil](../../../assets/screenshots/win11creator-tab-new.png)
 
 :::caution
-You need an **official Windows 11 ISO** from [Microsoft's website](https://www.microsoft.com/en-us/software-download/windows11) before starting. Custom, modified, or non-official ISOs are not supported. The process uses ~10–15 GB of temporary disk space, so make sure you have room.
+Você precisa de uma **ISO oficial do Windows 11** do [site da Microsoft](https://www.microsoft.com/en-us/software-download/windows11) antes de começar. ISOs personalizadas, modificadas ou não oficiais não são suportadas. O processo usa cerca de 10–15 GB de espaço temporário em disco, então verifique se há espaço livre.
 :::
 
 :::note
-This workflow is intended for fresh Windows installs, not in-place upgrades of an existing installation.
+Este fluxo de trabalho é indicado para instalações novas do Windows, não para atualizações no local de uma instalação existente.
 :::
 
 ---
 
-The tab is a three-step wizard. The step you are on is shown in the header row, and you can click an earlier step to go back to it until the image has been modified. The status log on the right stays visible throughout.
+A aba é um assistente de três etapas. A etapa em que você está aparece na linha do cabeçalho, e você pode clicar em uma etapa anterior para voltar até que a imagem tenha sido modificada. O log de status à direita fica visível o tempo todo.
 
-### Step 1 — Select Your Official Windows 11 ISO
+### Etapa 1 — Selecione sua ISO oficial do Windows 11
 
-1. Open WinUtil and go to the **Win11 Creator** tab.
-2. Click **Browse** and select your **official Windows 11 ISO file** from Microsoft (must be 4 GB or larger). Custom or modified ISOs are not supported.
-3. The file path and size will appear on screen once selected.
-4. Click **Mount & Verify ISO**. WinUtil mounts the ISO, checks for a valid `install.wim` or `install.esd`, and reads the available editions (Home, Pro, Enterprise, etc.).
+1. Abra o WinUtil e vá para a aba **Criador do Win11**.
+2. Clique em **Procurar** e selecione seu **arquivo ISO oficial do Windows 11** da Microsoft (deve ter 4 GB ou mais). ISOs personalizadas ou modificadas não são suportadas.
+3. O caminho e o tamanho do arquivo aparecem na tela depois da seleção.
+4. Clique em **Montar e verificar ISO**. O WinUtil monta a ISO, verifica se há um `install.wim` ou `install.esd` válido e lê as edições disponíveis (Home, Pro, Enterprise etc.).
 
 :::note
-Mounting and verification takes around 10–30 seconds, depending on your drive speed.
+A montagem e a verificação levam cerca de 10–30 segundos, dependendo da velocidade da sua unidade.
 :::
 
 ---
 
-### Step 2 — Modify the Image
+### Etapa 2 — Modifique a imagem
 
-Once the ISO is verified, WinUtil moves to this step and shows the mounted drive and image file. Choose your **edition** from the dropdown — Pro is selected by default if available — and tick **Inject current system drivers** if you want them.
+Depois que a ISO é verificada, o WinUtil passa para esta etapa e mostra a unidade montada e o arquivo de imagem. Escolha sua **edição** na lista suspensa — Pro vem selecionada por padrão, se disponível — e marque **Injetar drivers do sistema atual** se quiser usá-los.
 
-Then click **Run Windows ISO Modification and Creator** to start the customization process. WinUtil will:
+Em seguida, clique em **Executar modificação e criação da ISO do Windows** para iniciar o processo de personalização. O WinUtil vai:
 
-**App & Component Removal:**
-- **Remove 19 bloat apps** — Clipchamp, Teams, Dev Home, new Outlook, Bing apps, Solitaire, and more
-- **Uninstall OneDrive** during first logon
+**Remoção de apps e componentes:**
+- **Remover 19 apps indesejados** — Clipchamp, Teams, Dev Home, novo Outlook, apps do Bing, Solitaire e outros
+- **Desinstalar o OneDrive** durante o primeiro logon
 
-**System Customization:**
-- **Bypass hardware checks** — removes TPM, Secure Boot, CPU, RAM, and storage requirement enforcement so the ISO installs on unsupported hardware
-- **Enable local account setup** — injects an `autounattend.xml` that skips the Microsoft account screen during OOBE
-- **Disable BitLocker and device encryption** — removes startup overhead
-- **Disable Chat icon** — removes chat taskbar button
-- **Pin the selected edition during setup** — writes setup metadata so OEM firmware keys for a different edition do not force the installer down the wrong product-key path
+**Personalização do sistema:**
+- **Ignorar verificações de hardware** — remove a exigência de TPM, Secure Boot, CPU, RAM e armazenamento, para que a ISO seja instalada em hardware sem suporte
+- **Habilitar configuração com conta local** — injeta um `autounattend.xml` que pula a tela de conta da Microsoft durante a OOBE
+- **Desabilitar BitLocker e criptografia de dispositivo** — remove a sobrecarga na inicialização
+- **Desabilitar o ícone do Chat** — remove o botão de chat da barra de tarefas
+- **Fixar a edição selecionada durante a instalação** — grava metadados de instalação para que chaves de firmware OEM de outra edição não levem o instalador pelo caminho de chave de produto errado
 
-**Privacy & Telemetry Tweaks:**
-- **Disable telemetry** — advertising ID, tailored experiences, input personalization, speech online privacy
-- **Disable cloud content features** — app suggestions, Microsoft Store recommendations
-- **Remove telemetry scheduled tasks** — CEIP, Appraiser, WaaSMedic, and others
-- **Disable OneDrive folder backup** — prevents automatic backups to cloud
-- **Prevent DevHome and Outlook post-setup installation**
-- **Prevent Teams installation** — blocks auto-install after OOBE
-- **Prevent new Outlook Mail app installation**
-- **Disable Windows Update during OOBE** — re-enabled automatically on first login
-- **Disable Copilot and search box suggestions**
+**Ajustes de privacidade e telemetria:**
+- **Desabilitar telemetria** — ID de publicidade, experiências personalizadas, personalização de entrada, privacidade online de fala
+- **Desabilitar recursos de conteúdo na nuvem** — sugestões de apps, recomendações da Microsoft Store
+- **Remover tarefas agendadas de telemetria** — CEIP, Appraiser, WaaSMedic e outras
+- **Desabilitar backup de pastas do OneDrive** — impede backups automáticos na nuvem
+- **Impedir a instalação do DevHome e do Outlook após a configuração**
+- **Impedir a instalação do Teams** — bloqueia a instalação automática após a OOBE
+- **Impedir a instalação do novo app Outlook Mail**
+- **Desabilitar o Windows Update durante a OOBE** — reabilitado automaticamente no primeiro login
+- **Desabilitar o Copilot e as sugestões da caixa de pesquisa**
 
-**Optional: Driver Injection**
-- If enabled, WinUtil exports the drivers from your current system, injects boot-storage drivers into `boot.wim` (Windows Setup, index 2), and injects eligible packages into the selected `install.wim` image. Stale duplicate packages are excluded before injection. Each remaining package is added separately, so one incompatible package does not stop the others. If a package fails, WinUtil discards the partial mount and retries the remaining packages against the original image. Check the live log for warnings: if every package fails, WinUtil keeps the original `install.wim` and still produces the ISO.
+**Opcional: injeção de drivers**
+- Se habilitada, o WinUtil exporta os drivers do seu sistema atual, injeta os drivers de inicialização e armazenamento no `boot.wim` (Instalação do Windows, índice 2) e injeta os pacotes elegíveis na imagem `install.wim` selecionada. Pacotes duplicados obsoletos são excluídos antes da injeção. Cada pacote restante é adicionado separadamente, para que um pacote incompatível não interrompa os outros. Se um pacote falhar, o WinUtil descarta a montagem parcial e tenta os pacotes restantes na imagem original. Verifique o log ao vivo em busca de avisos: se todos os pacotes falharem, o WinUtil mantém o `install.wim` original e ainda gera a ISO.
 
 :::note
-Driver injection requires `sources\install.wim`. If the ISO uses `sources\install.esd`, leave this option off.
+A injeção de drivers exige `sources\install.wim`. Se a ISO usar `sources\install.esd`, deixe esta opção desligada.
 :::
 
-A live log shows progress as each step completes. Without driver injection, WinUtil writes the setup changes in a few seconds after the ISO copy. With driver injection, this stage usually takes **10–20 minutes**, depending on hardware. Keep WinUtil open until the log reports completion.
+Um log ao vivo mostra o progresso conforme cada etapa é concluída. Sem injeção de drivers, o WinUtil grava as mudanças de instalação em poucos segundos após a cópia da ISO. Com injeção de drivers, esta fase costuma levar **10–20 minutos**, dependendo do hardware. Deixe o WinUtil aberto até o log informar a conclusão.
 
 :::note
-The resulting ISO is close to the size of the source ISO. WinUtil does not remove the unused editions from `install.wim`; it selects your edition through `sources\ei.cfg` and `autounattend.xml` so Windows Setup installs the right one.
+A ISO resultante fica próxima do tamanho da ISO de origem. O WinUtil não remove as edições não utilizadas do `install.wim`; ele seleciona sua edição por meio de `sources\ei.cfg` e `autounattend.xml`, para que a Instalação do Windows instale a correta.
 :::
 
 ---
 
-### Step 3 — Export Your Result
+### Etapa 3 — Exporte o resultado
 
-Once the modification is complete, choose how to save your image:
+Depois que a modificação termina, escolha como salvar sua imagem:
 
 <Tabs>
-<TabItem label="Save as ISO">
-1. Click **Save as an ISO File**.
-2. Choose a save location (defaults to your Desktop as `Win11_Modified_yyyyMMdd.iso`).
-3. WinUtil builds a dual BIOS/UEFI bootable ISO using `oscdimg.exe`.
+<TabItem label="Salvar como ISO">
+1. Clique em **Salvar como arquivo ISO**.
+2. Escolha um local para salvar (por padrão, a Área de Trabalho, como `Win11_Modified_yyyyMMdd.iso`).
+3. O WinUtil monta uma ISO inicializável em BIOS/UEFI usando o `oscdimg.exe`.
 
 :::note
-`oscdimg.exe` (part of the Windows ADK) is required. If it's not found, WinUtil will attempt to install it automatically via WinGet. If that fails, install it manually: `winget install -e --id Microsoft.OSCDIMG`
+O `oscdimg.exe` (parte do Windows ADK) é obrigatório. Se não for encontrado, o WinUtil tentará instalá-lo automaticamente pelo WinGet. Se isso falhar, instale manualmente: `winget install -e --id Microsoft.OSCDIMG`
 :::
 </TabItem>
-<TabItem label="Write to USB">
-1. Click **Write Directly to a USB Drive**.
-2. Select your USB drive from the dropdown (click **Refresh** if it doesn't appear).
-3. Click **Erase & Write to USB** and confirm the warning — **all data on the drive will be permanently erased**.
-4. WinUtil formats the drive as GPT with a single FAT32 partition (capped at 32 GB, splitting `install.wim` into `.swm` files if larger than 3.8 GB) and copies the modified Windows files.
+<TabItem label="Gravar em pendrive">
+1. Clique em **Gravar diretamente em um pendrive**.
+2. Selecione seu pendrive na lista suspensa (clique em **Atualizar** se ele não aparecer).
+3. Clique em **Apagar e gravar no pendrive** e confirme o aviso — **todos os dados da unidade serão apagados permanentemente**.
+4. O WinUtil formata a unidade como GPT com uma única partição FAT32 (limitada a 32 GB, dividindo o `install.wim` em arquivos `.swm` se ele for maior que 3,8 GB) e copia os arquivos modificados do Windows.
 
 :::note
-WinUtil cannot split `install.esd`. If that file is 4 GB or larger, save an ISO instead of writing a FAT32 USB drive.
+O WinUtil não consegue dividir `install.esd`. Se esse arquivo tiver 4 GB ou mais, salve uma ISO em vez de gravar em um pendrive FAT32.
 :::
 
 :::danger
-Double-check you have selected the correct drive before confirming. This operation cannot be undone.
+Confirme duas vezes se você selecionou a unidade correta antes de confirmar. Esta operação não pode ser desfeita.
 :::
 
-**Minimum USB size:** 8 GB recommended. Writing takes 10–20 minutes.
+**Tamanho mínimo do pendrive:** 8 GB recomendado. A gravação leva de 10 a 20 minutos.
 </TabItem>
 </Tabs>
 
 ---
 
-### Start Over (Optional)
+### Começar de novo (opcional)
 
-Click **Start Over** to delete the temporary working directory (~10–15 GB) and return the tool to its initial state, ready for a new ISO. You will be asked to confirm before anything is deleted.
-
----
-
-### What the Modified ISO Does Differently
-
-When you install Windows 11 from your modified ISO:
-
-- **No Microsoft account required** — create a local account directly during setup
-- **No hardware checks** — installs on machines without TPM 2.0, Secure Boot, or supported CPUs
-- **Dark mode enabled by default**
-- **Empty taskbar and Start Menu** — no pinned apps, Chat icon removed
-- **Windows Update disabled during OOBE** — automatically re-enabled on first login to prevent setup interruptions
-- **BitLocker disabled** — removes startup overhead on first boot
+Clique em **Começar de novo** para apagar o diretório de trabalho temporário (cerca de 10–15 GB) e devolver a ferramenta ao estado inicial, pronta para uma nova ISO. Será pedida confirmação antes de qualquer exclusão.
 
 ---
 
-### First-login restart
+### O que a ISO modificada faz diferente
 
-After installation, WinUtil restarts Windows only after both the system and user customization scripts finish. If user customization has not signaled completion within five minutes after system customization finishes, the automatic restart is skipped. Check `C:\Windows\Setup\Scripts\FirstLogon.log` and `%TEMP%\UserOnce.log` before restarting manually.
+Ao instalar o Windows 11 a partir da sua ISO modificada:
 
-### Troubleshooting
+- **Nenhuma conta da Microsoft necessária** — crie uma conta local diretamente durante a instalação
+- **Sem verificações de hardware** — instala em máquinas sem TPM 2.0, Secure Boot ou CPUs suportadas
+- **Modo escuro habilitado por padrão**
+- **Barra de tarefas e Menu Iniciar vazios** — sem apps fixados, ícone do Chat removido
+- **Windows Update desabilitado durante a OOBE** — reabilitado automaticamente no primeiro login para evitar interrupções na instalação
+- **BitLocker desabilitado** — remove a sobrecarga na primeira inicialização
 
-| Problem | Fix |
+---
+
+### Reinicialização no primeiro logon
+
+Após a instalação, o WinUtil reinicia o Windows somente depois que os scripts de personalização do sistema e do usuário terminarem. Se a personalização do usuário não sinalizar conclusão em até cinco minutos depois do término da personalização do sistema, a reinicialização automática é ignorada. Verifique `C:\Windows\Setup\Scripts\FirstLogon.log` e `%TEMP%\UserOnce.log` antes de reiniciar manualmente.
+
+### Solução de problemas
+
+| Problema | Correção |
 |---------|-----|
-| "install.wim / install.esd was not found" | The ISO has no Windows installation image — download a fresh official ISO from Microsoft |
-| "oscdimg.exe not found" | Run `winget install -e --id Microsoft.OSCDIMG` then retry |
-| USB drive not showing up | Plug it in, wait a few seconds, then click **Refresh** |
-| Driver injection seems stuck | WIM servicing can pause at a mount or commit. Allow 10–20 minutes depending on hardware, and check the live log before closing WinUtil |
-| "Access Denied" error | Make sure WinUtil is running as Administrator |
-| Driver injection warning | Review the live log for the named package. Other compatible packages continue; if none succeed, the ISO is created with the original `install.wim` |
-| DISM error with an explanation in parentheses, e.g. "exit code 112 (Disk is full)" | WinUtil now explains common DISM failures in plain language. Free up disk space for a "Disk is full" error, or run WinUtil as Administrator for an "Access denied" error. If the code has no explanation, search the number on Microsoft's [DISM error code reference](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes) |
-| "Setup has failed to validate the product key" | Recreate the ISO with the latest WinUtil. The creator now removes stale `PID.txt`, writes `sources\ei.cfg`, and pins the selected image in `autounattend.xml` so setup does not use an embedded OEM key for a different edition |
+| "install.wim / install.esd was not found" | A ISO não tem imagem de instalação do Windows — baixe uma ISO oficial nova da Microsoft |
+| "oscdimg.exe not found" | Execute `winget install -e --id Microsoft.OSCDIMG` e tente de novo |
+| O pendrive não aparece | Conecte-o, aguarde alguns segundos e clique em **Atualizar** |
+| A injeção de drivers parece travada | O serviço de WIM pode pausar em uma montagem ou gravação. Aguarde 10–20 minutos conforme o hardware e verifique o log ao vivo antes de fechar o WinUtil |
+| Erro "Acesso negado" | Verifique se o WinUtil está sendo executado como Administrador |
+| Aviso na injeção de drivers | Consulte o log ao vivo para o pacote indicado. Os outros pacotes compatíveis continuam; se nenhum funcionar, a ISO é criada com o `install.wim` original |
+| Erro do DISM com uma explicação entre parênteses, como "exit code 112 (Disk is full)" | O WinUtil agora explica falhas comuns do DISM em linguagem simples. Libere espaço em disco para o erro "Disk is full", ou execute o WinUtil como Administrador para o erro "Access denied". Se o código não tiver explicação, busque o número na [referência de códigos de erro do DISM](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes) da Microsoft |
+| "Setup has failed to validate the product key" | Recrie a ISO com a versão mais recente do WinUtil. O criador agora remove `PID.txt` obsoletos, grava `sources\ei.cfg` e fixa a imagem selecionada em `autounattend.xml`, para que a instalação não use uma chave OEM embutida de outra edição |
 
 ---
 
-## Additional Resources
+## Recursos adicionais
 
-- Download official Windows 11 media from [Microsoft](https://www.microsoft.com/en-us/software-download/windows11).
-- If you prefer to write a finished ISO with another tool, common choices include [Rufus](https://rufus.ie/) or [Ventoy](https://www.ventoy.net/).
+- Baixe a mídia oficial do Windows 11 na [Microsoft](https://www.microsoft.com/en-us/software-download/windows11).
+- Se você preferir gravar uma ISO pronta com outra ferramenta, opções comuns incluem o [Rufus](https://rufus.ie/) ou o [Ventoy](https://www.ventoy.net/).
 
 :::note
-Always download Windows ISOs from official Microsoft sources or trusted tools like Rufus/UUP Dump to avoid tampered images.
+Sempre baixe ISOs do Windows de fontes oficiais da Microsoft ou de ferramentas confiáveis como Rufus/UUP Dump, para evitar imagens adulteradas.
 :::
 
 :::note
-Newer Windows 11 ISOs may not boot correctly on older versions of Ventoy — make sure Ventoy is up to date before use. If issues persist after updating, this is a Ventoy compatibility limitation outside of WinUtil's control.
+ISOs mais recentes do Windows 11 podem não inicializar corretamente em versões antigas do Ventoy — verifique se o Ventoy está atualizado antes de usar. Se os problemas continuarem após atualizar, é uma limitação de compatibilidade do Ventoy, fora do controle do WinUtil.
 :::
 
-Edition selection uses the language-independent edition ID from Windows image metadata, so localized Pro editions are selected correctly. If metadata cannot be read, Win11 Creator falls back to recognized English edition names; an unknown edition leaves setup edition configuration unset.
+A seleção de edição usa o ID de edição independente de idioma dos metadados da imagem do Windows, então edições Pro localizadas são selecionadas corretamente. Se os metadados não puderem ser lidos, o Criador do Win11 usa os nomes de edição em inglês reconhecidos; uma edição desconhecida deixa a configuração de edição da instalação sem definição.

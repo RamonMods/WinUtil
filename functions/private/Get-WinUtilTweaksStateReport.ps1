@@ -1,8 +1,8 @@
 function Get-WinUtilTweaksStateReport {
     <#
     .SYNOPSIS
-        Groups every config/tweaks.json entry's live applied state by category, reusing the same
-        detection Invoke-WPFGetInstalled uses to check the "Select Installed Tweaks" checkboxes.
+        Agrupa o estado aplicado real de cada entrada de config/tweaks.json por categoria, reutilizando a mesma
+        detecção que Invoke-WPFGetInstalled usa para marcar as caixas de seleção de "Select Installed Tweaks".
     #>
 
     $categoryFieldNames = [ordered]@{
@@ -30,14 +30,14 @@ function Get-WinUtilTweaksStateReport {
             $entry = $property.Value
             $fieldName = $categoryFieldNames[[string]$entry.category]
 
-            # Buttons embedded in the tweaks panel (e.g. the OOSU/Ultimate Performance launchers)
-            # are actions, not stateful tweaks, so they're outside this report's scope entirely.
+            # Botões embutidos no painel de ajustes (ex.: os iniciadores OOSU/Ultimate Performance)
+            # são ações, não ajustes com estado, então ficam totalmente fora do escopo deste relatório.
             if (-not $fieldName -or $entry.Type -eq "Button") {
                 continue
             }
 
-            # Combobox tweaks and script-only tweaks with no registry/service schema have no
-            # detectable current state. List them so the report doesn't silently drop them.
+            # Ajustes do tipo combobox e ajustes apenas de script, sem esquema de registro/serviço, não têm
+            # estado atual detectável. Liste-os para que o relatório não os descarte silenciosamente.
             if ($entry.Type -eq "Combobox" -or (-not $entry.registry -and -not $entry.service)) {
                 $notEvaluable.Add($tweakKey)
                 continue
@@ -46,12 +46,12 @@ function Get-WinUtilTweaksStateReport {
             $grouped[$fieldName][$tweakKey] = $appliedTweaks.Contains($tweakKey)
         }
     } catch {
-        Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message "Failed to collect tweaks/toggle state: $($_.Exception.Message)"
+        Write-WinUtilLog -Component "EnvironmentReport" -Level "WARN" -Message "Falha ao coletar o estado de ajustes/interruptores: $($_.Exception.Message)"
         $collectionStatus = "unavailable"
     }
 
-    # Empty groups from a failed collection would otherwise be indistinguishable in the JSON from a
-    # successful scan that found nothing notable, so record whether collection actually ran.
+    # Grupos vazios de uma coleta com falha seriam indistinguíveis no JSON de uma
+    # varredura bem-sucedida que nada encontrou de notável, então registre se a coleta realmente rodou.
     $result = [ordered]@{ collectionStatus = $collectionStatus }
     foreach ($fieldName in $categoryFieldNames.Values) {
         $result[$fieldName] = [pscustomobject]$grouped[$fieldName]

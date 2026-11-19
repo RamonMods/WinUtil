@@ -1,6 +1,6 @@
 ---
 title: Tweak Explorer
-description: See exactly which registry values, services, and scripts each WinUtil tweak changes, and what Undo puts back.
+description: Veja exatamente quais valores de registro, serviços e scripts cada ajuste do WinUtil altera e o que o Desfazer restaura.
 template: splash
 prev: false
 next: false
@@ -8,14 +8,14 @@ next: false
 
 import TweakExplorer from '../../components/tweak-explorer/TweakExplorer.jsx';
 
-See what each tweak changes before you run it. Open a tweak to see the registry values and service startup types it sets next to what **Undo** restores, along with any script it runs. Search also matches registry paths, service names, and script contents, so you can find every tweak that touches a given setting. Use **Add to config** on supported checkbox and toggle tweaks, then open them in the [Config Builder](/config-builder/) from the link above the list. For toggles, **Add to config (When on)** selects the on state only; configs cannot select the off state.
+Veja o que cada ajuste altera antes de executá-lo. Abra um ajuste para ver os valores de registro e os tipos de inicialização de serviço que ele define ao lado do que o **Desfazer** restaura, junto com qualquer script que ele execute. A busca também encontra caminhos de registro, nomes de serviços e conteúdos de scripts, para você localizar todo ajuste que mexe em uma determinada configuração. Use **Adicionar à configuração** nos ajustes de caixa de seleção e de interruptor compatíveis e depois abra-os no [Config Builder](/config-builder/) pelo link acima da lista. Para interruptores, **Adicionar à configuração (Quando ligado)** seleciona apenas o estado ligado; configurações não conseguem selecionar o estado desligado.
 
-The list is loaded from the latest WinUtil release on GitHub, the same version `https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1` runs.
+A lista é carregada da versão mais recente do WinUtil no GitHub, a mesma versão que `https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1` executa.
 
 <TweakExplorer client:load />
 
-Registry-backed dropdowns, such as Multiplane Overlay, show a column for each available state. Choose the state in WinUtil to apply it immediately. These controls do not use **Undo Selected Tweaks**; choose another state to revert them.
+Listas suspensas baseadas em registro, como Multiplane Overlay, mostram uma coluna para cada estado disponível. Escolha o estado no WinUtil para aplicá-lo imediatamente. Esses controles não usam **Desfazer ajustes selecionados**; escolha outro estado para revertê-los.
 
-**Has undo** means at least one registry, service, or script undo action is available, not that it restores your exact previous state. A tweak can also show **Script has no undo** or **AppX removal has no undo** when only part of its changes can be undone. For example, Undo can reinstall Microsoft Edge, but it cannot recover the browser profile deleted by the removal tweak.
+**Tem desfazer** significa que existe pelo menos uma ação de desfazer de registro, serviço ou script disponível, e não que ela restaura exatamente o seu estado anterior. Um ajuste também pode mostrar **O script não tem desfazer** ou **A remoção de AppX não tem desfazer** quando apenas parte das mudanças pode ser desfeita. Por exemplo, o Desfazer pode reinstalar o Microsoft Edge, mas não consegue recuperar o perfil do navegador apagado pelo ajuste de remoção.
 
-A tweak marked **Script has no undo** or **AppX removal has no undo** is one that Undo cannot fully reverse. Some are one-off actions with nothing to put back, such as creating a restore point or cleaning up temporary files. For the rest, create a restore point before applying them.
+Um ajuste marcado como **O script não tem desfazer** ou **A remoção de AppX não tem desfazer** é aquele que o Desfazer não consegue reverter por completo. Alguns são ações pontuais sem nada a restaurar, como criar um ponto de restauração ou limpar arquivos temporários. Para os demais, crie um ponto de restauração antes de aplicá-los.

@@ -237,7 +237,7 @@ function Invoke-WinUtilISOWriteUSB {
             Invoke-WPFUIThread -Parameters @{ DiskNumber = $DiskNumber } -ScriptBlock {
                 param($DiskNumber)
 
-                $sync["WPFWin11ISODoneLabel"].Text = "Disk $DiskNumber is ready to boot from."
+                $sync["WPFWin11ISODoneLabel"].Text = "O disco $DiskNumber estÃ¡ pronto para inicializar."
                 $sync["WPFWin11ISODonePanel"].Visibility = "Visible"
             }
             Set-WinUtilISOStep -Step "Output"

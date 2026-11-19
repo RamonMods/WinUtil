@@ -1,64 +1,64 @@
 ---
-title: Frequently Asked Questions
-description: Common questions about installing, running, and troubleshooting WinUtil.
+title: Perguntas frequentes
+description: Dúvidas comuns sobre instalar, executar e solucionar problemas do WinUtil.
 ---
 
-## General questions
+## Perguntas gerais
 
-### Is Windows 10 still supported?
+### O Windows 10 ainda é suportado?
 
-No. Windows 10 is no longer supported by WinUtil because it reached the end of support on **October 14, 2025**. WinUtil is focused on Windows 11.
+Não. O Windows 10 não é mais suportado pelo WinUtil porque chegou ao fim do suporte em **14 de outubro de 2025**. O WinUtil é focado no Windows 11.
 
-### How do I uninstall WinUtil?
+### Como desinstalo o WinUtil?
 
-You do not need to uninstall WinUtil. Because it runs as a PowerShell script, it is loaded into memory only while it is open. Once you close it, it is removed from memory and does not remain installed on your system.
+Você não precisa desinstalar o WinUtil. Como ele é executado como um script PowerShell, é carregado na memória apenas enquanto está aberto. Ao fechá-lo, ele é removido da memória e não permanece instalado no sistema.
 
-### Is WinUtil safe to use?
+### O WinUtil é seguro?
 
-Yes, WinUtil is open source, and the code is publicly available on GitHub. Thousands of users run it daily. However, like any system modification tool, you should:
+Sim, o WinUtil é de código aberto e o código está disponível publicamente no GitHub. Milhares de usuários o executam diariamente. No entanto, como qualquer ferramenta de modificação do sistema, você deve:
 
-- Run it as Administrator (required)
-- Create a restore point before major changes
-- Understand what tweaks you're applying
-- Run only from the [official source](https://github.com/RamonMods/WinUtil/)
+- Executá-lo como Administrador (obrigatório)
+- Criar um ponto de restauração antes de mudanças grandes
+- Entender quais ajustes você está aplicando
+- Executar somente a partir da [fonte oficial](https://github.com/RamonMods/WinUtil/)
 
-### Do I need to keep running WinUtil?
+### Preciso deixar o WinUtil rodando?
 
-No. Once you've applied tweaks or installed applications, you can close WinUtil. Changes persist after closing. You only need to run WinUtil again when you want to make additional changes or undo tweaks.
+Não. Depois de aplicar ajustes ou instalar aplicativos, você pode fechar o WinUtil. As mudanças persistem após o fechamento. Você só precisa executar o WinUtil de novo quando quiser fazer mudanças adicionais ou desfazer ajustes.
 
-### Does WinUtil require internet access?
+### O WinUtil precisa de acesso à internet?
 
-- **For downloading**: Yes, installing applications requires the internet
-- **For tweaks**: No, most tweaks work offline
-- **Initial run**: Yes, to run the latest script
+- **Para baixar**: Sim, instalar aplicativos exige internet
+- **Para ajustes**: Não, a maioria dos ajustes funciona offline
+- **Primeira execução**: Sim, para executar o script mais recente
 
-### How often is WinUtil updated?
+### Com que frequência o WinUtil é atualizado?
 
-WinUtil is actively maintained with frequent updates. New features, bug fixes, and application additions are released regularly. The script auto-downloads the latest version each time you run it.
+O WinUtil é mantido ativamente, com atualizações frequentes. Novos recursos, correções de bugs e novos aplicativos são lançados regularmente. O script baixa automaticamente a versão mais recente toda vez que você o executa.
 
-## Installation & running
+## Instalação e execução
 
-### How do I run WinUtil?
+### Como executo o WinUtil?
 
-1. Open PowerShell as Administrator
-2. Run: `irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1" | iex`
-3. Wait for the GUI to appear
+1. Abra o PowerShell como Administrador
+2. Execute: `irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1" | iex`
+3. Aguarde a interface gráfica aparecer
 
-### Why do I need Administrator rights?
+### Por que preciso de direitos de Administrador?
 
-WinUtil makes system-level changes (registry edits, service modifications, software installation) that require elevated permissions. Without admin rights, most features won't work.
+O WinUtil faz alterações no nível do sistema (edições de registro, modificações de serviços, instalação de software) que exigem permissões elevadas. Sem direitos de administrador, a maioria dos recursos não funciona.
 
-### The script won't download. What do I do?
+### O script não baixa. O que faço?
 
-Try these solutions in order:
+Tente estas soluções na ordem:
 
-1. **Use the direct GitHub link**:
+1. **Use o link direto do GitHub**:
 
    ```powershell
    irm https://github.com/RamonMods/WinUtil/releases/latest/download/Winutil.ps1 | iex
    ```
 
-2. **Force TLS 1.2**:
+2. **Force o TLS 1.2**:
 
    ```powershell
    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -66,262 +66,261 @@ Try these solutions in order:
    ```
 
    :::note
-   On Windows 11, you usually do not need the TLS 1.2 command. Use it only if you encounter download or security protocol errors.
+   No Windows 11, você normalmente não precisa do comando de TLS 1.2. Use-o apenas se encontrar erros de download ou de protocolo de segurança.
    :::
 
-3. **Change DNS** to Cloudflare (1.1.1.1) or Google (8.8.8.8)
-4. **Use a VPN** if GitHub is blocked in your region
+3. **Troque o DNS** para Cloudflare (1.1.1.1) ou Google (8.8.8.8)
+4. **Use uma VPN** se o GitHub estiver bloqueado na sua região
 
-### I get an "Execution Policy" error. How do I fix it?
+### Recebo um erro de "Execution Policy". Como corrijo?
 
-Run this command first to allow script execution:
+Execute este comando primeiro para permitir a execução de scripts:
 
 ```powershell
 Set-ExecutionPolicy Unrestricted -Scope Process -Force
 irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1" | iex
 ```
 
-This only affects the current PowerShell session and is safe.
+Isso afeta apenas a sessão atual do PowerShell e é seguro.
 
-## Tweaks & modifications
+## Ajustes e modificações
 
-### I applied a tweak and now something doesn't work. What do I do?
+### Apliquei um ajuste e agora algo não funciona. O que faço?
 
-If you applied a tweak and it breaks something, you can revert it:
+Se você aplicou um ajuste e ele quebrou algo, pode revertê-lo:
 
-1. Open WinUtil again
-2. Go to the **Tweaks** tab
-3. Select the same tweak you applied
-4. Click **Undo Selected Tweaks**
-5. The system will revert to the previous state
+1. Abra o WinUtil novamente
+2. Vá para a aba **Ajustes**
+3. Selecione o mesmo ajuste que você aplicou
+4. Clique em **Desfazer ajustes selecionados**
+5. O sistema voltará ao estado anterior
 
-Alternatively, use System Restore if you created a restore point.
+Como alternativa, use a Restauração do Sistema se você criou um ponto de restauração.
 
-### Which tweaks are safe to apply?
+### Quais ajustes são seguros de aplicar?
 
-**Safe for everyone (Essential Tweaks)**:
+**Seguros para todos (Ajustes essenciais)**:
 
-- Disable Telemetry
-- Disable Activity History
-- Disable Location Tracking
-- Delete Temporary Files
-- Run Disk Cleanup
-- Create Restore Point
+- Desabilitar telemetria
+- Desabilitar histórico de atividades
+- Desabilitar rastreamento de localização
+- Excluir arquivos temporários
+- Executar Limpeza de Disco
+- Criar ponto de restauração
 
-**Advanced Tweaks** should only be run by advanced users.
+**Ajustes avançados** devem ser executados apenas por usuários avançados.
 
-### Will tweaks survive Windows Updates?
+### Os ajustes sobrevivem às atualizações do Windows?
 
-Most tweaks persist through updates, but some may be reset by major Windows feature updates. You may need to reapply certain tweaks afterwards.
+A maioria dos ajustes persiste após as atualizações, mas alguns podem ser redefinidos por atualizações de recursos maiores do Windows. Talvez seja necessário reaplicar certos ajustes depois.
 
-### Can I create my own tweak presets?
+### Posso criar minhas próprias predefinições de ajustes?
 
-Currently, WinUtil uses predefined presets (Standard, Minimal). Custom presets aren't directly supported in the GUI, but you can script your preferred configuration.
+Atualmente o WinUtil usa predefinições fixas (Padrão, Mínimo). Predefinições personalizadas não são suportadas diretamente na interface, mas você pode criar um script com a configuração que preferir.
 
-### What's the difference between Essential and Advanced tweaks?
+### Qual a diferença entre ajustes essenciais e avançados?
 
-- **Essential Tweaks**: Safe for most users, improve performance/privacy with minimal risk
-- **Advanced Tweaks**: More aggressive changes that may break functionality or compatibility. Use with caution.
+- **Ajustes essenciais**: Seguros para a maioria dos usuários, melhoram desempenho/privacidade com risco mínimo
+- **Ajustes avançados**: Mudanças mais agressivas que podem quebrar funcionalidades ou compatibilidade. Use com cuidado.
 
-## Application installation
+## Instalação de aplicativos
 
-### How does WinUtil install applications?
+### Como o WinUtil instala aplicativos?
 
-WinUtil uses Windows Package Manager (WinGet) and Chocolatey to automate installations. It downloads applications from official sources and installs them silently without bloatware.
+O WinUtil usa o Windows Package Manager (WinGet) e o Chocolatey para automatizar as instalações. Ele baixa os aplicativos de fontes oficiais e os instala silenciosamente, sem bloatware.
 
-### Can I install multiple applications at once?
+### Posso instalar vários aplicativos de uma vez?
 
-Yes! Check the boxes for all applications you want, then click "Install Selected". They'll install sequentially.
+Sim! Marque as caixas de seleção de todos os aplicativos que quiser e clique em "Instalar selecionados". Eles serão instalados em sequência.
 
-### WinGet isn't working. How do I fix it?
+### O WinGet não está funcionando. Como corrijo?
 
-1. Go to the **Config** tab
-2. Find the **Fixes** section
-3. Click **WinGet Reinstall**
-4. Wait for completion
-5. Try installing applications again
+1. Vá para a aba **Configurações**
+2. Encontre a seção **Correções**
+3. Clique em **Reinstalar o WinGet**
+4. Aguarde a conclusão
+5. Tente instalar os aplicativos novamente
 
-### Do installed applications have bloatware or bundled software?
+### Os aplicativos instalados têm bloatware ou software empacotado?
 
-No. WinGet and Chocolatey install clean versions of applications without bundled offers, toolbars, or bloatware.
+Não. WinGet e Chocolatey instalam versões limpas dos aplicativos, sem ofertas empacotadas, barras de ferramentas ou bloatware.
 
-### Can I uninstall applications through WinUtil?
+### Posso desinstalar aplicativos pelo WinUtil?
 
-WinUtil primarily focuses on installing and managing applications rather than providing a full GUI for uninstalling every program. To remove applications you can:
+O WinUtil foca principalmente em instalar e gerenciar aplicativos, e não em oferecer uma interface completa para desinstalar todos os programas. Para remover aplicativos, você pode:
 
-- Use Windows Settings > Apps > Installed apps to uninstall programs.
-- Use package manager commands in PowerShell (for example `winget uninstall <package>` or `choco uninstall <package>`).
-- Some packages installed by WinUtil (AppX/MSIX) include removal helpers; check the app entry or use WinUtil's remove helpers when available.
+- Usar Configurações > Aplicativos > Aplicativos instalados do Windows para desinstalar programas.
+- Usar comandos de gerenciadores de pacotes no PowerShell (por exemplo `winget uninstall <package>` ou `choco uninstall <package>`).
+- Alguns pacotes instalados pelo WinUtil (AppX/MSIX) incluem auxiliares de remoção; verifique a entrada do aplicativo ou use os auxiliares de remoção do WinUtil quando disponíveis.
 
-### Will installed apps auto-update?
+### Os aplicativos instalados são atualizados automaticamente?
 
-Applications with built-in update mechanisms will auto-update. You can also update them via WinGet/Chocolatey commands or through WinUtil's "Upgrade Selected" feature.
+Aplicativos com mecanismos de atualização próprios são atualizados automaticamente. Você também pode atualizá-los por comandos do WinGet/Chocolatey ou pelo recurso "Atualizar selecionados" do WinUtil.
 
-## Updates & maintenance
+## Atualizações e manutenção
 
-### Should I disable Windows Updates?
+### Devo desabilitar as atualizações do Windows?
 
-Generally, **no**. Security updates are important. However, you might:
+Em geral, **não**. As atualizações de segurança são importantes. Porém, você pode:
 
-- Use "Security Updates Only" to avoid feature updates
-- Pause updates temporarily for stability
-- Disable only during critical work periods
+- Usar "Somente atualizações de segurança" para evitar atualizações de recursos
+- Pausar as atualizações temporariamente por estabilidade
+- Desabilitar apenas durante períodos de trabalho crítico
 
-### How do I re-enable updates after disabling them?
+### Como reabilito as atualizações depois de desabilitá-las?
 
-1. Open WinUtil
-2. Go to the **Updates** tab
-3. Click **Default Updates**
-4. Updates will resume normally
+1. Abra o WinUtil
+2. Vá para a aba **Atualizações**
+3. Clique em **Atualizações padrão**
+4. As atualizações voltarão ao normal
 
-### What's the difference between "Security Updates Only" and "Disable Updates"?
+### Qual a diferença entre "Somente atualizações de segurança" e "Desabilitar atualizações"?
 
-- **Security Updates Only**: Installs critical security patches, blocks feature updates (major versions)
-- **Disable Updates**: Blocks ALL updates including security (not recommended)
+- **Somente atualizações de segurança**: Instala patches de segurança críticos, bloqueia atualizações de recursos (versões principais)
+- **Desabilitar atualizações**: Bloqueia TODAS as atualizações, incluindo as de segurança (não recomendado)
 
-## Troubleshooting
+## Solução de problemas
 
-### WinUtil won't open after running the command
+### O WinUtil não abre depois de executar o comando
 
-Possible causes:
+Causas possíveis:
 
-1. **Antivirus blocking**: Add PowerShell exception
-2. **Not run as Admin**: Restart PowerShell as Administrator
-3. **Corrupted download**: Close PowerShell, reopen, try again
-4. **Windows Defender**: Allow the script
+1. **Antivírus bloqueando**: Adicione uma exceção para o PowerShell
+2. **Não executado como Admin**: Reinicie o PowerShell como Administrador
+3. **Download corrompido**: Feche o PowerShell, reabra e tente de novo
+4. **Windows Defender**: Permita o script
 
-### My antivirus flags WinUtil as malicious
+### Meu antivírus marca o WinUtil como malicioso
 
-This is a false positive. WinUtil makes system changes that antivirus programs may flag. The code is open source and audited. Add an exception if needed.
+Isso é um falso positivo. O WinUtil faz alterações no sistema que programas antivírus podem sinalizar. O código é de código aberto e auditado. Adicione uma exceção se necessário.
 
-### An application failed to install
+### Um aplicativo falhou ao instalar
 
-Troubleshooting steps:
+Passos para solucionar:
 
-1. Check your internet connection
-2. Try installing just that one application
-3. Review error messages in the output panel
-4. Check if the antivirus is blocking
-5. Try the WinGet Reinstall fix
+1. Verifique sua conexão com a internet
+2. Tente instalar apenas esse aplicativo
+3. Verifique as mensagens de erro no painel de saída
+4. Verifique se o antivírus está bloqueando
+5. Tente a correção Reinstalar o WinGet
 
-### Network tweaks broke my internet connection
+### Ajustes de rede quebraram minha conexão com a internet
 
-1. Open WinUtil
-2. Go to **Config** > **Fixes**
-3. Click **Reset Network**
-4. Restart your computer
-5. Connection should be restored
+1. Abra o WinUtil
+2. Vá para **Configurações** > **Correções**
+3. Clique em **Redefinir rede**
+4. Reinicie o computador
+5. A conexão deve ser restaurada
 
-### I can't access certain Windows features after applying tweaks
+### Não consigo acessar certos recursos do Windows depois de aplicar ajustes
 
-Undo the tweaks that might have affected those features:
+Desfaça os ajustes que possam ter afetado esses recursos:
 
-1. Reopen WinUtil
-2. Select the tweaks you applied
-3. Click **Undo Selected Tweaks**
+1. Reabra o WinUtil
+2. Selecione os ajustes que você aplicou
+3. Clique em **Desfazer ajustes selecionados**
 
-If that doesn't work, use System Restore to revert to a previous state.
+Se isso não funcionar, use a Restauração do Sistema para voltar a um estado anterior.
 
-## Advanced topics
+## Tópicos avançados
 
-### Can I run WinUtil on Windows Server?
+### Posso executar o WinUtil no Windows Server?
 
-Yes, WinUtil works on Windows Server editions, though some features may not be applicable or may behave differently.
+Sim, o WinUtil funciona nas edições do Windows Server, embora alguns recursos possam não se aplicar ou se comportar de forma diferente.
 
-### Does WinUtil work with Windows LTSC?
+### O WinUtil funciona com o Windows LTSC?
 
-WinUtil currently targets Windows 11. Windows 10 LTSC is not supported, consistent with the Windows 10 support policy above. Some features and applications may vary by Windows 11 edition.
+Atualmente o WinUtil tem como alvo o Windows 11. O Windows 10 LTSC não é suportado, de acordo com a política de suporte ao Windows 10 acima. Alguns recursos e aplicativos podem variar conforme a edição do Windows 11.
 
-### Can I use WinUtil in a corporate/enterprise environment?
+### Posso usar o WinUtil em ambiente corporativo/empresarial?
 
-Yes, but check your organization's policies first. Some tweaks may conflict with Group Policy or other corporate requirements.
+Sim, mas consulte primeiro as políticas da sua organização. Alguns ajustes podem conflitar com a Diretiva de Grupo ou outros requisitos corporativos.
 
-### How do I automate WinUtil for multiple PCs?
+### Como automatizo o WinUtil para vários PCs?
 
-See the [Automation Guide](/guides/automation/) for details on:
+Veja o [Guia de automação](/guides/automation/) para detalhes sobre:
 
-- Configuration files
-- PowerShell parameters
-- Batch deployment
-- Silent installation
+- Arquivos de configuração
+- Parâmetros do PowerShell
+- Implantação em lote
+- Instalação silenciosa
 
-### Can I contribute to WinUtil?
+### Posso contribuir com o WinUtil?
 
-Yes! Contributions are welcome:
+Sim! Contribuições são bem-vindas:
 
-- Report bugs on GitHub Issues
-- Submit pull requests for fixes/features
-- Improve documentation
-- Help others in Discord
+- Relate bugs nas Issues do GitHub
+- Envie pull requests com correções/recursos
+- Melhore a documentação
+- Ajude outras pessoas na comunidade
 
-See the [Contributing Guide](/contributing/) for details.
+Veja o [Guia de contribuição](/contributing/) para detalhes.
 
-## Privacy & security
+## Privacidade e segurança
 
-### Does WinUtil collect any data?
+### O WinUtil coleta algum dado?
 
-No, WinUtil itself doesn't collect or transmit any user data. It's a local PowerShell script.
+Não, o próprio WinUtil não coleta nem transmite dados de usuário. É um script PowerShell local.
 
-### What telemetry does the Disable Telemetry tweak block?
+### Que telemetria o ajuste Desabilitar telemetria bloqueia?
 
-It disables:
+Ele desabilita:
 
-- Windows diagnostic data collection
-- Activity history tracking
-- Feedback requests
-- Usage statistics
-- Error reporting (optional)
+- Coleta de dados de diagnóstico do Windows
+- Rastreamento do histórico de atividades
+- Solicitações de feedback
+- Estatísticas de uso
+- Relatórios de erro (opcional)
 
-### Will removing Microsoft Store affect security updates?
+### Remover a Microsoft Store afeta as atualizações de segurança?
 
-No, Windows security updates are independent of the Microsoft Store.
+Não, as atualizações de segurança do Windows são independentes da Microsoft Store.
 
-## Performance
+## Desempenho
 
-### Will WinUtil make my PC faster?
+### O WinUtil deixa meu PC mais rápido?
 
-Tweaks can improve performance by:
+Os ajustes podem melhorar o desempenho ao:
 
-- Reducing background processes
-- Disabling unnecessary services
-- Cleaning temporary files
-- Optimizing startup programs
+- Reduzir processos em segundo plano
+- Desabilitar serviços desnecessários
+- Limpar arquivos temporários
+- Otimizar programas de inicialização
 
-Results may vary depending on your system.
+Os resultados podem variar conforme o seu sistema.
 
-### What's the best preset for gaming?
+### Qual a melhor predefinição para jogos?
 
-Use the **Desktop** preset, then additionally apply:
+Use a predefinição **Desktop** e aplique ainda:
 
-- Disable GameDVR
-- Ultimate Performance power plan
-- Disable full-screen optimizations (Advanced)
-- Set display for performance (Advanced)
+- Desabilitar GameDVR
+- Plano de energia Alto Desempenho Máximo
+- Desabilitar otimizações de tela cheia (Avançado)
+- Definir exibição para desempenho (Avançado)
 
-### How much RAM does WinUtil use?
+### Quanta RAM o WinUtil usa?
 
-WinUtil itself uses about 50-100 MB while running. Once closed, it is removed from memory.
+O próprio WinUtil usa cerca de 50-100 MB enquanto está em execução. Depois de fechado, é removido da memória.
 
-## Error messages
+## Mensagens de erro
 
-### "Access Denied" errors
+### Erros de "Acesso negado"
 
-- Ensure PowerShell is running as Administrator
-- Check if the antivirus is blocking changes
-- Verify you have ownership of files/registry keys
+- Verifique se o PowerShell está sendo executado como Administrador
+- Verifique se o antivírus está bloqueando mudanças
+- Confirme se você tem a propriedade dos arquivos/chaves de registro
 
 ### "GitHub rate limit has been reached"
 
-Some pages on this site, such as the [Config Builder](/config-builder/) and the [Tweak Explorer](/tweak-explorer/), load their data from the latest WinUtil release on GitHub when you open them. GitHub only allows 60 requests an hour from each IP address without signing in, and everyone sharing your connection, such as a home, office, or school network, counts towards the same limit. These pages only use one of those requests per browser session, but once the limit is used up, they have to wait for GitHub to reset it.
+Algumas páginas deste site, como o [Config Builder](/config-builder/) e o [Tweak Explorer](/tweak-explorer/), carregam seus dados da versão mais recente do WinUtil no GitHub quando você as abre. Sem autenticação, o GitHub permite apenas 60 requisições por hora por endereço IP, e todos que compartilham sua conexão, como uma rede doméstica, de escritório ou escolar, contam para o mesmo limite. Essas páginas usam apenas uma dessas requisições por sessão do navegador, mas, quando o limite acaba, elas precisam esperar o GitHub liberá-lo.
 
-Wait a while and select **Try again**. The rest of the docs aren't affected.
+Aguarde um pouco e selecione **Tentar novamente**. O restante da documentação não é afetado.
 
-## Still need help?
+## Ainda precisa de ajuda?
 
-Can't find your answer? Try these resources:
+Não encontrou sua resposta? Tente estes recursos:
 
-- **[Known Issues](/knownissues/)** — Check if it's a known problem
-- **[User Guide](/guides/getting-started/)** — Comprehensive documentation
-- **[Discord Community](https://github.com/RamonMods/WinUtil)** — Get help from other users
-- **[GitHub Issues](https://github.com/RamonMods/WinUtil/issues)** — Report bugs
-- **[YouTube Tutorial](https://github.com/RamonMods/WinUtil)** — Video walkthrough
+- **[Problemas conhecidos](/knownissues/)** — Verifique se é um problema conhecido
+- **[Guia do usuário](/guides/getting-started/)** — Documentação completa
+- **[Comunidade](https://github.com/RamonMods/WinUtil)** — Receba ajuda de outros usuários
+- **[Issues do GitHub](https://github.com/RamonMods/WinUtil/issues)** — Relate bugs

@@ -1,126 +1,126 @@
 # SPEC.md
 
-Project contract for WinUtil — what the project is, how it's built, and how it runs. Written for anyone, human or AI, who needs to understand the project itself.
+Contrato do projeto WinUtil — o que o projeto é, como é construído e como funciona. Escrito para qualquer pessoa, humana ou IA, que precise entender o projeto em si.
 
-`AGENTS.md` in the repository root points here for these facts, and separately covers how an agent should behave while working in this repo. This file does not change based on who's reading it.
+O `AGENTS.md` na raiz do repositório aponta para cá em relação a esses fatos e, separadamente, cobre como um agente deve se comportar enquanto trabalha neste repositório. Este arquivo não muda conforme quem está lendo.
 
-## Project Context
+## Contexto Do Projeto
 
-WinUtil is a Windows PowerShell utility with a WPF interface. The repository is maintained as modular source, but the distributed artifact is one compiled PowerShell script.
+WinUtil é um utilitário de Windows em PowerShell com interface WPF. O repositório é mantido como código modular, mas o artefato distribuído é um único script PowerShell compilado.
 
 ### Stack
 
-- Language: Windows PowerShell / PowerShell.
-- UI: WPF via `xaml/inputXML.xaml`.
-- Configuration: JSON files under `config/`.
-- Tests: Pester tests under `pester/`.
-- Lint: PowerShell Script Analyzer with settings in `lint/PSScriptAnalyser.ps1`.
-- Docs: Astro + Starlight site under `docs/`, built independently of `Compile.ps1` (its own `package.json`/`node_modules`).
-- Release artifact: generated root `winutil.ps1`.
+- Linguagem: Windows PowerShell / PowerShell.
+- Interface: WPF via `xaml/inputXML.xaml`.
+- Configuração: arquivos JSON em `config/`.
+- Testes: testes Pester em `pester/`.
+- Lint: PowerShell Script Analyzer com configurações em `lint/PSScriptAnalyser.ps1`.
+- Documentação: site Astro + Starlight em `docs/`, compilado de forma independente do `Compile.ps1` (com seu próprio `package.json`/`node_modules`).
+- Artefato de release: `winutil.ps1` gerado na raiz.
 
-### Repository Layout
+### Estrutura Do Repositório
 
-- `Compile.ps1`: build script that creates `winutil.ps1`.
-- `scripts/start.ps1`: startup/bootstrap segment used at the beginning of the compiled script.
-- `scripts/main.ps1`: main entrypoint appended at the end of the compiled script.
-- `functions/public/`: public/UI-facing PowerShell functions.
-- `functions/private/`: internal helper PowerShell functions.
-- `config/`: JSON configuration consumed at compile time and embedded into `$sync.configs`.
-- `xaml/inputXML.xaml`: WPF UI markup embedded into the compiled script.
-- `tools/autounattend.xml`: unattended setup XML embedded for Windows ISO workflows.
-- `pester/`: Pester tests for config and function checks.
-- `lint/PSScriptAnalyser.ps1`: PowerShell Script Analyzer settings.
-- `tools/title-screen/`: uv project that captures WinUtil's Light and Dark themes and generates the title-screen composite.
-- `docs/`: Astro + Starlight documentation site, with its own `package.json` and build independent of `Compile.ps1`.
-- `winutil.ps1`: ignored generated build artifact.
+- `Compile.ps1`: script de build que cria o `winutil.ps1`.
+- `scripts/start.ps1`: trecho de inicialização/bootstrap usado no começo do script compilado.
+- `scripts/main.ps1`: ponto de entrada principal anexado ao final do script compilado.
+- `functions/public/`: funções PowerShell públicas/de interface.
+- `functions/private/`: funções PowerShell auxiliares internas.
+- `config/`: configuração JSON consumida em tempo de compilação e embutida em `$sync.configs`.
+- `xaml/inputXML.xaml`: marcação da interface WPF embutida no script compilado.
+- `tools/autounattend.xml`: XML de instalação autônoma embutido para fluxos de ISO do Windows.
+- `pester/`: testes Pester para checagens de configuração e de funções.
+- `lint/PSScriptAnalyser.ps1`: configurações do PowerShell Script Analyzer.
+- `tools/title-screen/`: projeto uv que captura os temas Claro e Escuro do WinUtil e gera a composição da tela de título.
+- `docs/`: site de documentação Astro + Starlight, com seu próprio `package.json` e build independente do `Compile.ps1`.
+- `winutil.ps1`: artefato de build gerado e ignorado.
 
-## Goals
+## Objetivos
 
-- Provide a single-script Windows utility that can be launched from PowerShell.
-- Keep development modular enough for contributors to work on functions, config, UI, docs, and tooling independently.
-- Make install, tweak, feature, repair, update, and ISO workflows discoverable from the WPF UI.
-- Keep common lists and options declarative in JSON config where possible.
-- Preserve a repeatable compile process so local builds and GitHub Actions builds produce the distributable script from the same inputs.
+- Fornecer um utilitário de Windows em script único que possa ser iniciado a partir do PowerShell.
+- Manter o desenvolvimento modular o suficiente para que colaboradores trabalhem de forma independente em funções, configuração, interface, documentação e ferramentas.
+- Tornar os fluxos de instalação, ajuste, recursos, reparo, atualização e ISO descobríveis pela interface WPF.
+- Manter listas e opções comuns declarativas no JSON de configuração sempre que possível.
+- Preservar um processo de compilação repetível, para que builds locais e builds do GitHub Actions produzam o script distribuível a partir das mesmas entradas.
 
-## Non-Goals
+## Não Objetivos
 
-- `winutil.ps1` is not hand-maintained.
-- The project is not structured as a PowerShell module at runtime.
-- The GUI is not a separate packaged desktop application in this repository's normal release path.
-- Generated files should not be reviewed as source changes.
+- `winutil.ps1` não é mantido à mão.
+- O projeto não é estruturado como um módulo PowerShell em tempo de execução.
+- A interface gráfica não é uma aplicação desktop empacotada separadamente no caminho normal de release deste repositório.
+- Arquivos gerados não devem ser revisados como mudanças de código-fonte.
 
-## Build Model
+## Modelo De Build
 
-`Compile.ps1` combines the repository sources into `winutil.ps1` in this order:
+O `Compile.ps1` combina os códigos-fonte do repositório em `winutil.ps1` nesta ordem:
 
-1. Read `scripts/start.ps1` and replace `#{replaceme}` with the current `yy.MM.dd` build date.
-2. Append every file under `functions/` recursively.
-3. Convert each `config/*.json` file into embedded `$sync.configs` objects.
-4. Special-case `config/applications.json` so keys receive the `WPFInstall` prefix in compiled config.
-5. Embed `xaml/inputXML.xaml` into `$inputXML`.
-6. Embed `tools/autounattend.xml` into `$WinUtilAutounattendXml`.
-7. Append `scripts/main.ps1`.
-8. Write the result to root `winutil.ps1`.
+1. Lê `scripts/start.ps1` e substitui `#{replaceme}` pela data de build atual no formato `yy.MM.dd`.
+2. Anexa todos os arquivos em `functions/` recursivamente.
+3. Converte cada arquivo `config/*.json` em objetos embutidos em `$sync.configs`.
+4. Trata `config/applications.json` como caso especial, para que as chaves recebam o prefixo `WPFInstall` na configuração compilada.
+5. Embute `xaml/inputXML.xaml` em `$inputXML`.
+6. Embute `tools/autounattend.xml` em `$WinUtilAutounattendXml`.
+7. Anexa `scripts/main.ps1`.
+8. Grava o resultado no `winutil.ps1` da raiz.
 
-Because the final script is concatenated, code cannot rely on runtime module imports or source-relative dot-sourcing unless the compiled script will also contain the required code/data.
+Como o script final é concatenado, o código não pode depender de importações de módulo em tempo de execução nem de dot-sourcing relativo à origem, a menos que o script compilado também contenha o código/dados necessários.
 
-## Runtime Model
+## Modelo De Execução
 
-- WinUtil runs in PowerShell on Windows and uses WPF for the UI.
-- Shared mutable state is stored in `$sync`, including configs, UI element references, runspace state, selections, and progress.
-- Long-running operations use runspaces or existing async patterns so the UI remains responsive.
-- User actions that opt into the job queue run one at a time with their selected inputs. Queued work can be reordered or cancelled, pauses during close confirmation, and is discarded when the window closes. ISO and USB jobs still refuse to queue.
-- UI updates from background work are dispatched back to the WPF UI thread.
-- Every runspace logs to the timestamped `%LocalAppData%\winutil\logs` session file through `Write-WinUtilLog`, which shares one writer through `$sync`. Job output and the UI runspace's warnings, errors and `Write-Host` output are collected into it; console-only output such as banners and progress uses `Write-WinUtilHost`.
-- Declarative features such as apps, tweaks, presets, DNS providers, and navigation stay in `config/*.json` unless code is required.
+- O WinUtil roda em PowerShell no Windows e usa WPF para a interface.
+- O estado mutável compartilhado fica em `$sync`, incluindo configurações, referências a elementos de interface, estado de runspace, seleções e progresso.
+- Operações longas usam runspaces ou padrões assíncronos já existentes, para que a interface continue responsiva.
+- Ações do usuário que optam pela fila de jobs rodam uma por vez, com as entradas que selecionaram. O trabalho enfileirado pode ser reordenado ou cancelado, pausa durante a confirmação de fechamento e é descartado quando a janela fecha. Jobs de ISO e de USB continuam se recusando a entrar na fila.
+- Atualizações de interface vindas de trabalho em segundo plano são despachadas de volta para a thread de interface do WPF.
+- Cada runspace registra em log no arquivo de sessão com data e hora em `%LocalAppData%\winutil\logs`, por meio de `Write-WinUtilLog`, que compartilha um único escritor via `$sync`. A saída dos jobs e os avisos, erros e saídas de `Write-Host` do runspace da interface são recolhidos nesse arquivo; saídas apenas de console, como banners e progresso, usam `Write-WinUtilHost`.
+- Recursos declarativos, como aplicativos, ajustes, predefinições, provedores de DNS e navegação, ficam em `config/*.json` a menos que seja necessário código.
 
-## UI And Event Contract
+## Contrato De Interface E Eventos
 
-- UI layout lives in `xaml/inputXML.xaml`.
-- Named WPF controls are discovered and stored in `$sync`.
-- Maximized window content is inset to the current monitor work area by `Update-WinUtilWindowInsets`, using native bounds converted to WPF units. Interface events coalesce updates on the dispatcher after window or DPI changes.
-- Button/action wiring follows a naming convention: an element named like `WPFThingButton` maps to a function named like `Invoke-WPFThingButton`.
+- O layout da interface fica em `xaml/inputXML.xaml`.
+- Controles WPF nomeados são descobertos e armazenados em `$sync`.
+- O conteúdo da janela maximizada é ajustado à área de trabalho do monitor atual por `Update-WinUtilWindowInsets`, usando limites nativos convertidos para unidades WPF. Eventos da interface agrupam atualizações no dispatcher após mudanças de janela ou de DPI.
+- A ligação de botões/ações segue uma convenção de nomes: um elemento chamado como `WPFThingButton` mapeia para uma função chamada como `Invoke-WPFThingButton`.
 
-## Configuration Contract
+## Contrato De Configuração
 
-- Config files must remain valid JSON and compile cleanly through `ConvertFrom-Json`.
-- `config/dns.json` opts unfiltered providers into Fastest selection with `BenchmarkEligible: true`; missing or false values exclude a provider from the TCP latency benchmark.
-- `config/applications.json` defines installable applications; each entry includes the fields expected by tests and UI code, such as package manager IDs, category, display content, description, and link.
-- `config/icons/<key>.png` holds one 48x48 icon per application, named after its key in `config/applications.json` (without the `WPFInstall` prefix). `Compile.ps1` embeds the folder as `$sync.configs.icons`, and the Install tab draws the icons without any network access (`Get-WinUtilAppIcon`); an app with no icon file falls back to the online favicon lookup. Add or replace one with `tools/New-WinUtilIcon.ps1`; a Pester test requires an icon of at most 8 KB for every application.
-- `config/tweaks.json` defines Windows tweaks; registry and service changes include original values or original states when applicable so undo workflows can restore user systems.
-- Preset and navigation files reference valid config keys. Renaming a config key requires updating all presets, UI references, docs, and code paths together.
-- Adding or renaming a preset, adding a selection key prefix, or adding a new kind of tweak change also requires updating the docs Tools pages (see Docs Site).
+- Os arquivos de configuração devem continuar sendo JSON válido e compilar sem erros por `ConvertFrom-Json`.
+- `config/dns.json` coloca provedores sem filtro na seleção Mais Rápido com `BenchmarkEligible: true`; valores ausentes ou falsos excluem um provedor do benchmark de latência TCP.
+- `config/applications.json` define os aplicativos instaláveis; cada entrada inclui os campos esperados pelos testes e pelo código da interface, como IDs do gerenciador de pacotes, categoria, conteúdo de exibição, descrição e link.
+- `config/icons/<key>.png` guarda um ícone 48x48 por aplicativo, nomeado conforme sua chave em `config/applications.json` (sem o prefixo `WPFInstall`). O `Compile.ps1` embute a pasta como `$sync.configs.icons`, e a aba Instalar desenha os ícones sem qualquer acesso à rede (`Get-WinUtilAppIcon`); um aplicativo sem arquivo de ícone recorre à busca de favicon online. Adicione ou substitua um ícone com `tools/New-WinUtilIcon.ps1`; um teste Pester exige um ícone de no máximo 8 KB para cada aplicativo.
+- `config/tweaks.json` define os ajustes do Windows; alterações de registro e de serviço incluem os valores originais ou os estados originais quando aplicável, para que os fluxos de desfazer possam restaurar o sistema do usuário.
+- Arquivos de predefinição e de navegação referenciam chaves de configuração válidas. Renomear uma chave de configuração exige atualizar todas as predefinições, referências de interface, documentação e caminhos de código em conjunto.
+- Adicionar ou renomear uma predefinição, adicionar um prefixo de chave de seleção ou adicionar um novo tipo de campo de alteração em ajustes também exige atualizar as páginas Tools da documentação (veja Site De Documentação).
 
-## Safety Requirements
+## Requisitos De Segurança
 
-- Registry, service, package manager, Windows Update, AppX removal, and ISO operations affect the host system and are treated as high-risk.
-- Tweak changes include undo metadata when the schema supports it, so changes stay reversible.
-- ISO workflows never modify the user's original ISO file; they work on copied/mounted content.
+- Operações de registro, serviço, gerenciador de pacotes, Windows Update, remoção de AppX e ISO afetam o sistema hospedeiro e são tratadas como de alto risco.
+- Alterações de ajustes incluem metadados de desfazer quando o esquema permite, para que as mudanças permaneçam reversíveis.
+- Fluxos de ISO nunca modificam o arquivo ISO original do usuário; eles trabalham sobre conteúdo copiado/montado.
 
-## Docs Site (Astro)
+## Site De Documentação (Astro)
 
-- `docs/` is an Astro + Starlight site, independent of `Compile.ps1`'s build (its own `package.json`/`node_modules`, deployed via the `docs.yaml` GitHub Actions workflow to GitHub Pages).
-- Pages live under `docs/src/content/docs/` (`.mdx`), organized into `guides/`, `code-reference/`, plus top-level pages like `faq.mdx`, `knownissues.mdx`, `contributing.mdx`, `index.mdx`.
-- `docs/src/content/docs/code-reference/tweaks/` and `.../features/` are auto-generated by `tools/devdocs-generator.ps1` from `config/tweaks.json`/`config/feature.json` and the relevant PowerShell function files. Other pages under `code-reference/` (e.g. `architecture.mdx`) are hand-written and untouched by the generator.
-- Sidebar entries in `docs/astro.config.mjs` must match actual page slugs under `docs/src/content/docs/`.
-- The site's UI is plugged into Starlight through component overrides in `docs/src/components/overrides/` (Header, Sidebar, MobileMenuToggle, TableOfContents, MobileTableOfContents, PageTitle, Pagination, ThemeSelect), registered in `docs/astro.config.mjs`. Static parts are Astro components; interactive parts (search, menus, table of contents, theme toggle) are React islands in `docs/src/components/docs/`. Starlight still owns routing, Markdown rendering, the Pagefind search index, and the generated reference pages. The landing page (`index.mdx`) adds React Bits components (`docs/src/components/react-bits/`, MIT + Commons Clause; see its `LICENSE.md`) and GSAP + Lenis motion (`docs/src/scripts/landing-motion.js`, with landing-only components in `docs/src/components/landing/`). That motion is skipped entirely for visitors who prefer reduced motion.
-- The Tools pages, Config Builder (`config-builder.mdx`, `docs/src/components/config-builder/`) and Tweak Explorer (`tweak-explorer.mdx`, `docs/src/components/tweak-explorer/`), fetch `config/*.json` in the browser from the latest stable release tag through `docs/src/lib/winutil-release.js` rather than bundling the repo's copy, because `-Config` runs the stable release and rejects the whole import on any key it does not know.
-  - New or removed apps, tweaks, toggles, features, AppX packages, and categories show up in the next browser session after a release is marked Latest, with no docs rebuild. Pre-releases are not picked up. The Tweak Explorer shows a reference link only when the latest stable release's config contains that link, and its page exists once the pre-release docs-update PR is merged and the docs are redeployed.
-  - Three things are hard-coded and must be updated by hand when WinUtil changes them: preset names (`Standard`, `Minimal`, `Advanced`, `AppxDefault`) in `ConfigBuilder.jsx` and `TweakExplorer.jsx`; the importable key prefixes (`WPFInstall`, `WPFTweaks`, `WPFToggle`, `WPFFeature`, `WPFAppx`) in `ConfigBuilder.jsx`, which mirror `Update-WinUtilSelections`; and the tweak change fields (`registry`, `service`, `InvokeScript`, `UndoScript`, `appx`, and registry `Values` mappings for `Combobox` entries) read by `TweakExplorer.jsx`, which mirror `Invoke-WinUtilTweaks` and `Set-WinUtilRegistryComboState`.
-  - Config Builder share links, including the Tweak Explorer's hand-off, put the selected keys in the URL hash as a comma-separated list, built and read by `docs/src/lib/config-link.js`. Links are posted publicly, so the builder must keep reading that format.
-- `docs/public/` is tracked source for static assets (favicons, etc.), not generated output. Generated/ignored paths are listed in `docs/.gitignore` (`dist/`, `.astro/`, `node_modules/`, local env files).
-- `docs/src/assets/branding/title-screen.png` is a tracked generated image used by the repository README and docs homepage. Its raw Light and Dark captures are temporary.
-- `docs/Dockerfile` and `docs/docker-compose.yml` (service `winutil-astro`) containerize the site's npm tooling, including Playwright and its browsers (version pinned in `docs/package.json`); see AGENTS.md's Dependency Installs, Builds, And Dev Servers for why and how agents must use them instead of running npm on the host.
+- `docs/` é um site Astro + Starlight, independente do build do `Compile.ps1` (com seu próprio `package.json`/`node_modules`, publicado pelo workflow `docs.yaml` do GitHub Actions no GitHub Pages).
+- As páginas ficam em `docs/src/content/docs/` (`.mdx`), organizadas em `guides/`, `code-reference/`, além das páginas de nível superior como `faq.mdx`, `knownissues.mdx`, `contributing.mdx`, `index.mdx`.
+- `docs/src/content/docs/code-reference/tweaks/` e `.../features/` são gerados automaticamente por `tools/devdocs-generator.ps1` a partir de `config/tweaks.json`/`config/feature.json` e dos arquivos de função PowerShell relevantes. As demais páginas em `code-reference/` (por exemplo, `architecture.mdx`) são escritas à mão e não são tocadas pelo gerador.
+- As entradas da barra lateral em `docs/astro.config.mjs` devem corresponder aos slugs reais das páginas em `docs/src/content/docs/`.
+- A interface do site é conectada ao Starlight por meio de substituições de componentes em `docs/src/components/overrides/` (Header, Sidebar, MobileMenuToggle, TableOfContents, MobileTableOfContents, PageTitle, Pagination, ThemeSelect), registradas em `docs/astro.config.mjs`. As partes estáticas são componentes Astro; as partes interativas (busca, menus, sumário, alternador de tema) são ilhas React em `docs/src/components/docs/`. O Starlight continua responsável pelo roteamento, pela renderização de Markdown, pelo índice de busca Pagefind e pelas páginas de referência geradas. A página inicial (`index.mdx`) acrescenta componentes React Bits (`docs/src/components/react-bits/`, MIT + Commons Clause; veja o `LICENSE.md` deles) e movimento com GSAP + Lenis (`docs/src/scripts/landing-motion.js`, com componentes exclusivos da landing em `docs/src/components/landing/`). Esse movimento é totalmente ignorado para visitantes que preferem movimento reduzido.
+- As páginas Tools, o Config Builder (`config-builder.mdx`, `docs/src/components/config-builder/`) e o Tweak Explorer (`tweak-explorer.mdx`, `docs/src/components/tweak-explorer/`) buscam `config/*.json` no navegador a partir da tag de release estável mais recente, por meio de `docs/src/lib/winutil-release.js`, em vez de empacotar a cópia do repositório, porque `-Config` executa a release estável e rejeita toda a importação em qualquer chave que não conheça.
+  - Aplicativos, ajustes, interruptores, recursos, pacotes AppX e categorias novos ou removidos aparecem na próxima sessão do navegador após uma release ser marcada como Latest, sem reconstruir a documentação. Pré-releases não são consideradas. O Tweak Explorer só mostra um link de referência quando a configuração da release estável mais recente contém esse link, e a página dele existe depois que o PR de atualização da documentação da pré-release é mesclado e a documentação é republicada.
+  - Três coisas estão codificadas de forma fixa e precisam ser atualizadas à mão quando o WinUtil as alterar: os nomes das predefinições (`Standard`, `Minimal`, `Advanced`, `AppxDefault`) em `ConfigBuilder.jsx` e `TweakExplorer.jsx`; os prefixos de chave importáveis (`WPFInstall`, `WPFTweaks`, `WPFToggle`, `WPFFeature`, `WPFAppx`) em `ConfigBuilder.jsx`, que espelham `Update-WinUtilSelections`; e os campos de alteração de ajuste (`registry`, `service`, `InvokeScript`, `UndoScript`, `appx` e os mapeamentos `Values` de registro para entradas `Combobox`) lidos por `TweakExplorer.jsx`, que espelham `Invoke-WinUtilTweaks` e `Set-WinUtilRegistryComboState`.
+  - Links de compartilhamento do Config Builder, incluindo a passagem de bastão do Tweak Explorer, colocam as chaves selecionadas no hash da URL como uma lista separada por vírgulas, criada e lida por `docs/src/lib/config-link.js`. Os links são publicados publicamente, então o builder precisa continuar lendo esse formato.
+- `docs/public/` é código-fonte versionado de ativos estáticos (favicons etc.), não saída gerada. Caminhos gerados/ignorados estão listados em `docs/.gitignore` (`dist/`, `.astro/`, `node_modules/`, arquivos de ambiente locais).
+- `docs/src/assets/branding/title-screen.png` é uma imagem gerada e versionada, usada pelo README do repositório e pela página inicial da documentação. Suas capturas brutas em Claro e Escuro são temporárias.
+- `docs/Dockerfile` e `docs/docker-compose.yml` (serviço `winutil-astro`) colocam em contêiner as ferramentas npm do site, incluindo o Playwright e seus navegadores (versão fixada em `docs/package.json`); veja Instalações De Dependências, Builds E Servidores De Desenvolvimento no AGENTS.md para saber por que e como os agentes devem usá-los em vez de rodar npm no host.
 
-## Testing And CI
+## Testes E CI
 
-- `.\Compile.ps1` verifies the compiler can generate `winutil.ps1`.
-- `.\Compile.ps1 -Run` compiles and launches the generated utility for manual GUI verification.
-- Pester 5.8.0 runs the suite under `pester/*.Tests.ps1`. GitHub Actions (`unittests.yaml`) installs Pester 5.8.0 fresh and runs with `-CI`, which produces `testResults.xml` and exits non-zero on failure.
-- GitHub Actions also runs PowerShell Script Analyzer with `lint/PSScriptAnalyser.ps1` on every push.
-- The generated `winutil.ps1` may appear locally after compile. It remains ignored build output (see root `.gitignore`) and must not be committed.
-- The manually triggered title-screen workflow compiles WinUtil from `main` and opens an image-only pull request when the generated composite changes. These pull requests require manual review. Failed runs retain diagnostics for 14 days.
+- `.\Compile.ps1` verifica se o compilador consegue gerar `winutil.ps1`.
+- `.\Compile.ps1 -Run` compila e abre o utilitário gerado para verificação manual da interface.
+- O Pester 5.8.0 executa a suíte em `pester/*.Tests.ps1`. O GitHub Actions (`unittests.yaml`) instala o Pester 5.8.0 do zero e roda com `-CI`, o que produz `testResults.xml` e encerra com código diferente de zero em caso de falha.
+- O GitHub Actions também executa o PowerShell Script Analyzer com `lint/PSScriptAnalyser.ps1` a cada push.
+- O `winutil.ps1` gerado pode aparecer localmente após a compilação. Ele continua sendo saída de build ignorada (veja o `.gitignore` da raiz) e não deve ser commitado.
+- O workflow `title-screen`, acionado manualmente, compila o WinUtil a partir de `main` e abre um pull request somente com imagem quando a composição gerada muda. Esses pull requests exigem revisão manual. Execuções que falham retêm diagnósticos por 14 dias.
 
-## Release Artifact
+## Artefato De Release
 
-GitHub Actions is responsible for producing the release `winutil.ps1` from repository sources. A release is considered valid only if the generated script came from the compile process, not from direct manual edits to `winutil.ps1`.
+O GitHub Actions é responsável por produzir o `winutil.ps1` de release a partir dos códigos-fonte do repositório. Uma release só é considerada válida se o script gerado veio do processo de compilação, e não de edições manuais diretas no `winutil.ps1`.

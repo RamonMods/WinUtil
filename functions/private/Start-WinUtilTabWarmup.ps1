@@ -1,21 +1,21 @@
 function Start-WinUtilTabWarmup {
     <#
         .SYNOPSIS
-            Builds the tabs the user has not opened yet, while the interface is idle
+            Constrói as abas que o usuário ainda não abriu, enquanto a interface está ociosa
 
         .DESCRIPTION
-            Tab content has to be built on the interface thread, so a tab that is still empty
-            when it is first clicked makes that click pay for the build. Queueing the builds
-            moves that cost to where nothing is waiting on it.
+            O conteúdo das abas precisa ser construído na thread da interface, então uma aba que
+            ainda está vazia quando é clicada pela primeira vez faz esse clique pagar a construção.
+            Enfileirar as construções move esse custo para onde nada está esperando por ele.
 
-            Queued at background priority rather than idle priority. At idle priority this never
-            ran until the app list had finished, which is the exact window in which a tab the
-            user clicks is still empty and costs a full build to open.
+            Enfileirado com prioridade de segundo plano em vez de prioridade ociosa. Na prioridade
+            ociosa isto nunca rodava até a lista de aplicativos terminar, que é exatamente a janela
+            em que uma aba clicada pelo usuário ainda está vazia e custa uma construção inteira para abrir.
     #>
 
-    # Win11ISO is left out: building it runs the existing work check, which raises the resume
-    # prompt while the user is on another tab. That check belongs to opening the tab, not warming
-    # it.
+    # Win11ISO fica de fora: construí-la executa a verificação de trabalho existente, que levanta
+    # o aviso de retomada enquanto o usuário está em outra aba. Essa verificação pertence à abertura
+    # da aba, não ao seu aquecimento.
     $pending = [System.Collections.Queue]::new()
     foreach ($tab in @("Tweaks", "Config", "AppX")) {
         if (-not $sync.InitializedTabs[$tab]) {
@@ -31,7 +31,7 @@ function Start-WinUtilTabWarmup {
     Start-WinUtilBackgroundQueue -Name "TabWarmup" -Queue $pending -Step {
         param($Tab)
 
-        Measure-WinUtilStep -Scope "UI" -Name "warm $Tab tab" -ScriptBlock {
+        Measure-WinUtilStep -Scope "UI" -Name "aquecer a aba $Tab" -ScriptBlock {
             Initialize-WinUtilTabContent -TabName $Tab -Yield
         }
     }

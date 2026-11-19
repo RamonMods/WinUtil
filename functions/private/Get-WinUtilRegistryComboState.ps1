@@ -1,13 +1,13 @@
 function Get-WinUtilRegistryComboState {
     <#
     .SYNOPSIS
-        Finds the configured combo-box state matching the current registry values.
+        Encontra o estado de lista suspensa configurado que corresponde aos valores atuais do registro.
 
     .PARAMETER Registry
-        Registry settings containing a value mapping for each supported state.
+        Configurações de registro contendo um mapeamento de valor para cada estado suportado.
 
     .OUTPUTS
-        The name of the matching state.
+        O nome do estado correspondente.
     #>
     param(
         [Parameter(Mandatory)]
@@ -20,7 +20,7 @@ function Get-WinUtilRegistryComboState {
             $currentValue = Get-WinUtilRegistryComboValue -Setting $setting
             $actualValue = if ($currentValue.Exists -and $null -ne $currentValue.Value) { $currentValue.Value } else { $setting.DefaultValue }
             $configuredValue = $setting.Values.PSObject.Properties[$state.Name].Value
-            # Removal represents the effective Windows default when matching the current state.
+            # A remoção representa o padrão efetivo do Windows ao comparar o estado atual.
             $expectedValue = if ($configuredValue -eq "<RemoveEntry>") { $setting.DefaultValue } else { $configuredValue }
             if ([string]$actualValue -ne [string]$expectedValue) {
                 $stateMatches = $false
@@ -32,5 +32,5 @@ function Get-WinUtilRegistryComboState {
         }
     }
 
-    throw "Registry values do not match a supported state."
+    throw "Os valores do registro não correspondem a nenhum estado suportado."
 }

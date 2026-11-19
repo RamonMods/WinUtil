@@ -1,15 +1,15 @@
 function Find-TweaksByNameOrDescription {
     <#
     .SYNOPSIS
-        Filters tweak/appx entries by name or description using literal string matching.
+        Filtra entradas de ajustes/appx por nome ou descrição usando correspondência literal de texto.
     .PARAMETER SearchString
-        The string to search for. Treated as a literal (no wildcard expansion).
+        O texto a buscar. Tratado como literal (sem expansão de curinga).
     #>
     param(
         [string]$SearchString = ""
     )
 
-    # $sync is always in scope in the compiled script - no multi-level fallback needed
+    # $sync está sempre no escopo no script compilado - não é preciso fallback em vários níveis
     if ($null -eq $sync -or $null -eq $sync.Form) { return }
 
     if ($null -eq $sync.TweakCategoryAutoExpanded) {
@@ -20,7 +20,7 @@ function Find-TweaksByNameOrDescription {
     try { $tweaksPanel = $sync.Form.FindName($panelName) } catch { return }
     if ($null -eq $tweaksPanel) { return }
 
-    # --- Helper: extract searchable text from a DockPanel or StackPanel item ---
+    # --- Auxiliar: extrai o texto pesquisável de um item DockPanel ou StackPanel ---
     function Get-ItemSearchText($item) {
         $text = ""; $tip = ""
         if ($item -is [Windows.Controls.DockPanel]) {
@@ -34,7 +34,7 @@ function Find-TweaksByNameOrDescription {
     }
 
     try {
-        # Reset visibility when search is cleared
+        # Restaura a visibilidade quando a busca é limpa
         if ([string]::IsNullOrWhiteSpace($SearchString)) {
             foreach ($categoryBorder in $tweaksPanel.Children) {
                 if ($null -eq $categoryBorder) { continue }
@@ -48,7 +48,7 @@ function Find-TweaksByNameOrDescription {
                             if ($null -eq $item) { continue }
                             if ($item -is [Windows.Controls.Label]) {
                                 $item.Visibility = [Windows.Visibility]::Visible
-                                # A category that filtering expanded goes back to how the user left it
+                                # Uma categoria que a filtragem expandiu volta a como o usuário a deixou
                                 $labelStr = [string]$item.Content
                                 $categoryName = $labelStr -replace '^[+-] ', ''
                                 if ($sync.TweakCategoryAutoExpanded.ContainsKey($categoryName)) {
@@ -56,7 +56,7 @@ function Find-TweaksByNameOrDescription {
                                     $labelStr = [string]$item.Content
                                     $sync.TweakCategoryAutoExpanded.Remove($categoryName)
                                 }
-                                # Respect collapsed state: labels starting with "+" keep items collapsed
+                                # Respeita o estado recolhido: rótulos que começam com "+" mantêm os itens recolhidos
                                 if ($labelStr.StartsWith("+ ")) {
                                     $collapsed = $true
                                 } else {
@@ -72,7 +72,7 @@ function Find-TweaksByNameOrDescription {
             return
         }
 
-        # Perform literal search
+        # Executa a busca literal
         foreach ($categoryBorder in $tweaksPanel.Children) {
             $categoryHasMatch = $false
             if (-not ($categoryBorder -is [Windows.Controls.Border])) { continue }
@@ -95,7 +95,7 @@ function Find-TweaksByNameOrDescription {
                     continue
                 }
 
-                # Unified search for both DockPanel and StackPanel items
+                # Busca unificada para itens DockPanel e StackPanel
                 if ($item -is [Windows.Controls.DockPanel] -or $item -is [Windows.Controls.StackPanel]) {
                     $search = Get-ItemSearchText $item
                     $isMatch = ($search.Text -and $search.Text.IndexOf($SearchString, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) -or
@@ -110,7 +110,7 @@ function Find-TweaksByNameOrDescription {
                 }
             }
 
-            # Update category label and border visibility
+            # Atualiza o rótulo da categoria e a visibilidade da borda
             if ($categoryHasMatch -and $null -ne $categoryLabel) {
                 $categoryLabel.Visibility = [Windows.Visibility]::Visible
                 $labelStr = [string]$categoryLabel.Content
@@ -122,7 +122,7 @@ function Find-TweaksByNameOrDescription {
             $categoryBorder.Visibility = if ($categoryHasMatch) { [Windows.Visibility]::Visible } else { [Windows.Visibility]::Collapsed }
         }
     } catch {
-        # Log instead of silently swallowing - but only at DEBUG to avoid keystroke spam
-        Write-WinUtilLog -Level "DEBUG" -Component "Search" -Message "Tweaks search error: $($_.Exception.Message)"
+        # Registra em log em vez de engolir em silêncio - mas só em DEBUG para evitar spam a cada tecla
+        Write-WinUtilLog -Level "DEBUG" -Component "Search" -Message "Erro na busca de ajustes: $($_.Exception.Message)"
     }
 }

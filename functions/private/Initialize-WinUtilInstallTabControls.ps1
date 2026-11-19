@@ -1,14 +1,14 @@
 function Initialize-WinUtilInstallTabControls {
     <#
         .SYNOPSIS
-            Wires the Install tab controls that are generated from config rather than declared
-            in XAML
+            Conecta os controles da aba Instalar que são gerados a partir da configuração em vez de
+            declarados no XAML
 
         .DESCRIPTION
-            The package manager radio buttons and the install action buttons are created by
-            Invoke-WPFUIElements, so they do not exist until the Install tab is built. Setting
-            them up anywhere other than immediately after that build makes the code depend on
-            when the tab happens to be created.
+            Os botões de rádio do gerenciador de pacotes e os botões de ação de instalação são criados por
+            Invoke-WPFUIElements, então eles não existem até a aba Instalar ser construída. Configurá-los
+            em qualquer lugar que não seja imediatamente após essa construção faz o código depender de
+            quando a aba é criada.
     #>
 
     if ($sync.ChocoRadioButton) {

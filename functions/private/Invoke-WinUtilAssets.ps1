@@ -16,20 +16,20 @@ function Invoke-WinUtilAssets {
       }
   }
 
-  # Create the Viewbox and set its size
+  # Cria o Viewbox e define seu tamanho
   $LogoViewbox = New-Object Windows.Controls.Viewbox
   $LogoViewbox.Width = $Size
   $LogoViewbox.Height = $Size
 
-  # Create a Canvas to hold the paths
+  # Cria um Canvas para conter os caminhos
   $canvas = New-Object Windows.Controls.Canvas
   $canvas.Width = 100
   $canvas.Height = 100
 
-  # Define a scale factor for the content inside the Canvas
+  # Define um fator de escala para o conteúdo dentro do Canvas
   $scaleFactor = $Size / 100
 
-  # Apply a scale transform to the Canvas content
+  # Aplica uma transformação de escala ao conteúdo do Canvas
   $scaleTransform = New-Object Windows.Media.ScaleTransform($scaleFactor, $scaleFactor)
   $canvas.LayoutTransform = $scaleTransform
 
@@ -102,19 +102,19 @@ C 21.36,47.14 28.67,50.71 30.01,52.63
           $scaleTransform = New-Object Windows.Media.ScaleTransform($scaleFactor, $scaleFactor)
           $canvas.LayoutTransform = $scaleTransform
 
-          # Define the circle path
+          # Define o caminho do círculo
           $circlePathData = "M 1.27,0 A 1.27,1.27 0 1,0 1.27,2.54 A 1.27,1.27 0 1,0 1.27,0"
           $circlePath = New-Object Windows.Shapes.Path
           $circlePath.Data = [Windows.Media.Geometry]::Parse($circlePathData)
           $circlePath.Fill = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#39ba00")
 
-          # Define the checkmark path
+          # Define o caminho do tique de verificação
           $checkmarkPathData = "M 0.873 1.89 L 0.41 1.391 A 0.17 0.17 0 0 1 0.418 1.151 A 0.17 0.17 0 0 1 0.658 1.16 L 1.016 1.543 L 1.583 1.013 A 0.17 0.17 0 0 1 1.599 1 L 1.865 0.751 A 0.17 0.17 0 0 1 2.105 0.759 A 0.17 0.17 0 0 1 2.097 0.999 L 1.282 1.759 L 0.999 2.022 L 0.874 1.888 Z"
           $checkmarkPath = New-Object Windows.Shapes.Path
           $checkmarkPath.Data = [Windows.Media.Geometry]::Parse($checkmarkPathData)
           $checkmarkPath.Fill = [Windows.Media.Brushes]::White
 
-          # Add the paths to the Canvas
+          # Adiciona os caminhos ao Canvas
           $canvas.Children.Add($circlePath) | Out-Null
           $canvas.Children.Add($checkmarkPath) | Out-Null
       }
@@ -122,8 +122,8 @@ C 21.36,47.14 28.67,50.71 30.01,52.63
           $canvas.Width = 512
           $canvas.Height = 512
 
-          # Define a scale factor for the content inside the Canvas
-          $scaleFactor = $Size / 512  # Adjust scaling based on the canvas size
+          # Define um fator de escala para o conteúdo dentro do Canvas
+          $scaleFactor = $Size / 512  # Ajusta a escala com base no tamanho do canvas
           $scaleTransform = New-Object Windows.Media.ScaleTransform($scaleFactor, $scaleFactor)
           $canvas.LayoutTransform = $scaleTransform
 
@@ -133,20 +133,20 @@ C 21.36,47.14 28.67,50.71 30.01,52.63
           $circlePath.Data = [Windows.Media.Geometry]::Parse($circlePathData)
           $circlePath.Fill = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#f41b43")
 
-          # Define the exclamation mark path
+          # Define o caminho do ponto de exclamação
           $exclamationPathData = "M 256 307.2 A 35.89 35.89 0 0 1 220.14 272.74 L 215.41 153.3 A 35.89 35.89 0 0 1 251.27 116 H 260.73 A 35.89 35.89 0 0 1 296.59 153.3 L 291.86 272.74 A 35.89 35.89 0 0 1 256 307.2 Z"
           $exclamationPath = New-Object Windows.Shapes.Path
           $exclamationPath.Data = [Windows.Media.Geometry]::Parse($exclamationPathData)
           $exclamationPath.Fill = [Windows.Media.Brushes]::White
 
-          # Get the bounds of the exclamation mark path
+          # Obtém os limites do caminho do ponto de exclamação
           $exclamationBounds = $exclamationPath.Data.Bounds
 
-          # Calculate the center position for the exclamation mark path
+          # Calcula a posição central para o caminho do ponto de exclamação
           $exclamationCenterX = ($canvas.Width - $exclamationBounds.Width) / 2 - $exclamationBounds.X
           $exclamationPath.SetValue([Windows.Controls.Canvas]::LeftProperty, $exclamationCenterX)
 
-          # Define the rounded rectangle at the bottom (dot of exclamation mark)
+          # Define o retângulo arredondado na parte inferior (ponto do ponto de exclamação)
           $roundedRectangle = New-Object Windows.Shapes.Rectangle
           $roundedRectangle.Width = 80
           $roundedRectangle.Height = 80
@@ -154,49 +154,49 @@ C 21.36,47.14 28.67,50.71 30.01,52.63
           $roundedRectangle.RadiusY = 30
           $roundedRectangle.Fill = [Windows.Media.Brushes]::White
 
-          # Calculate the center position for the rounded rectangle
+          # Calcula a posição central para o retângulo arredondado
           $centerX = ($canvas.Width - $roundedRectangle.Width) / 2
           $roundedRectangle.SetValue([Windows.Controls.Canvas]::LeftProperty, $centerX)
           $roundedRectangle.SetValue([Windows.Controls.Canvas]::TopProperty, 324.34)
 
-          # Add the paths to the Canvas
+          # Adiciona os caminhos ao Canvas
           $canvas.Children.Add($circlePath) | Out-Null
           $canvas.Children.Add($exclamationPath) | Out-Null
           $canvas.Children.Add($roundedRectangle) | Out-Null
       }
       default {
-          Write-Host "Invalid type: $type"
+          Write-Host "Tipo inválido: $type"
       }
   }
 
-  # Add the Canvas to the Viewbox
+  # Adiciona o Canvas ao Viewbox
   $LogoViewbox.Child = $canvas
 
   if ($render) {
-      # Measure and arrange the canvas to ensure proper rendering
+      # Mede e organiza o canvas para garantir a renderização correta
       $canvas.Measure([Windows.Size]::new($canvas.Width, $canvas.Height))
       $canvas.Arrange([Windows.Rect]::new(0, 0, $canvas.Width, $canvas.Height))
       $canvas.UpdateLayout()
 
-      # Initialize RenderTargetBitmap correctly with dimensions
+      # Inicializa RenderTargetBitmap corretamente com as dimensões
       $renderTargetBitmap = New-Object Windows.Media.Imaging.RenderTargetBitmap($canvas.Width, $canvas.Height, 96, 96, [Windows.Media.PixelFormats]::Pbgra32)
 
-      # Render the canvas to the bitmap
+      # Renderiza o canvas no bitmap
       $renderTargetBitmap.Render($canvas)
 
-      # Create a BitmapFrame from the RenderTargetBitmap
+      # Cria um BitmapFrame a partir do RenderTargetBitmap
       $bitmapFrame = [Windows.Media.Imaging.BitmapFrame]::Create($renderTargetBitmap)
 
-      # Create a PngBitmapEncoder and add the frame
+      # Cria um PngBitmapEncoder e adiciona o frame
       $bitmapEncoder = [Windows.Media.Imaging.PngBitmapEncoder]::new()
       $bitmapEncoder.Frames.Add($bitmapFrame)
 
-      # Save to a memory stream
+      # Salva em um fluxo de memória
       $imageStream = New-Object System.IO.MemoryStream
       $bitmapEncoder.Save($imageStream)
       $imageStream.Position = 0
 
-      # Load the stream into a BitmapImage
+      # Carrega o fluxo em um BitmapImage
       $bitmapImage = [Windows.Media.Imaging.BitmapImage]::new()
       $bitmapImage.BeginInit()
       $bitmapImage.StreamSource = $imageStream

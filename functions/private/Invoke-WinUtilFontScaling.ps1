@@ -2,30 +2,30 @@ function Invoke-WinUtilFontScaling {
     <#
 
     .SYNOPSIS
-        Applies UI and font scaling for accessibility
+        Aplica escala de interface e de fonte para acessibilidade
 
     .PARAMETER ScaleFactor
-        Sets the scaling from 0.75 and 2.0.
-        Default is 1.0 (100% - no scaling)
+        Define a escala entre 0.75 e 2.0.
+        O padrão é 1.0 (100% - sem escala)
 
     .EXAMPLE
         Invoke-WinUtilFontScaling -ScaleFactor 1.25
-        # Applies 125% scaling
+        # Aplica escala de 125%
     #>
 
     param (
         [double]$ScaleFactor = 1.0
     )
 
-    # Validate if scale factor is within the range
+    # Valida se o fator de escala está dentro do intervalo
     if ($ScaleFactor -lt 0.75 -or $ScaleFactor -gt 2.0) {
-        Write-Warning "Scale factor must be between 0.75 and 2.0. Using 1.0 instead."
+        Write-Warning "O fator de escala deve estar entre 0.75 e 2.0. Usando 1.0 no lugar."
         $ScaleFactor = 1.0
     }
 
-    # Define an array for resources to be scaled
+    # Define uma matriz de recursos a serem escalados
     $fontResources = @(
-        # Fonts
+        # Fontes
         "FontSize",
         "ButtonFontSize",
         "HeaderFontSize",
@@ -42,7 +42,7 @@ function Invoke-WinUtilFontScaling {
         "CustomDialogFontSize",
         "CustomDialogFontSizeHeader",
         "ConfigUpdateButtonFontSize",
-        # Buttons and UI
+        # Botões e interface
         "CheckBoxBulletDecoratorSize",
         "ButtonWidth",
         "ButtonHeight",
@@ -58,31 +58,31 @@ function Invoke-WinUtilFontScaling {
         "ToolTipWidth"
     )
 
-    # Apply scaling to each resource
+    # Aplica a escala a cada recurso
     foreach ($resourceName in $fontResources) {
         try {
-            # Get the default font size from the theme configuration
+            # Obtém o tamanho de fonte padrão da configuração do tema
             $originalValue = $sync.configs.themes.shared.$resourceName
             if ($originalValue) {
-                # Convert string to double since values are stored as strings
+                # Converte a string para double, já que os valores são armazenados como strings
                 $originalValue = [double]$originalValue
-                # Calculates and applies the new font size
+                # Calcula e aplica o novo tamanho de fonte
                 $newValue = [math]::Round($originalValue * $ScaleFactor, 1)
                 $sync.Form.Resources[$resourceName] = $newValue
             }
         }
         catch {
-            Write-Warning "Failed to scale resource $resourceName : $_"
+            Write-Warning "Falha ao escalar o recurso $resourceName : $_"
         }
     }
 
-    # Store the scale factor so it can be reapplied after theme changes
+    # Armazena o fator de escala para poder reaplicá-lo depois de mudanças de tema
     $sync.FontScaleFactor = $ScaleFactor
 
-    # The minimum card width just changed, so the cards have to be fitted to the row again
+    # A largura mínima dos cartões acabou de mudar, então os cartões precisam ser ajustados à linha novamente
     Update-WinUtilAppEntryWidth
 
-    # Update the font scaling percentage displayed on the UI
+    # Atualiza a porcentagem de escala de fonte exibida na interface
     if ($sync.FontScalingValue) {
         $percentage = [math]::Round($ScaleFactor * 100)
         $sync.FontScalingValue.Text = "$percentage%"

@@ -1,25 +1,25 @@
 function Get-WinUtilAppIcon {
     <#
         .SYNOPSIS
-            Returns the bundled icon for an app on the Install tab
+            Retorna o ícone embutido de um app na aba Instalar
 
         .DESCRIPTION
-            Icons ship inside the script as base64 PNGs, one per app, taken from config/icons/<key>.png
-            at compile time, so the Install tab needs no network access to draw them and nothing is
-            waiting on a favicon service.
+            Os ícones acompanham o script como PNGs em base64, um por app, tirados de config/icons/<key>.png
+            em tempo de compilação, então a aba Instalar não precisa de acesso à rede para desenhá-los e nada
+            fica esperando um serviço de favicon.
 
-            Each icon is decoded once into a frozen bitmap, which WPF can share between entries,
-            threads and windows. It is kept in memory for the rest of the session and never written
-            to disk.
+            Cada ícone é decodificado uma vez em um bitmap congelado, que o WPF pode compartilhar entre
+            entradas, threads e janelas. Ele fica na memória pelo resto da sessão e nunca é gravado
+            em disco.
 
         .PARAMETER Key
-            The app key as written in config/applications.json, without the WPFInstall prefix.
-            It is also the name of the icon's file.
+            A chave do app como escrita em config/applications.json, sem o prefixo WPFInstall.
+            Também é o nome do arquivo do ícone.
 
         .OUTPUTS
-            A frozen bitmap when the app has a bundled icon.
-            $null when the app has no icon file or it cannot be decoded, so the caller can look the
-            icon up online.
+            Um bitmap congelado quando o app tem um ícone embutido.
+            $null quando o app não tem arquivo de ícone ou ele não pode ser decodificado, para que o chamador
+            possa procurar o ícone online.
     #>
     param([Parameter(Mandatory)][string]$Key)
 
@@ -34,14 +34,14 @@ function Get-WinUtilAppIcon {
     $entry = if ($sync.configs.icons) { $sync.configs.icons.PSObject.Properties[$Key] }
     if ($entry) {
         try {
-            # Decoding the frame directly is about a third faster than going through BitmapImage
+            # Decodificar o quadro diretamente é cerca de um terço mais rápido do que passar pelo BitmapImage
             $stream = [IO.MemoryStream]::new([Convert]::FromBase64String($entry.Value))
             $frame = [Windows.Media.Imaging.BitmapFrame]::Create($stream, [Windows.Media.Imaging.BitmapCreateOptions]::PreservePixelFormat, [Windows.Media.Imaging.BitmapCacheOption]::OnLoad)
             $frame.Freeze()
             $stream.Dispose()
             $icon = $frame
         } catch {
-            Write-Debug "Bundled icon for $Key could not be decoded: $_"
+            Write-Debug "O ícone embutido de $Key não pôde ser decodificado: $_"
         }
     }
 

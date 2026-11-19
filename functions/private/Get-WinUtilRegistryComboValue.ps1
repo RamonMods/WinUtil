@@ -1,10 +1,10 @@
 function Get-WinUtilRegistryComboValue {
     <#
     .SYNOPSIS
-        Reads one registry value for a registry-backed combo-box state.
+        Lê um valor de registro para um estado de lista suspensa baseado no registro.
 
     .PARAMETER Setting
-        The registry setting from the combo-box configuration.
+        A configuração de registro vinda da configuração da lista suspensa.
     #>
     param(
         [Parameter(Mandatory)]
@@ -16,7 +16,7 @@ function Get-WinUtilRegistryComboValue {
         $property = $item.PSObject.Properties[$Setting.Name]
         return [pscustomobject]@{ Exists = $null -ne $property; Value = $property.Value }
     } catch [System.Management.Automation.PSArgumentException] {
-        # The registry provider uses PSArgumentException when a named value is absent.
+        # O provedor de registro usa PSArgumentException quando um valor nomeado está ausente.
         return [pscustomobject]@{ Exists = $false; Value = $null }
     } catch [System.Management.Automation.ItemNotFoundException] {
         return [pscustomobject]@{ Exists = $false; Value = $null }

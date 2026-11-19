@@ -1,67 +1,67 @@
 ---
-title: Automation
-description: Run WinUtil from an exported configuration file or a preset to automate setups across multiple PCs.
+title: Automação
+description: Execute o WinUtil a partir de um arquivo de configuração exportado ou de uma predefinição para automatizar configurações em vários PCs.
 sidebar:
   order: 6
 ---
 
-Use Automation to run WinUtil from an exported configuration file.
+Use Automação para executar o WinUtil a partir de um arquivo de configuração exportado.
 
-WinUtil supports predefined presets that apply common configurations automatically:
+O WinUtil suporta predefinições que aplicam configurações comuns automaticamente:
 
 - `Standard`
 - `Minimal`
 - `Advanced`
 
-Example:
+Exemplo:
 
 ```powershell
 & ([ScriptBlock]::Create((irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1"))) -Preset Standard
 ```
 
-To view exactly what each preset does, see:
+Para ver exatamente o que cada predefinição faz, consulte:
 https://github.com/RamonMods/WinUtil/blob/main/config/preset.json
 
-To find a key for a custom configuration, hover over a supported application, tweak, feature, or AppX entry in WinUtil. Its tooltip shows `Preset key: <key>`. Application keys are searchable on the Install tab, while tweak and AppX keys are searchable on their respective tabs. Feature keys are available from their tooltips because the Config/Features tab does not have search. Controls that cannot be applied from a preset, such as toggle switches, drop-downs, and package-manager choices, intentionally do not advertise a preset key.
+Para descobrir a chave de uma configuração personalizada, passe o mouse sobre um aplicativo, ajuste, recurso ou entrada AppX compatível no WinUtil. A dica mostra `Chave da predefinição: <key>`. As chaves de aplicativos podem ser buscadas na aba Instalar, enquanto as de ajustes e AppX podem ser buscadas nas abas respectivas. As chaves de recursos estão disponíveis nas dicas porque a aba Configurações/Recursos não tem busca. Controles que não podem ser aplicados por uma predefinição, como interruptores, listas suspensas e escolhas de gerenciador de pacotes, deliberadamente não exibem uma chave de predefinição.
 
-To create your own config file:
+Para criar seu próprio arquivo de configuração:
 
-1. Open WinUtil.
-2. Click the gear icon in the top-right corner.
-3. Choose **Export**.
-4. Save the exported JSON file.
+1. Abra o WinUtil.
+2. Clique no ícone de engrenagem no canto superior direito.
+3. Escolha **Exportar**.
+4. Salve o arquivo JSON exportado.
 
-To build a config without opening WinUtil, pick your selections in the browser with the [Config Builder](/config-builder/) and download the file from there.
+Para montar uma configuração sem abrir o WinUtil, faça suas seleções no navegador com o [Config Builder](/config-builder/) e baixe o arquivo por lá.
 
-Use the Config Builder's generated command with its downloaded file. It runs the release used to build the catalog, keeping the selections compatible if a newer release removes or renames keys.
+Use o comando gerado pelo Config Builder com o arquivo baixado por ele. Ele executa a versão usada para montar o catálogo, mantendo as seleções compatíveis caso uma versão mais nova remova ou renomeie chaves.
 
-Local configuration paths are used exactly as provided when importing or exporting. Square brackets in folder or file names, such as `C:\Configs\setup[1].json`, are treated as part of the name rather than wildcard patterns.
+Os caminhos locais de configuração são usados exatamente como fornecidos ao importar ou exportar. Colchetes em nomes de pastas ou arquivos, como `C:\Configs\setup[1].json`, são tratados como parte do nome, e não como padrões curinga.
 
-Use HTTPS URLs or trusted local files for configurations. HTTP URLs do not protect configuration integrity, so a network attacker could replace the selected actions. WinUtil reads remote responses as JSON data without processing web-page scripts. Invalid JSON responses are rejected before the current selections change.
+Use URLs HTTPS ou arquivos locais confiáveis para configurações. URLs HTTP não protegem a integridade da configuração, então um atacante na rede poderia substituir as ações selecionadas. O WinUtil lê respostas remotas como dados JSON, sem processar scripts de páginas web. Respostas JSON inválidas são rejeitadas antes que as seleções atuais mudem.
 
-Export also copies a command to the clipboard that launches WinUtil with the saved configuration. The copied command preserves special characters in the path, including apostrophes, dollar signs, and backticks.
+A exportação também copia para a área de transferência um comando que inicia o WinUtil com a configuração salva. O comando copiado preserva caracteres especiais no caminho, incluindo apóstrofos, cifrões e acentos graves.
 
-You can also launch WinUtil with an exported config using this command:
+Você também pode iniciar o WinUtil com uma configuração exportada usando este comando:
 ```powershell
 & ([ScriptBlock]::Create((irm "https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1"))) -Config "C:\Path\To\Config.json"
 ```
 
-Repeated keys in an imported configuration select each entry only once. Unchecking an imported entry removes it from the selection, even if its key appeared more than once in the file.
+Chaves repetidas em uma configuração importada selecionam cada entrada apenas uma vez. Desmarcar uma entrada importada a remove da seleção, mesmo que a chave dela apareça mais de uma vez no arquivo.
 
-This is useful for:
+Isso é útil para:
 
-- Applying the same WinUtil configuration across multiple Windows 11 PCs
-- Reusing a known-good baseline after reinstalling Windows
-- Standardizing deployments for labs, workstations, or personal setups
+- Aplicar a mesma configuração do WinUtil em vários PCs com Windows 11
+- Reutilizar uma linha de base confiável após reinstalar o Windows
+- Padronizar implantações para laboratórios, estações de trabalho ou configurações pessoais
 
-:::caution[Keep exported configurations current]
-Exported configurations contain the WinUtil catalog keys that existed when the file was created. Current exports use a flat JSON format: one string when a single setting is selected, or an array of strings when several settings are selected. If a later WinUtil version removes or renames any imported key, the entire import is rejected before current selections are changed. PowerShell reports the stale entry as `Unknown selection key '<key>'`.
+:::caution[Mantenha as configurações exportadas atualizadas]
+As configurações exportadas contêm as chaves do catálogo do WinUtil que existiam quando o arquivo foi criado. As exportações atuais usam um formato JSON plano: uma string quando uma única configuração está selecionada, ou um array de strings quando várias estão selecionadas. Se uma versão posterior do WinUtil remover ou renomear qualquer chave importada, a importação inteira é rejeitada antes que as seleções atuais sejam alteradas. O PowerShell relata a entrada obsoleta como `Unknown selection key '<key>'`.
 
-Older WinUtil versions exported a JSON object with `Install` package metadata and grouped `WPFInstall`, `WPFTweaks`, `WPFToggle`, and `WPFFeature` selections. When importing one of these legacy files, WinUtil restores the keys that still exist and skips retired keys, recording them as a warning in the WinUtil log. If the file contains no supported selections, the import makes no changes.
+Versões mais antigas do WinUtil exportavam um objeto JSON com metadados de pacote `Install` e seleções agrupadas `WPFInstall`, `WPFTweaks`, `WPFToggle` e `WPFFeature`. Ao importar um desses arquivos legados, o WinUtil restaura as chaves que ainda existem e ignora as chaves retiradas, registrando-as como aviso no log do WinUtil. Se o arquivo não contiver nenhuma seleção compatível, a importação não faz mudanças.
 
-To recover, compare the reported key with the current files in the [WinUtil configuration catalog](https://github.com/RamonMods/WinUtil/tree/main/config). Remove or replace the stale key in your JSON file, or create and export a new configuration with the current WinUtil version, then run the import again. Re-export long-lived baselines after catalog changes so they remain compatible.
+Para se recuperar, compare a chave relatada com os arquivos atuais no [catálogo de configurações do WinUtil](https://github.com/RamonMods/WinUtil/tree/main/config). Remova ou substitua a chave obsoleta no seu arquivo JSON, ou crie e exporte uma nova configuração com a versão atual do WinUtil e execute a importação de novo. Reexporte linhas de base de longa duração após mudanças no catálogo, para que continuem compatíveis.
 :::
 
 :::note
-Run the command in an elevated PowerShell session so WinUtil can apply system-level changes.
+Execute o comando em uma sessão elevada do PowerShell para que o WinUtil possa aplicar mudanças no nível do sistema.
 :::

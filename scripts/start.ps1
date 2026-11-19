@@ -16,7 +16,7 @@ param (
 function Test-WinUtilOwnsFileProcess {
     <#
         .SYNOPSIS
-            Whether the current process was launched with this script as its file target
+            Indica se o processo atual foi iniciado com este script como seu arquivo de destino
     #>
     param(
         [string]$ScriptPath = $PSCommandPath,
@@ -73,7 +73,7 @@ function Test-WinUtilOwnsFileProcess {
             return $hostOptionAliases[$optionName]
         }
 
-        # pwsh accepts any unambiguous prefix of a host option, such as -WorkingD.
+        # O pwsh aceita qualquer prefixo não ambíguo de uma opção do host, como -WorkingD.
         $matchingOptions = @($hostOptionKinds.Keys | Where-Object {
             $_.StartsWith($optionName, [StringComparison]::OrdinalIgnoreCase)
         })
@@ -124,8 +124,8 @@ function Test-WinUtilOwnsFileProcess {
     return $false
 }
 
-# A headless script launched with powershell.exe/pwsh.exe -File owns its process and must set
-# that process's exit code. An invoked or in-memory script must return without closing its caller.
+# Um script headless iniciado com powershell.exe/pwsh.exe -File é dono do próprio processo e precisa
+# definir o código de saída desse processo. Um script invocado ou em memória deve retornar sem fechar quem o chamou.
 $script:WinUtilIsFileProcess = Test-WinUtilOwnsFileProcess
 
 $PARAM_OFFLINE = $false
@@ -134,7 +134,7 @@ if ($Offline) {
 }
 
 if ($ExecutionContext.SessionState.LanguageMode -ne 'FullLanguage') {
-    Write-Host "WinUtil is unable to run on your system. PowerShell execution is restricted by security policies." -ForegroundColor Red
+    Write-Host "O WinUtil não consegue ser executado no seu sistema. A execução do PowerShell está restrita por políticas de segurança." -ForegroundColor Red
     $global:LASTEXITCODE = 1
     if ($env:WINUTIL_HEADLESS_CHILD -eq "1" -or $script:WinUtilIsFileProcess) { exit 1 }
     return 1
@@ -143,7 +143,7 @@ if ($ExecutionContext.SessionState.LanguageMode -ne 'FullLanguage') {
 function New-WinUtilElevationCommand {
     <#
         .SYNOPSIS
-            Encodes the relaunch target and bound parameters as data for an elevated child
+            Codifica o destino de relançamento e os parâmetros vinculados como dados para um processo filho elevado
     #>
     param(
         [string]$ScriptPath,
@@ -159,8 +159,8 @@ function New-WinUtilElevationCommand {
     $serializedLaunch = [System.Management.Automation.PSSerializer]::Serialize($launchData)
     $launchPayload = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($serializedLaunch))
 
-    # Only base64 is embedded in executable text. User-controlled values are deserialized and
-    # splatted as parameter data in the child, so quotes in Config cannot become PowerShell code.
+    # Apenas base64 é embutido no texto executável. Valores controlados pelo usuário são desserializados e
+    # repassados como dados de parâmetro no processo filho, então aspas em Config não podem virar código PowerShell.
     $bootstrap = @"
 `$launchXml = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('$launchPayload'))
 `$launch = [System.Management.Automation.PSSerializer]::Deserialize(`$launchXml)
@@ -178,7 +178,7 @@ if (`$launch.ScriptPath) {
 }
 
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Output "WinUtil needs to be run as Administrator. Attempting to relaunch."
+    Write-Output "O WinUtil precisa ser executado como Administrador. Tentando reiniciar."
     $elevationParameters = @{}
     foreach ($parameter in $PSBoundParameters.GetEnumerator()) {
         $elevationParameters[$parameter.Key] = if ($parameter.Value -is [switch]) {
@@ -190,17 +190,17 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 
     $powershellCmd = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
 
-    # A headless caller is waiting on this process for an outcome, so the elevated run has to be
-    # waited on and its code handed back. A terminal tab is skipped for the same reason: the
-    # exit code of wt.exe is its own, not the run's.
+    # Um chamador headless está esperando um resultado deste processo, então a execução elevada precisa
+    # ser aguardada e ter seu código devolvido. Uma aba de terminal é dispensada pelo mesmo motivo: o
+    # código de saída do wt.exe é dele próprio, não o da execução.
     if ($Config -or $Preset) {
-        # A declined UAC prompt throws, which would leave $elevated null and exit 0: the caller
-        # waiting on this process would read that as a successful run
+        # Um pedido do UAC recusado gera exceção, o que deixaria $elevated nulo e sairia com 0: o chamador
+        # que espera este processo interpretaria isso como uma execução bem-sucedida
         try {
             $elevationCommand = New-WinUtilElevationCommand -ScriptPath $PSCommandPath -Parameters $elevationParameters -Headless
             $elevated = Start-Process $powershellCmd -ArgumentList @("-ExecutionPolicy", "Bypass", "-NoProfile", "-EncodedCommand", $elevationCommand) -Verb RunAs -Wait -PassThru -ErrorAction Stop
         } catch {
-            Write-Host "Elevation was declined or failed: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "A elevação foi recusada ou falhou: $($_.Exception.Message)" -ForegroundColor Red
             $global:LASTEXITCODE = 1
             if ($script:WinUtilIsFileProcess) { exit 1 }
             return 1
@@ -222,30 +222,30 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     break
 }
 
-# Variable to sync between runspaces
+# Variável para sincronizar entre runspaces
 $sync = [Hashtable]::Synchronized(@{})
 $sync.version = "#{replaceme}"
 $sync.IsLocalCompile = "#{islocalcompile}" -eq "true"
 $sync.configs = @{}
 $sync.Buttons = [System.Collections.Generic.List[PSObject]]::new()
 $sync.preferences = @{}
-# Name of the job currently running, or $null when idle. Owned by Start-WinUtilJob.
+# Nome do job em execução no momento, ou $null quando ocioso. Pertence a Start-WinUtilJob.
 $sync.ActiveJob = $null
-# User actions waiting for the slot, oldest first. Changed only under $sync.SyncRoot.
+# Ações do usuário aguardando a vaga, a mais antiga primeiro. Alterado apenas sob $sync.SyncRoot.
 $sync.JobQueue = [System.Collections.Generic.List[object]]::new()
-# True from a job's release until the queued job that follows it claims the slot, so a new action
-# cannot take the slot ahead of the queue.
+# True desde a liberação de um job até o job enfileirado seguinte assumir a vaga, para que uma nova ação
+# não pegue a vaga na frente da fila.
 $sync.JobHandoff = $false
-# A modal close question must not start a different queued job behind its prompt.
+# Uma pergunta modal de fechamento não deve iniciar outro job enfileirado por trás do seu prompt.
 $sync.JobClosePromptOpen = $false
-# Serializes worker-pool startup with recycling and shutdown.
+# Serializa a inicialização do pool de workers com a reciclagem e o encerramento.
 $sync.RunspacePoolLock = [object]::new()
-# Serializes the speculative and UI-thread taskbar overlay renderers.
+# Serializa os renderizadores de sobreposição da barra de tarefas, o especulativo e o da thread de UI.
 $sync.AssetRenderLock = [object]::new()
 $sync.RenderedAssetCache = [Hashtable]::Synchronized(@{})
-# Every step recorded by Measure-WinUtilStep, from any thread
+# Cada etapa registrada por Measure-WinUtilStep, de qualquer thread
 $sync.StepTimings = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
-# Every error logged, so a job can report that something went wrong even when it did not throw
+# Todo erro registrado, para que um job consiga relatar que algo deu errado mesmo sem ter lançado exceção
 $sync.LoggedErrors = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
 $sync.StartedAt = Get-Date
 $sync.selectedAppx = [System.Collections.Generic.List[string]]::new()
@@ -259,8 +259,8 @@ $dateTime = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $winutildir = "$env:LocalAppData\winutil"
 $sync.winutildir = $winutildir
 
-# Written by Write-WinUtilLog. Not a transcript, as that only records this runspace and misses
-# everything from the UI thread and the jobs.
+# Escrito por Write-WinUtilLog. Não é um transcript, já que esse só registra este runspace e perde
+# tudo que vem da thread de UI e dos jobs.
 $sync.logPath = "$winutildir\logs\winutil_$dateTime.log"
 
 $Host.UI.RawUI.WindowTitle = "WinUtil"

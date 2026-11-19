@@ -1,47 +1,47 @@
 ---
-title: Known Issues
-description: Known problems with WinUtil and how to work around them.
+title: Problemas conhecidos
+description: Problemas conhecidos do WinUtil e como contorná-los.
 ---
 
-### Download not working
+### Download não funciona
 
-If you run WinUtil and get an error like:
+Se você executar o WinUtil e receber um erro como:
 
 `< : The term '<' is not recognized as the name of a cmdlet, function, script file, or operable program.`
 
-try using a **VPN** and if that doesn't work then report the issue to https://github.com/RamonMods/WinUtil/issues
+tente usar uma **VPN** e, se isso não funcionar, relate o problema em https://github.com/RamonMods/WinUtil/issues
 
-### Script Won't Run
+### O script não executa
 
-If you run WinUtil and get the error:
+Se você executar o WinUtil e receber o erro:
 
 `"WinUtil is unable to run on your system. PowerShell execution is restricted by security policies"`
 
-This means that your PowerShell session is in **Constrained Language Mode**, which prevents WinUtil from running.
+Isso significa que sua sessão do PowerShell está em **Modo de Linguagem Restrita** (Constrained Language Mode), o que impede o WinUtil de ser executado.
 
-### Ultimate Performance Plan Not Working
+### Plano Alto Desempenho Máximo não funciona
 
-The Ultimate Performance power plan may not work on some laptops that do not fully support this power plan.
+O plano de energia Alto Desempenho Máximo pode não funcionar em alguns notebooks que não oferecem suporte completo a esse plano.
 
-In these cases, the power plan may fail to apply. This is expected behavior on unsupported hardware.
+Nesses casos, o plano pode falhar ao ser aplicado. Esse é o comportamento esperado em hardware sem suporte.
 
-### Revert start menu tweak not working
+### O ajuste de reverter o menu Iniciar não funciona
 
-Revert start menu tweak stops working starting with **Windows 11 update KB5089573** (released in May 2026).
+O ajuste de reverter o menu Iniciar deixa de funcionar a partir da **atualização KB5089573 do Windows 11** (lançada em maio de 2026).
 
-In this update, Microsoft completely removed the old Start Menu code from Windows, so we aren't able to bring it back.
+Nessa atualização, a Microsoft removeu completamente o código antigo do Menu Iniciar do Windows, então não conseguimos trazê-lo de volta.
 
-### Issues with PowerShell 7 or Class not registered Error
-Installing PowerShell 7 from the Microsoft Store (MSIX package) is known to cause issues with DISM cmdlets such as `Get-WindowsOptionalFeature` and `Enable-WindowsOptionalFeature`, resulting in a `Class not registered` COM error.
+### Problemas com o PowerShell 7 ou erro Class not registered
+Instalar o PowerShell 7 pela Microsoft Store (pacote MSIX) é conhecido por causar problemas com cmdlets do DISM, como `Get-WindowsOptionalFeature` e `Enable-WindowsOptionalFeature`, resultando em um erro COM `Class not registered`.
 
-This might also make it so running the "pre-installed app removal" will take an indefinite amount of time
+Isso também pode fazer com que a "remoção de aplicativos pré-instalados" leve um tempo indeterminado
 
-Instead, install PowerShell 7 using one of the following methods:
+Em vez disso, instale o PowerShell 7 usando um dos seguintes métodos:
 
-**winget (recommended):**
+**winget (recomendado):**
 ```powershell
 winget install --id Microsoft.PowerShell --source winget --installer-type wix
 ```
-**Direct MSI from GitHub Releases:** Download the `.msi` installer from the [PowerShell GitHub Releases](https://github.com/PowerShell/PowerShell/releases) page.
+**MSI direto das releases do GitHub:** Baixe o instalador `.msi` na página de [releases do PowerShell no GitHub](https://github.com/PowerShell/PowerShell/releases).
 
-For more details see https://github.com/PowerShell/PowerShell/issues/13866
+Para mais detalhes, veja https://github.com/PowerShell/PowerShell/issues/13866
