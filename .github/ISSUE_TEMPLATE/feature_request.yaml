@@ -1,23 +1,23 @@
-name: "Feature request"
-description: "Suggest a new feature or improvement for the project."
-title: "[Feature Request] - <your summary here>"
+name: "Solicitação de recurso"
+description: "Sugira um novo recurso ou melhoria para o projeto."
+title: "[Solicitação de Recurso] - <seu resumo aqui>"
 labels: ["enhancement"]
 
 body:
   - type: markdown
     attributes:
       value: |
-        # ✨ **Feature request**
-        Thank you for taking the time to suggest a feature! Please provide as much detail as possible to help us understand and evaluate your request.
+        # ✨ **Solicitação de recurso**
+        Obrigado por dedicar seu tempo para sugerir um recurso! Forneça o máximo de detalhes possível para nos ajudar a entender e avaliar sua solicitação.
 
-        ## ⚠️ **IMPORTANT**
-        - 🛠️ **Supported environments only:** We only support Windows 11.
-        - 💡 For general questions, use the [Discussions section](https://github.com/RamonMods/WinUtil/discussions) or join our Community-driven [Discord Server](https://github.com/RamonMods/WinUtil).
+        ## ⚠️ **IMPORTANTE**
+        - 🛠️ **Apenas ambientes suportados:** Só damos suporte ao Windows 11.
+        - 💡 Para dúvidas gerais, use a [seção Discussões](https://github.com/RamonMods/WinUtil/discussions) ou entre no nosso [Servidor Discord](https://github.com/RamonMods/WinUtil) mantido pela comunidade.
 
   - type: textarea
     id: proposed_solution
     attributes:
-      label: 💡 Describe the solution you'd like
-      placeholder: "Provide a clear and concise description."
+      label: 💡 Descreva a solução que você gostaria
+      placeholder: "Forneça uma descrição clara e concisa."
     validations:
       required: true

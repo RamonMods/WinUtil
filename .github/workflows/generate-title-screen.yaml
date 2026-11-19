@@ -1,4 +1,4 @@
-name: Generate WinUtil title screen
+name: Gerar tela de título do WinUtil
 
 on:
   workflow_dispatch:
@@ -23,23 +23,23 @@ jobs:
         shell: pwsh
 
     steps:
-      - name: Checkout repository
+      - name: Checkout do repositório
         uses: actions/checkout@v7
         with:
           ref: main
           persist-credentials: false
 
-      - name: Install uv and Python
+      - name: Instalar uv e Python
         uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "0.12.0"
           python-version: "3.13"
           enable-cache: false
 
-      - name: Set display resolution
+      - name: Definir resolução de exibição
         run: |
-          # Set-DisplayResolution is provided by Windows PowerShell's ServerCore
-          # module, so this step intentionally calls powershell.exe from pwsh.
+          # Set-DisplayResolution é fornecido pelo módulo ServerCore do
+          # Windows PowerShell, por isso esta etapa chama powershell.exe a partir do pwsh de propósito.
           & powershell.exe -NoLogo -NoProfile -Command @'
           Set-DisplayResolution `
               -Width $env:WINUTIL_CAPTURE_WIDTH `
@@ -48,7 +48,7 @@ jobs:
           '@
 
           if ($LASTEXITCODE -ne 0) {
-              throw "Failed to set the runner display resolution."
+              throw "Falha ao definir a resolução de exibição do runner."
           }
 
           Add-Type @"
@@ -67,14 +67,14 @@ jobs:
               $actualHeight -ne [int]$env:WINUTIL_CAPTURE_HEIGHT
           ) {
               throw (
-                  "The hosted runner rejected the requested resolution. " +
-                  "Requested: $env:WINUTIL_CAPTURE_WIDTH" +
+                  "O runner hospedado rejeitou a resolução solicitada. " +
+                  "Solicitada: $env:WINUTIL_CAPTURE_WIDTH" +
                   "x$env:WINUTIL_CAPTURE_HEIGHT; " +
-                  "actual: ${actualWidth}x${actualHeight}."
+                  "real: ${actualWidth}x${actualHeight}."
               )
           }
 
-      - name: Report display environment
+      - name: Relatar ambiente de exibição
         run: |
           Add-Type @"
           using System.Runtime.InteropServices;
@@ -89,23 +89,23 @@ jobs:
           $height = [DisplayInfo]::GetSystemMetrics(1)
           $sessionId = [Diagnostics.Process]::GetCurrentProcess().SessionId
 
-          Write-Host "Resolution: ${width}x${height}"
-          Write-Host "Session ID: $sessionId"
-          Write-Host "User: $env:USERNAME"
+          Write-Host "Resolução: ${width}x${height}"
+          Write-Host "ID da sessão: $sessionId"
+          Write-Host "Usuário: $env:USERNAME"
 
-      - name: Compile WinUtil
+      - name: Compilar WinUtil
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
           ./Compile.ps1
 
-      - name: Launch WinUtil
+      - name: Iniciar WinUtil
         run: |
           $scriptPath = Join-Path $env:GITHUB_WORKSPACE "winutil.ps1"
           $command = "& '$scriptPath'"
           $bytes = [Text.Encoding]::Unicode.GetBytes($command)
           $encodedCommand = [Convert]::ToBase64String($bytes)
 
-          # Hide the console host while leaving the WPF window available.
+          # Oculta o host do console mantendo a janela WPF disponível.
           $process = Start-Process powershell.exe -ArgumentList @(
               "-NoLogo",
               "-NoProfile",
@@ -119,25 +119,25 @@ jobs:
           $deadline = (Get-Date).AddSeconds(90)
           do {
               Start-Sleep -Seconds 2
-              # A versioned title excludes the unversioned console host.
+              # Um título com versão exclui o host do console sem versão.
               $window = Get-Process |
                   Where-Object { $_.MainWindowTitle -match '^WinUtil\s+\d' } |
                   Select-Object -First 1
           } until ($window -or (Get-Date) -ge $deadline)
 
           if (-not $window) {
-              throw "WinUtil did not expose a window within 90 seconds."
+              throw "O WinUtil não exibiu uma janela em até 90 segundos."
           }
 
-          Write-Host "WinUtil HWND: $($window.MainWindowHandle)"
-          Write-Host "WinUtil title: $($window.MainWindowTitle)"
+          Write-Host "HWND do WinUtil: $($window.MainWindowHandle)"
+          Write-Host "Título do WinUtil: $($window.MainWindowTitle)"
 
-          # The exact HWND avoids desktop-enumeration ambiguity. Python validates
-          # the title and WPF class before using it.
+          # O HWND exato evita ambiguidade na enumeração da área de trabalho. O Python valida
+          # o título e a classe WPF antes de usá-lo.
           "WINUTIL_HWND=$($window.MainWindowHandle)" |
               Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
-      - name: Generate title screen
+      - name: Gerar tela de título
         working-directory: tools/title-screen
         run: |
           & uv run --locked python automate_title_screen.py `
@@ -145,10 +145,10 @@ jobs:
               Tee-Object -FilePath "$env:RUNNER_TEMP\title-screen-capture.log"
 
           if ($LASTEXITCODE -ne 0) {
-              throw "Title-screen automation exited with code $LASTEXITCODE."
+              throw "A automação da tela de título terminou com o código $LASTEXITCODE."
           }
 
-      - name: Create title-screen update pull request
+      - name: Criar pull request de atualização da tela de título
         id: cpr
         uses: peter-evans/create-pull-request@v8
         with:
@@ -157,18 +157,18 @@ jobs:
           base: main
           branch: title-screen-update
           delete-branch: true
-          commit-message: "docs: update WinUtil title screen"
-          title: "docs: update WinUtil title screen"
+          commit-message: "docs: atualizar tela de título do WinUtil"
+          title: "docs: atualizar tela de título do WinUtil"
           body: |
-            Regenerates the WinUtil Light and Dark title-screen composite from the current main branch.
+            Regera a composição da tela de título do WinUtil nas versões clara e escura a partir da branch main atual.
 
-            Source workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Fluxo de trabalho de origem: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           labels: |
             automated
             documentation
             skip-changelog
 
-      - name: Report pull request
+      - name: Relatar pull request
         if: steps.cpr.outputs.pull-request-url
         env:
           PR_OPERATION: ${{ steps.cpr.outputs.pull-request-operation }}
@@ -176,7 +176,7 @@ jobs:
         run: |
           Write-Host "Pull request $env:PR_OPERATION`: $env:PR_URL"
 
-      - name: Inspect UI Automation on failure
+      - name: Inspecionar UI Automation em caso de falha
         if: failure()
         continue-on-error: true
         working-directory: tools/title-screen
@@ -184,7 +184,7 @@ jobs:
           uv run --locked python inspect_winutil.py `
               "$env:RUNNER_TEMP\winutil-title-screen-inspect.txt"
 
-      - name: Upload failure diagnostics
+      - name: Enviar diagnósticos de falha
         if: failure()
         uses: actions/upload-artifact@v7
         with:
@@ -196,7 +196,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Close WinUtil
+      - name: Fechar WinUtil
         if: always()
         run: |
           if ($env:WINUTIL_HOST_PID) {

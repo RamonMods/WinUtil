@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Multiplane Overlay
+# Testes - Multiplane Overlay
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -14,8 +14,8 @@ BeforeAll {
     }
 }
 
-Describe "Multiplane Overlay configuration" {
-    It "keeps every state and registry action in tweaks.json" {
+Describe "Configuração do Multiplane Overlay" {
+    It "mantém todo estado e ação de registro em tweaks.json" {
         $script:config.WPFMultiplaneOverlay.Type | Should -Be "Combobox"
         $script:config.WPFMultiplaneOverlay.ComboItems | Should -BeOfType [string]
         $comboItems = @($script:config.WPFMultiplaneOverlay.ComboItems -split "\|")
@@ -30,7 +30,7 @@ Describe "Multiplane Overlay configuration" {
 }
 
 Describe "Get-WinUtilRegistryComboState" {
-    It "treats missing registry properties and paths as absent" -TestCases @(
+    It "trata propriedades e caminhos de registro ausentes como inexistentes" -TestCases @(
         @{ Exception = [System.Management.Automation.PSArgumentException]::new("Property is missing") }
         @{ Exception = [System.Management.Automation.ItemNotFoundException]::new("Path is missing") }
     ) {
@@ -40,7 +40,7 @@ Describe "Get-WinUtilRegistryComboState" {
         Get-WinUtilRegistryComboState -Registry $script:states | Should -Be "Enabled"
     }
 
-    It "reports Enabled when the values are absent or zero" -TestCases @(
+    It "informa o estado Enabled quando os valores estão ausentes ou são zero" -TestCases @(
         @{ OverlayTestMode = $null; DisableOverlays = $null }
         @{ OverlayTestMode = 0; DisableOverlays = 0 }
     ) {
@@ -55,7 +55,7 @@ Describe "Get-WinUtilRegistryComboState" {
         Get-WinUtilRegistryComboState -Registry $script:states | Should -Be "Enabled"
     }
 
-    It "reports each disabled state" -TestCases @(
+    It "informa cada estado desativado" -TestCases @(
         @{ OverlayTestMode = 5; DisableOverlays = $null; Expected = "Disabled (Compatibility)" }
         @{ OverlayTestMode = 5; DisableOverlays = 1; Expected = "Fully Disabled" }
     ) {
@@ -70,7 +70,7 @@ Describe "Get-WinUtilRegistryComboState" {
         Get-WinUtilRegistryComboState -Registry $script:states | Should -Be $Expected
     }
 
-    It "rejects an unsupported combination" {
+    It "rejeita uma combinação não suportada" {
         Mock Get-ItemProperty {
             if ($Name -eq "OverlayTestMode") {
                 return [pscustomobject]@{ OverlayTestMode = 0 }
@@ -105,7 +105,7 @@ Describe "Set-WinUtilRegistryComboState" {
         }
     }
 
-    It "applies each configured state" -TestCases @(
+    It "aplica cada estado configurado" -TestCases @(
         @{ State = "Enabled"; OverlayTestMode = $null; DisableOverlays = $null }
         @{ State = "Disabled (Compatibility)"; OverlayTestMode = 5; DisableOverlays = $null }
         @{ State = "Fully Disabled"; OverlayTestMode = 5; DisableOverlays = 1 }
@@ -118,7 +118,7 @@ Describe "Set-WinUtilRegistryComboState" {
         $script:registryValues.DisableOverlays | Should -Be $DisableOverlays
     }
 
-    It "restores previous values when verification fails" {
+    It "restaura valores anteriores quando a verificação falha" {
         Mock Set-WinUtilRegistry {
             param($Name, $Path, $Type, $Value)
             if ($Name -eq "DisableOverlays" -and $Value -eq 1) {
@@ -136,7 +136,7 @@ Describe "Set-WinUtilRegistryComboState" {
         $script:registryValues.DisableOverlays | Should -Be 0
     }
 
-    It "restores absence when a state cannot be applied" {
+    It "restaura a ausência quando um estado não pode ser aplicado" {
         $script:registryValues.Clear()
         Mock Set-WinUtilRegistry {
             param($Name, $Path, $Type, $Value)
@@ -155,7 +155,7 @@ Describe "Set-WinUtilRegistryComboState" {
         $script:registryValues.ContainsKey("DisableOverlays") | Should -BeFalse
     }
 
-    It "reports when the previous values cannot be restored" {
+    It "informa quando os valores anteriores não podem ser restaurados" {
         Mock Set-WinUtilRegistry {
             param($Name, $Path, $Type, $Value)
             if (($Name -eq "DisableOverlays" -and $Value -eq 1) -or ($Name -eq "OverlayTestMode" -and $Value -eq 0)) {

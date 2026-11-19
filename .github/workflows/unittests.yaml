@@ -1,43 +1,43 @@
-name: Unit Tests
+name: Testes unitários
 
 on:
   push:
 
 jobs:
   lint:
-    name: PS Script Analyzer
+    name: Análise de scripts PowerShell
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
-    - name: Test discussion closing
+    - name: Testar fechamento de discussão
       run: node --test .github/tests/close-discussion.test.cjs
-    - name: Install PSScriptAnalyzer
+    - name: Instalar PSScriptAnalyzer
       run: |
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
         Install-Module -Name PSScriptAnalyzer -RequiredVersion 1.20.0 -Scope CurrentUser -Force
         Import-Module PSScriptAnalyzer -RequiredVersion 1.20.0 -Force
         Get-Module PSScriptAnalyzer | Select-Object Name, Version, Path
       shell: pwsh
-    - name: Run PSScriptAnalyzer
+    - name: Executar PSScriptAnalyzer
       run: |
         $results = Invoke-ScriptAnalyzer -Path . -Settings ./lint/PSScriptAnalyser.ps1 -Recurse
         if ($results) {
             $results | Format-Table -AutoSize | Out-String -Width 4096 | Write-Host
         } else {
-            Write-Host "PSScriptAnalyzer found no diagnostics."
+            Write-Host "O PSScriptAnalyzer não encontrou diagnósticos."
         }
       shell: pwsh
   test:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout do código
       uses: actions/checkout@v7
 
-    - name: Test PR labeling
+    - name: Testar rotulagem de PRs
       run: node --test .github/tests/label-pr.test.cjs
 
-    - name: Install Pester
+    - name: Instalar Pester
       run: |
         Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         Install-Module -Name Pester -RequiredVersion 5.8.0 -Force -SkipPublisherCheck -AllowClobber
@@ -45,7 +45,7 @@ jobs:
         Get-Module Pester | Select-Object Name, Version, Path
       shell: pwsh
 
-    - name: Run Pester tests
+    - name: Executar testes Pester
       run: |
         Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         Import-Module Pester -RequiredVersion 5.8.0 -Force

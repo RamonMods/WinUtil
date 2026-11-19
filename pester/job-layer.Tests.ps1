@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Job layer
+# Testes - Camada de jobs
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -40,13 +40,13 @@ BeforeAll {
     }
 }
 
-Describe "Interface thread dispatch" {
-    # Work handed to the interface thread must arrive as body text plus parameters. A scriptblock
-    # marshalled from a worker runspace keeps that runspace's session state, so every command it
-    # invokes is resolved back through the originating runspace. Measured on 400 invocations:
-    # 5354 ms marshalled against 3 ms rebuilt from text.
+Describe "Despacho na thread da interface" {
+    # O trabalho entregue à thread da interface deve chegar como texto do corpo mais parâmetros. Um scriptblock
+    # encaminhado de um runspace de worker mantém o estado de sessão daquele runspace, então todo comando que
+    # ele invoca é resolvido de volta pelo runspace de origem. Medido em 400 invocações:
+    # 5354 ms encaminhado contra 3 ms reconstruído a partir de texto.
 
-    It "passes deferred values as parameters rather than capturing them" {
+    It "passa valores adiados como parâmetros em vez de capturá-los" {
         foreach ($path in @(
             "functions\private\Step-WinUtilJob.ps1",
             "functions\private\Invoke-WinUtilISO.ps1"
@@ -59,7 +59,7 @@ Describe "Interface thread dispatch" {
     }
 }
 
-Describe "Invoke-WPFUIThread output" {
+Describe "Saída de Invoke-WPFUIThread" {
     BeforeEach {
         $dispatcher = [pscustomobject]@{ HasShutdownStarted = $false }
         $dispatcher | Add-Member -MemberType ScriptMethod -Name CheckAccess -Value { $true }
@@ -72,24 +72,24 @@ Describe "Invoke-WPFUIThread output" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    # Output from the body must not join the caller's own return value: a caller that only
-    # wanted a control updated would otherwise return an array and every index read wrong.
-    It "swallows the body's output by default" {
+    # A saída do corpo não deve se juntar ao valor de retorno do chamador: um chamador que só
+    # queria atualizar um controle retornaria um array e toda leitura de índice sairia errada.
+    It "descarta a saída do corpo por padrão" {
         @(Invoke-WPFUIThread -ScriptBlock { "stray" }).Count | Should -Be 0
     }
 
-    It "returns the body's output when asked" {
+    It "retorna a saída do corpo quando solicitado" {
         Invoke-WPFUIThread -PassThru -ScriptBlock { "wanted" } | Should -Be "wanted"
     }
 
-    It "passes values in rather than relying on the caller's scope" {
+    It "passa valores em vez de depender do escopo do chamador" {
         Invoke-WPFUIThread -PassThru -Parameters @{ Value = 7 } -ScriptBlock {
             param($Value)
             $Value * 2
         } | Should -Be 14
     }
 
-    It "ignores a synchronous dispatch canceled by window shutdown" {
+    It "ignora um despacho síncrono cancelado pelo fechamento da janela" {
         $dispatcher = [pscustomobject]@{ HasShutdownStarted = $false }
         $dispatcher | Add-Member -MemberType ScriptMethod -Name CheckAccess -Value { $false }
         $dispatcher | Add-Member -MemberType ScriptMethod -Name Invoke -Value {
@@ -106,7 +106,7 @@ Describe "Invoke-WPFUIThread output" {
         { Invoke-WPFUIThread -ScriptBlock { } } | Should -Not -Throw
     }
 
-    It "does not hide a dispatch failure while the window is still alive" {
+    It "não oculta uma falha de despacho enquanto a janela ainda está ativa" {
         $dispatcher = [pscustomobject]@{ HasShutdownStarted = $false }
         $dispatcher | Add-Member -MemberType ScriptMethod -Name CheckAccess -Value { $false }
         $dispatcher | Add-Member -MemberType ScriptMethod -Name Invoke -Value {
@@ -120,7 +120,7 @@ Describe "Invoke-WPFUIThread output" {
         { Invoke-WPFUIThread -ScriptBlock { } } | Should -Throw "*not a shutdown*"
     }
 
-    It "rethrows synchronous callback failures for the waiting caller to log" {
+    It "relança falhas síncronas de callback para que o chamador em espera as registre" {
         $tokens = $null
         $errors = $null
         $uiAst = [System.Management.Automation.Language.Parser]::ParseFile(
@@ -142,7 +142,7 @@ Describe "Invoke-WPFUIThread output" {
         Should -Invoke Write-WinUtilErrorRecord -Times 0 -Exactly
     }
 
-    It "logs asynchronous callback failures without throwing on the dispatcher" {
+    It "registra falhas assíncronas de callback sem lançar exceção no dispatcher" {
         $tokens = $null
         $errors = $null
         $uiAst = [System.Management.Automation.Language.Parser]::ParseFile(
@@ -198,7 +198,7 @@ Describe "Start-WinUtilJob" {
         Remove-Variable -Name activeJobAtQueueTime -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "claims the busy state before the work is queued" {
+    It "assume o estado ocupado antes de o trabalho ser enfileirado" {
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
 
         $script:activeJobAtQueueTime | Should -Be "Example"
@@ -211,7 +211,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "uses the description for the initial progress text" {
+    It "usa a descrição para o texto inicial de progresso" {
         Start-WinUtilJob -Name "Example" -Description "Doing the thing" -ScriptBlock { } | Out-Null
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
@@ -219,7 +219,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "refuses a second job while one is running" {
+    It "recusa um segundo job enquanto um está em execução" {
         $script:sync.ActiveJob = "Install"
 
         $result = Start-WinUtilJob -Name "Tweaks" -ScriptBlock { }
@@ -232,14 +232,14 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -Be "Install"
     }
 
-    It "claims the slot with a token that identifies the run, not just its name" {
+    It "assume a vaga com um token que identifica a execução, não apenas seu nome" {
         Start-WinUtilJob -Name "Install" -ScriptBlock { } | Out-Null
         $first = $script:sync.ActiveJobToken
 
         $first | Should -Not -BeNullOrEmpty
         $script:capturedRunspaceArgs["JobToken"] | Should -Be $first
 
-        # a second run of the same name gets its own token, so a late worker cannot release it
+        # uma segunda execução com o mesmo nome recebe seu próprio token, para que um worker tardio não possa liberá-lo
         $script:sync.ActiveJob = $null
         $script:sync.ActiveJobToken = $null
         Start-WinUtilJob -Name "Install" -ScriptBlock { } | Out-Null
@@ -247,7 +247,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJobToken | Should -Not -Be $first
     }
 
-    It "passes the body text and its parameters to the worker" {
+    It "passa o texto do corpo e seus parâmetros ao worker" {
         Start-WinUtilJob -Name "Example" -Parameters @{ Value = 42 } -ScriptBlock { param($Value) $Value } | Out-Null
 
         $script:capturedRunspaceArgs["JobName"] | Should -Be "Example"
@@ -257,7 +257,7 @@ Describe "Start-WinUtilJob" {
         $script:capturedRunspaceArgs["JobRestoresAppList"] | Should -BeFalse
     }
 
-    It "shows the Install working view while an Install job runs" {
+    It "mostra a visão de trabalho do Install enquanto um job Install executa" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "Install" -Description "Installing apps" -ScriptBlock { } | Out-Null
@@ -267,7 +267,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "shows the Install working view while an Uninstall job runs" {
+    It "mostra a visão de trabalho do Install enquanto um job Uninstall executa" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "Uninstall" -ScriptBlock { } | Out-Null
@@ -277,7 +277,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "shows the Install working view for the Upgrade All button job" {
+    It "mostra a visão de trabalho do Install para o job do botão Upgrade All" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "Upgrade all Applications" -ScriptBlock { } | Out-Null
@@ -288,7 +288,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "does not let a stale Upgrade worker hide a newer Install working view" {
+    It "não permite que um worker Upgrade obsoleto oculte uma visão de trabalho do Install mais recente" {
         Mock Set-WinUtilWorkingView { }
         Start-WinUtilJob -Name "Upgrade all Applications" -ScriptBlock { } | Out-Null
         $oldToken = $script:capturedRunspaceArgs["JobToken"]
@@ -306,7 +306,7 @@ Describe "Start-WinUtilJob" {
         Should -Not -Invoke Set-WinUtilWorkingView -ParameterFilter { $Working -eq $false }
         $script:sync.ActiveJobToken | Should -Be "current-token"
     }
-    It "shows the Tweaks working view while a Tweaks job runs" {
+    It "mostra a visão de trabalho de Ajustes enquanto um job Tweaks executa" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "Tweaks" -Description "Applying tweaks" -ScriptBlock { } | Out-Null
@@ -316,7 +316,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "shows the Tweaks working view while an Undo job runs" {
+    It "mostra a visão de trabalho de Ajustes enquanto um job Undo executa" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "Undo tweaks" -ScriptBlock { } | Out-Null
@@ -326,7 +326,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "does not show a working view for other jobs" {
+    It "não mostra visão de trabalho para outros jobs" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "OOSU" -ScriptBlock { } | Out-Null
@@ -334,7 +334,7 @@ Describe "Start-WinUtilJob" {
         Should -Invoke -CommandName Set-WinUtilWorkingView -Times 0 -Exactly
     }
 
-    It "hides the working view when the worker finishes" {
+    It "oculta a visão de trabalho quando o worker termina" {
         Mock Set-WinUtilWorkingView { }
 
         Start-WinUtilJob -Name "Tweaks" -ScriptBlock { } | Out-Null
@@ -354,7 +354,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
 
-    It "still releases the job when hiding the working view fails" {
+    It "ainda libera o job quando ocultar a visão de trabalho falha" {
         Mock Set-WinUtilWorkingView { if ($Working -eq $false) { throw "dispatcher stopped" } }
 
         Start-WinUtilJob -Name "Install" -ScriptBlock { } | Out-Null
@@ -377,14 +377,14 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "greys out the app list only when asked to" {
+    It "deixa a lista de aplicativos cinza apenas quando solicitado" {
         Start-WinUtilJob -Name "Install" -DisableAppList -ScriptBlock { } | Out-Null
 
         $script:sync.ItemsControl.IsEnabled | Should -BeFalse
         $script:capturedRunspaceArgs["JobRestoresAppList"] | Should -BeTrue
     }
 
-    It "releases the job and restores the app list when scheduling fails" {
+    It "libera o job e restaura a lista de aplicativos quando o agendamento falha" {
         Mock Invoke-WPFRunspace { throw "pool failed" }
         Mock Write-Host { }
 
@@ -394,7 +394,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ItemsControl.IsEnabled | Should -BeTrue
     }
 
-    It "releases the job when progress setup and failure reporting both throw" {
+    It "libera o job quando a configuração de progresso e o relatório de falha lançam exceção" {
         Mock Step-WinUtilJob { throw "progress unavailable" }
         Mock Write-Host { }
 
@@ -406,7 +406,7 @@ Describe "Start-WinUtilJob" {
         Should -Invoke -CommandName Invoke-WPFRunspace -Times 0 -Exactly
     }
 
-    It "reports completion and releases the busy state when the body succeeds" {
+    It "relata a conclusão e libera o estado ocupado quando o corpo tem sucesso" {
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
 
         & $script:capturedRunspaceBody `
@@ -425,7 +425,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
 
-    It "does not let a stale worker replace the current job result" {
+    It "não permite que um worker obsoleto substitua o resultado do job atual" {
         Start-WinUtilJob -Name "Old" -ScriptBlock { } | Out-Null
         $oldToken = $script:capturedRunspaceArgs["JobToken"]
         $script:sync.ActiveJob = "Current"
@@ -445,7 +445,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJobToken | Should -Be "current-token"
     }
 
-    It "logs the failure and releases the busy state when the body throws" {
+    It "registra a falha e libera o estado ocupado quando o corpo lança exceção" {
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
         $script:sync.ActiveJob = "Example"
         Mock Write-Host { }
@@ -468,7 +468,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
 
-    It "does not count an error again when the body logs it before throwing" {
+    It "não conta um erro novamente quando o corpo o registra antes de lançar exceção" {
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
 
         & $script:capturedRunspaceBody `
@@ -484,7 +484,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "counts a distinct terminating error after an earlier reported error" {
+    It "conta um erro terminal distinto após um erro relatado anteriormente" {
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
 
         & $script:capturedRunspaceBody `
@@ -500,7 +500,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "reports a job that logged errors without throwing" {
+    It "relata um job que registrou erros sem lançar exceção" {
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
 
         & $script:capturedRunspaceBody `
@@ -517,7 +517,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
 
-    It "ignores errors logged outside the active job worker" {
+    It "ignora erros registrados fora do worker do job ativo" {
         $script:sync.LoggedErrors = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
         $null = $script:sync.LoggedErrors.Add("[UI] unrelated rendering failure")
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
@@ -535,7 +535,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "surfaces warnings and non-terminating errors raised by the body" {
+    It "mostra avisos e erros não terminais levantados pelo corpo" {
         $script:sync.LoggedErrors = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
         Start-WinUtilJob -Name "Example" -ScriptBlock { } | Out-Null
 
@@ -557,7 +557,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.LastJobResult.Errors | Should -Be 0
     }
 
-    It "logs Write-Host output from the body and the helpers it calls" {
+    It "registra a saída de Write-Host do corpo e dos auxiliares que ele chama" {
         Mock Write-WinUtilHost { }
         Start-WinUtilJob -Name "Tweaks" -ScriptBlock { } | Out-Null
 
@@ -581,7 +581,7 @@ Describe "Start-WinUtilJob" {
         $script:sync.LastJobResult.Warnings | Should -Be 0
     }
 
-    It "finishes with a warning when elevated install skips a user-scoped package" {
+    It "termina com um aviso quando a instalação elevada omite um pacote no escopo do usuário" {
         Start-WinUtilJob -Name "Install" -ScriptBlock { } | Out-Null
 
         & $script:capturedRunspaceBody `
@@ -597,7 +597,7 @@ Describe "Start-WinUtilJob" {
         }
     }
 
-    It "restores the app list after a failing job that disabled it" {
+    It "restaura a lista de aplicativos após um job com falha que a desativou" {
         Start-WinUtilJob -Name "Install" -DisableAppList -ScriptBlock { } | Out-Null
         $script:sync.ActiveJob = "Install"
         Mock Write-Host { }
@@ -613,11 +613,11 @@ Describe "Start-WinUtilJob" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
 
-    It "releases the job when dispatcher shutdown aborts the app-list restore" {
+    It "libera o job quando o desligamento do dispatcher aborta a restauração da lista de aplicativos" {
         $script:dispatchCount = 0
         Mock Invoke-WPFUIThread {
             $script:dispatchCount++
-            # Queue refresh, working-view show and app-list disable precede the worker restore.
+            # Atualização da fila, exibição da visão de trabalho e desativação da lista de aplicativos precedem a restauração do worker.
             if ($script:dispatchCount -gt 3) {
                 throw [System.Threading.Tasks.TaskCanceledException]::new("dispatcher stopped")
             }
@@ -643,7 +643,7 @@ Describe "Start-WinUtilJob" {
     }
 }
 
-Describe "Job timing summaries" {
+Describe "Resumos de tempo dos jobs" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             StepTimings = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
@@ -653,7 +653,7 @@ Describe "Job timing summaries" {
         Mock Write-WinUtilLog { }
     }
 
-    It "excludes entries recorded before the current run" {
+    It "exclui entradas registradas antes da execução atual" {
         Write-WinUtilTimingSummary -Scope "Install" -TotalMilliseconds 30 -StartIndex 1
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
@@ -662,7 +662,7 @@ Describe "Job timing summaries" {
     }
 }
 
-Describe "Job queue" {
+Describe "Fila de jobs" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             ActiveJob = $null
@@ -687,7 +687,7 @@ Describe "Job queue" {
         Remove-Variable -Name sync, started -Scope Script -ErrorAction SilentlyContinue
     }
 
-    # Runs the worker body the way the pool would, which releases the slot and posts the next job
+    # Executa o corpo do worker como o pool faria, o que libera a vaga e posta o próximo job
     function script:Complete-TestJob {
         param($Run, [string]$Body = '$null = $true')
 
@@ -695,7 +695,7 @@ Describe "Job queue" {
             -JobParameters @{} -JobRestoresAppList $false -JobToken $Run.Args["JobToken"]
     }
 
-    It "queues instead of refusing when asked to and the slot is taken" {
+    It "enfileira em vez de recusar quando solicitado e a vaga está ocupada" {
         $script:sync.ActiveJob = "Install"
 
         $result = Start-WinUtilJob -Name "Tweaks" -Description "Applying tweaks" -DisableAppList -QueueIfBusy -Parameters @{ Tweaks = @("A", "B") } -ScriptBlock { param($Tweaks) $Tweaks }
@@ -716,7 +716,7 @@ Describe "Job queue" {
         }
     }
 
-    It "starts at once with the switch when the slot is free" {
+    It "inicia imediatamente com a opção quando a vaga está livre" {
         Start-WinUtilJob -Name "Tweaks" -QueueIfBusy -ScriptBlock { } | Out-Null
 
         $script:sync.JobQueue.Count | Should -Be 0
@@ -724,7 +724,7 @@ Describe "Job queue" {
         $script:started.Count | Should -Be 1
     }
 
-    It "still refuses with a message and leaves the queue alone without the switch" {
+    It "ainda recusa com uma mensagem e não mexe na fila sem a opção" {
         $script:sync.ActiveJob = "Install"
 
         Start-WinUtilJob -Name "ISO mount" -ScriptBlock { } | Out-Null
@@ -735,7 +735,7 @@ Describe "Job queue" {
         }
     }
 
-    It "does not queue a nested job, which runs inline" {
+    It "não enfileira um job aninhado, que executa inline" {
         $script:sync.ActiveJob = "Install"
         $global:WinUtilIsJobWorker = $true
         try {
@@ -748,7 +748,7 @@ Describe "Job queue" {
         $script:sync.JobQueue.Count | Should -Be 0
     }
 
-    It "does not queue while WinUtil is closing" {
+    It "não enfileira enquanto o WinUtil está fechando" {
         $script:sync.ActiveJob = "Install"
         $script:sync.ShuttingDown = $true
 
@@ -757,7 +757,7 @@ Describe "Job queue" {
         $script:sync.JobQueue.Count | Should -Be 0
     }
 
-    It "refuses work when closing wins before the queue lock (<Flag>, <Running>)" -TestCases @(
+    It "recusa trabalho quando o fechamento vence antes do bloqueio da fila (<Flag>, <Running>)" -TestCases @(
         @{ Flag = "ShuttingDown"; Running = "Install" }
         @{ Flag = "ShuttingDown"; Running = $null }
         @{ Flag = "FinishInConsole"; Running = "Install" }
@@ -774,7 +774,7 @@ Describe "Job queue" {
         $script:started.Count | Should -Be 0
     }
 
-    It "runs queued jobs first in, first out, and carries on after one fails" {
+    It "executa os jobs enfileirados em ordem de chegada e continua após um falhar" {
         Start-WinUtilJob -Name "First" -QueueIfBusy -ScriptBlock { } | Out-Null
         Start-WinUtilJob -Name "Second" -QueueIfBusy -Parameters @{ Value = 2 } -ScriptBlock { } | Out-Null
         Start-WinUtilJob -Name "Third" -QueueIfBusy -DisableAppList -ScriptBlock { } | Out-Null
@@ -804,7 +804,7 @@ Describe "Job queue" {
         }
     }
 
-    It "starts the next job when scheduling the current one fails" {
+    It "inicia o próximo job quando o agendamento do atual falha" {
         $script:sync.ActiveJob = "Install"
         Start-WinUtilJob -Name "Queued" -QueueIfBusy -ScriptBlock { } | Out-Null
         $script:sync.ActiveJob = $null
@@ -815,12 +815,12 @@ Describe "Job queue" {
 
         Start-WinUtilJob -Name "Broken" -QueueIfBusy -ScriptBlock { } | Out-Null
 
-        # Broken failed to schedule, released the slot, and the queued job took it
+        # Broken falhou ao agendar, liberou a vaga e o job enfileirado a ocupou
         $script:started.Count | Should -Be 2
         $script:sync.JobQueue.Count | Should -Be 0
     }
 
-    It "does not start anything while the slot is held" {
+    It "não inicia nada enquanto a vaga está ocupada" {
         $script:sync.ActiveJob = "Install"
         Start-WinUtilJob -Name "Queued" -QueueIfBusy -ScriptBlock { } | Out-Null
 
@@ -830,7 +830,7 @@ Describe "Job queue" {
         $script:started.Count | Should -Be 0
     }
 
-    It "does not start the queue when WinUtil is closing" {
+    It "não inicia a fila quando o WinUtil está fechando" {
         foreach ($flag in @("ShuttingDown", "FinishInConsole")) {
             $script:sync.Remove("ShuttingDown")
             $script:sync.Remove("FinishInConsole")
@@ -848,7 +848,7 @@ Describe "Job queue" {
         }
     }
 
-    It "does not start the queue when the slot is reset without a token" {
+    It "não inicia a fila quando a vaga é redefinida sem um token" {
         $script:sync.ActiveJob = "Install"
         Start-WinUtilJob -Name "Queued" -QueueIfBusy -ScriptBlock { } | Out-Null
 
@@ -858,7 +858,7 @@ Describe "Job queue" {
         $script:started.Count | Should -Be 0
     }
 
-    It "moves a job up and down and leaves the ends alone" {
+    It "move um job para cima e para baixo e não mexe nas extremidades" {
         $script:sync.ActiveJob = "Install"
         foreach ($name in "A", "B", "C") {
             Start-WinUtilJob -Name $name -QueueIfBusy -ScriptBlock { } | Out-Null
@@ -884,7 +884,7 @@ Describe "Job queue" {
         }
     }
 
-    It "cancels a queued job and ignores one that already started" {
+    It "cancela um job enfileirado e ignora um que já começou" {
         $script:sync.ActiveJob = "Install"
         foreach ($name in "A", "B") {
             Start-WinUtilJob -Name $name -QueueIfBusy -ScriptBlock { } | Out-Null
@@ -899,7 +899,7 @@ Describe "Job queue" {
             $Component -eq "A" -and $Message -eq "Cancelled queued A job."
         }
 
-        # B starts, so cancelling it now finds nothing in the queue and leaves the running job be
+        # B começa, então cancelá-lo agora não encontra nada na fila e deixa o job em execução como está
         $script:sync.ActiveJob = $null
         Start-WinUtilNextQueuedJob
         Remove-WinUtilQueuedJob -Id $ids[1]
@@ -907,7 +907,7 @@ Describe "Job queue" {
         $script:started.Count | Should -Be 1
     }
 
-    It "keeps a queued job's parameters as they were when the user clicked" {
+    It "mantém os parâmetros de um job enfileirado como estavam quando o usuário clicou" {
         $script:sync.ActiveJob = "Install"
         $selection = [System.Collections.Generic.List[string]]::new()
         $selection.Add("WPFTweaksOne")
@@ -918,7 +918,7 @@ Describe "Job queue" {
         $script:sync.JobQueue[0].Parameters.Tweaks | Should -Be @("WPFTweaksOne")
     }
 
-    It "snapshots the selection in each caller that queues" {
+    It "faz uma cópia da seleção em cada chamador que enfileira" {
         . (Join-Path $script:repoRoot "functions\public\Invoke-WPFtweaksbutton.ps1")
         . (Join-Path $script:repoRoot "functions\public\Invoke-WPFFeatureInstall.ps1")
         . (Join-Path $script:repoRoot "functions\public\Invoke-WPFAppxInstall.ps1")
@@ -953,7 +953,7 @@ Describe "Job queue" {
         $script:captured["AppX"].Parameters.Selected | Should -Be @("One")
     }
 
-    It "keeps queued upgrades for different package managers distinct and uses the requested one" {
+    It "mantém atualizações enfileiradas de diferentes gerenciadores de pacotes distintas e usa a solicitada" {
         . (Join-Path $script:repoRoot 'functions/public/Invoke-WPFButton.ps1')
         . (Join-Path $script:repoRoot 'functions/public/Invoke-WPFInstallUpgrade.ps1')
         $script:sync.ActiveJob = 'Held'
@@ -974,7 +974,7 @@ Describe "Job queue" {
         Should -Invoke Invoke-WPFInstallUpgrade -Times 1 -Exactly -ParameterFilter { $ManagerPreference -eq 'Choco' }
     }
 
-    It "upgrades the explicit manager instead of a later preference (<Manager>)" -TestCases @(
+    It "atualiza com o gerenciador explícito em vez de uma preferência posterior (<Manager>)" -TestCases @(
         @{ Manager = 'Choco'; Later = 'Winget' }
         @{ Manager = 'Winget'; Later = 'Choco' }
     ) {
@@ -999,7 +999,7 @@ Describe "Job queue" {
         Should -Invoke Install-WinUtilProgramWinget -Times (1 - $expectedChoco) -Exactly -ParameterFilter { $Action -eq 'Upgrade' -and $Programs[0] -eq 'all' }
     }
 
-    It "queues a new action behind the head while the slot is held for the queue" {
+    It "enfileira uma nova ação atrás da cabeça enquanto a vaga está reservada para a fila" {
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head"; Description = ""; ScriptBlock = ""; Parameters = @{}; DisableAppList = $false })
         $script:sync.JobHandoff = $true
 
@@ -1013,7 +1013,7 @@ Describe "Job queue" {
         }
     }
 
-    It "refuses an action without the switch while the slot is held for the queue" {
+    It "recusa uma ação sem a opção enquanto a vaga está reservada para a fila" {
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head" })
         $script:sync.JobHandoff = $true
 
@@ -1026,7 +1026,7 @@ Describe "Job queue" {
         }
     }
 
-    It "holds the slot for the queue after a job ends and hands it to the head" {
+    It "mantém a vaga para a fila após um job terminar e a entrega à cabeça" {
         Mock Invoke-WPFUIThread { }
         Start-WinUtilJob -Name "First" -QueueIfBusy -ScriptBlock { } | Out-Null
         Start-WinUtilJob -Name "Head" -QueueIfBusy -Parameters @{ Value = 1 } -ScriptBlock { } | Out-Null
@@ -1049,7 +1049,7 @@ Describe "Job queue" {
         @($script:sync.JobQueue | ForEach-Object Name) | Should -Be @("Late")
     }
 
-    It "does not hold the slot when nothing is queued or WinUtil is closing" {
+    It "não mantém a vaga quando nada está enfileirado ou o WinUtil está fechando" {
         $script:sync.ActiveJob = "A"
         $script:sync.ActiveJobToken = "t"
         $null = Clear-WinUtilActiveJob -Token "t"
@@ -1063,22 +1063,22 @@ Describe "Job queue" {
         $script:sync.JobHandoff | Should -BeFalse
     }
 
-    It "clears the handoff on every way out of the dispatch" {
+    It "limpa a transferência em todas as saídas do despacho" {
         $queued = [pscustomobject]@{ Id = "1"; Name = "Head"; Description = ""; ScriptBlock = ""; Parameters = @{}; DisableAppList = $false }
 
-        # closing
+        # fechando
         $script:sync.JobHandoff = $true
         $script:sync.ShuttingDown = $true
         Start-WinUtilNextQueuedJob
         $script:sync.JobHandoff | Should -BeFalse
         $script:sync.Remove("ShuttingDown")
 
-        # empty queue
+        # fila vazia
         $script:sync.JobHandoff = $true
         Start-WinUtilNextQueuedJob
         $script:sync.JobHandoff | Should -BeFalse
 
-        # slot taken, the queue is kept
+        # vaga ocupada, a fila é mantida
         $script:sync.JobQueue.Add($queued)
         $script:sync.ActiveJob = "Other"
         $script:sync.JobHandoff = $true
@@ -1086,7 +1086,7 @@ Describe "Job queue" {
         $script:sync.JobHandoff | Should -BeFalse
         $script:sync.JobQueue.Count | Should -Be 1
 
-        # the job refuses to start because WinUtil began closing after the dequeue
+        # o job se recusa a iniciar porque o WinUtil começou a fechar após a remoção da fila
         $script:sync.ActiveJob = $null
         $script:sync.JobHandoff = $true
         $script:sync.ShuttingDown = $true
@@ -1095,7 +1095,7 @@ Describe "Job queue" {
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
 
-    It "clears the handoff when the dispatch cannot be posted" {
+    It "limpa a transferência quando o despacho não pode ser postado" {
         Mock Invoke-WPFUIThread { throw "dispatcher is gone" }
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head" })
         $script:sync.ActiveJob = "A"
@@ -1106,7 +1106,7 @@ Describe "Job queue" {
         $script:sync.JobHandoff | Should -BeFalse
     }
 
-    It "preserves update choices separated by another action (<Sequence>)" -TestCases @(
+    It "preserva escolhas de atualização separadas por outra ação (<Sequence>)" -TestCases @(
         @{ Sequence = @('WPFUpdatesdefault', 'WPFUpdatesdisable', 'WPFUpdatesdefault', 'WPFUpdatesdefault'); Expected = @('Default', 'Disable', 'Default') }
         @{ Sequence = @('WPFUpdatesdefault', 'WPFUpdatesdefault'); Expected = @('Default') }
     ) {
@@ -1131,7 +1131,7 @@ Describe "Job queue" {
         @($script:updateChoices) | Should -Be $Expected
         $script:updateChoices[$script:updateChoices.Count - 1] | Should -Be 'Default'
     }
-    It "queues identical work once and ignores repeated clicks" {
+    It "enfileira trabalho idêntico uma vez e ignora cliques repetidos" {
         $script:sync.ActiveJob = "Install"
 
         foreach ($click in 1..4) {
@@ -1145,7 +1145,7 @@ Describe "Job queue" {
         Should -Invoke -CommandName Show-WinUtilMessage -Times 0 -Exactly
     }
 
-    It "treats the same parameters given in a different key order as identical" {
+    It "trata os mesmos parâmetros dados em ordem de chave diferente como idênticos" {
         $script:sync.ActiveJob = "Install"
 
         Start-WinUtilJob -Name "Tweaks" -QueueIfBusy -Parameters ([ordered]@{ A = 1; B = 2 }) -ScriptBlock { } | Out-Null
@@ -1154,7 +1154,7 @@ Describe "Job queue" {
         $script:sync.JobQueue.Count | Should -Be 1
     }
 
-    It "queues the same name again when the selection differs" {
+    It "enfileira o mesmo nome novamente quando a seleção difere" {
         $script:sync.ActiveJob = "Install"
 
         Start-WinUtilJob -Name "Tweaks" -QueueIfBusy -Parameters @{ Tweaks = @("A") } -ScriptBlock { } | Out-Null
@@ -1164,7 +1164,7 @@ Describe "Job queue" {
         $script:sync.JobQueue.Count | Should -Be 3
     }
 
-    It "does not compare against the running job" {
+    It "não compara com o job em execução" {
         Start-WinUtilJob -Name "Tweaks" -QueueIfBusy -Parameters @{ Tweaks = @("A") } -ScriptBlock { } | Out-Null
         $script:sync.ActiveJob | Should -Be "Tweaks"
 
@@ -1174,7 +1174,7 @@ Describe "Job queue" {
         $script:sync.JobQueue.Count | Should -Be 1
     }
 
-    It "queues without the duplicate check when the parameters cannot be serialised" {
+    It "enfileira sem a verificação de duplicata quando os parâmetros não podem ser serializados" {
         Mock ConvertTo-Json { throw "cannot serialise" }
         $script:sync.ActiveJob = "Install"
 
@@ -1187,7 +1187,7 @@ Describe "Job queue" {
         }
     }
 
-    It "opts the user actions in and keeps the ISO and USB jobs refusing" {
+    It "faz as ações do usuário aderirem e mantém os jobs ISO e USB recusando" {
         foreach ($path in @(
             "functions\public\Invoke-WPFInstall.ps1", "functions\public\Invoke-WPFUnInstall.ps1",
             "functions\public\Invoke-WPFAppxInstall.ps1", "functions\public\Invoke-WPFAppxRemoval.ps1",
@@ -1202,7 +1202,7 @@ Describe "Job queue" {
     }
 }
 
-Describe "Closing with queued jobs" {
+Describe "Fechamento com jobs enfileirados" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             ActiveJob = "Install"
@@ -1215,7 +1215,7 @@ Describe "Closing with queued jobs" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "holds queued work during a running-job close prompt and applies <Answer> before resuming" -TestCases @(
+    It "mantém o trabalho enfileirado durante o prompt de fechamento com job em execução e aplica <Answer> antes de retomar" -TestCases @(
         @{ Answer = 'Cancel'; ExpectedStarts = 1 }
         @{ Answer = 'No'; ExpectedStarts = 0 }
         @{ Answer = 'Yes'; ExpectedStarts = 0 }
@@ -1230,7 +1230,7 @@ Describe "Closing with queued jobs" {
         Mock Invoke-WPFUIThread { $script:postedHandoffs.Add($ScriptBlock) }
         Mock Show-WinUtilMessage {
             $script:sync.JobClosePromptOpen | Should -BeTrue
-            # A real modal question pumps the dispatcher while the worker finishes.
+            # Uma pergunta modal real bombeia o dispatcher enquanto o worker termina.
             $script:sync.ActiveJob = $null
             $script:sync.ActiveJobToken = $null
             $script:sync.JobHandoff = $true
@@ -1249,7 +1249,7 @@ Describe "Closing with queued jobs" {
         Should -Invoke Start-WinUtilJob -Times $ExpectedStarts -Exactly
     }
 
-    It "tells the user how many queued operations will be discarded" {
+    It "informa ao usuário quantas operações enfileiradas serão descartadas" {
         Mock Show-WinUtilMessage { "Cancel" }
 
         Invoke-WinUtilCloseRequest -RunningJob "Install" -QueuedCount 2
@@ -1259,7 +1259,7 @@ Describe "Closing with queued jobs" {
         }
     }
 
-    It "says nothing about the queue when it is empty" {
+    It "não diz nada sobre a fila quando ela está vazia" {
         Mock Show-WinUtilMessage { "Cancel" }
 
         Invoke-WinUtilCloseRequest -RunningJob "Install"
@@ -1269,7 +1269,7 @@ Describe "Closing with queued jobs" {
         }
     }
 
-    It "empties the queue and reports how many it dropped" {
+    It "esvazia a fila e informa quantos itens descartou" {
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "A" })
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "2"; Name = "B" })
 
@@ -1281,14 +1281,14 @@ Describe "Closing with queued jobs" {
         }
     }
 
-    It "has the window's closing handler pass the count and clear the queue after the prompt" {
+    It "faz o manipulador de fechamento da janela passar a contagem e limpar a fila após o prompt" {
         $source = Get-Content (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw
 
         $source | Should -Match 'Invoke-WinUtilCloseRequest -RunningJob \$runningJob -QueuedCount \$sync\.JobQueue\.Count'
         $source.IndexOf('Clear-WinUtilJobQueue') | Should -BeGreaterThan $source.IndexOf('Invoke-WinUtilCloseRequest -RunningJob')
     }
 
-    It "asks only whether to discard when nothing is running, and closes on yes" {
+    It "pergunta apenas se deseja descartar quando nada está em execução e fecha ao responder sim" {
         $script:sync.ActiveJob = $null
         Mock Show-WinUtilMessage { "Yes" }
         Mock Request-WinUtilWindowClose { }
@@ -1303,7 +1303,7 @@ Describe "Closing with queued jobs" {
         Should -Invoke -CommandName Request-WinUtilWindowClose -Times 1 -Exactly
     }
 
-    It "shuts the queue before the accepted queued-only close is posted" {
+    It "desliga a fila antes de postar o fechamento aceito de apenas enfileirados" {
         $script:sync.ActiveJob = $null
         $script:sync.JobHandoff = $true
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head" })
@@ -1321,7 +1321,7 @@ Describe "Closing with queued jobs" {
         $script:atClose.Handoff | Should -BeFalse
     }
 
-    It "refuses a job that tries to start once the queued-only close is accepted" {
+    It "recusa um job que tenta iniciar após o fechamento de apenas enfileirados ser aceito" {
         Mock Show-WinUtilMessage { "Yes" }
         Mock Request-WinUtilWindowClose { }
         $script:sync.ActiveJob = $null
@@ -1337,7 +1337,7 @@ Describe "Closing with queued jobs" {
         Should -Invoke -CommandName Invoke-WPFRunspace -Times 0 -Exactly
     }
 
-    It "keeps the window open and the queue when the queued-only close is declined" {
+    It "mantém a janela aberta e a fila quando o fechamento de apenas enfileirados é recusado" {
         $script:sync.ActiveJob = $null
         Mock Show-WinUtilMessage { "No" }
         Mock Request-WinUtilWindowClose { }
@@ -1348,7 +1348,7 @@ Describe "Closing with queued jobs" {
         Should -Invoke -CommandName Request-WinUtilWindowClose -Times 0 -Exactly
     }
 
-    It "shuts the queue before the stop-the-job close is posted, and nothing starts after it" {
+    It "desliga a fila antes de postar o fechamento de parar o job, e nada inicia depois disso" {
         $script:sync.JobHandoff = $true
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head"; Description = ""; ScriptBlock = ""; Parameters = @{}; DisableAppList = $false })
         Mock Show-WinUtilMessage { "No" }
@@ -1367,13 +1367,13 @@ Describe "Closing with queued jobs" {
         $script:atClose.Handoff | Should -BeFalse
         $script:sync.ForceClose | Should -BeTrue
 
-        # the running job ends after the answer and its handoff finds nothing to start
+        # o job em execução termina após a resposta e sua transferência não encontra nada para iniciar
         $script:sync.ActiveJob = $null
         Start-WinUtilNextQueuedJob
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "leaves the queue and flags alone when the close is cancelled or hands the job to the console" {
+    It "não mexe na fila nem nas flags quando o fechamento é cancelado ou entrega o job ao console" {
         $script:sync.JobHandoff = $true
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head" })
         Mock Request-WinUtilWindowClose { }
@@ -1389,7 +1389,7 @@ Describe "Closing with queued jobs" {
         $script:sync.JobHandoff | Should -BeTrue
     }
 
-    It "asks again about the running job when a queued job started during the prompt" {
+    It "pergunta novamente sobre o job em execução quando um job enfileirado iniciou durante o prompt" {
         $script:sync.ActiveJob = $null
         $script:sync.JobQueue.Add([pscustomobject]@{ Id = "1"; Name = "Head" })
         $script:asked = 0
@@ -1410,7 +1410,7 @@ Describe "Closing with queued jobs" {
         Should -Invoke -CommandName Request-WinUtilWindowClose -Times 0 -Exactly
     }
 
-    It "has the closing handler prompt for queued work even with nothing running" {
+    It "faz o manipulador de fechamento perguntar sobre trabalho enfileirado mesmo sem nada em execução" {
         $source = Get-Content (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw
 
         $source | Should -Match '\(\$sync\.ActiveJob -or \$sync\.JobQueue\.Count -gt 0\) -and -not \$sync\.ForceClose'

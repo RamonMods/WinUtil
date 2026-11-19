@@ -5,21 +5,21 @@ RUN corepack enable
 
 WORKDIR /app
 
-# Keeps Playwright's browsers out of root's home so the node user can reach them.
+# Mantém os navegadores do Playwright fora do diretório inicial do root para que o usuário node possa acessá-los.
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-# Deps first for layer caching; lifecycle scripts stay on since Astro/Vite need some.
+# Dependências primeiro para aproveitar o cache de camadas; os scripts de ciclo de vida permanecem ativos porque Astro/Vite precisam de alguns.
 COPY package*.json ./
 RUN npm ci
 
-# Browsers and their system libraries for Playwright tests; needs root for apt-get.
-# --no-install fails the build rather than fetching an unpinned Playwright if it's missing from package.json.
+# Navegadores e suas bibliotecas do sistema para os testes do Playwright; precisa de root para o apt-get.
+# --no-install faz a compilação falhar em vez de buscar um Playwright sem versão fixada se ele estiver ausente do package.json.
 RUN npx --no-install playwright install --with-deps chromium firefox webkit \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
 
-# Run as a non-root user for defense-in-depth.
+# Executa como um usuário não-root para defesa em profundidade.
 RUN chown -R node:node /app "$PLAYWRIGHT_BROWSERS_PATH"
 USER node
 

@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Package run outcomes
+# Testes - Resultados de execução de pacotes
 #===========================================================================
 
 BeforeAll {
@@ -15,12 +15,12 @@ BeforeAll {
     }
 }
 
-Describe "Install-WinUtilProgramWinget outcomes" {
+Describe "Resultados de Install-WinUtilProgramWinget" {
     BeforeEach {
         Mock Write-WinUtilLog { }
     }
 
-    It "reports success for exit code 0" {
+    It "informa sucesso para código de saída 0" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
         $result = Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
@@ -33,7 +33,7 @@ Describe "Install-WinUtilProgramWinget outcomes" {
 
 
 
-    It "reports an already installed package as skipped rather than failed" {
+    It "informa um pacote já instalado como ignorado em vez de falho" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = -1978335135 } }
 
         $result = Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
@@ -42,7 +42,7 @@ Describe "Install-WinUtilProgramWinget outcomes" {
         $result.Detail | Should -Be "already installed"
     }
 
-    It "skips a per-user package that elevated WinGet cannot update during install" {
+    It "ignora um pacote por usuário que o WinGet elevado não pode atualizar durante a instalação" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = -1978335107 } }
 
         $result = Install-WinUtilProgramWinget -Action Install -Programs @("Microsoft.Sysinternals.ProcessExplorer")
@@ -55,7 +55,7 @@ Describe "Install-WinUtilProgramWinget outcomes" {
         Should -Invoke -CommandName Start-Process -Times 1 -Exactly
     }
 
-    It "skips actions that elevated WinGet cannot perform on a per-user package" {
+    It "ignora ações que o WinGet elevado não pode executar em um pacote por usuário" {
         $expectedDetails = @{
             Upgrade = "not upgraded; installed for the current user and elevated WinUtil cannot modify it"
             Uninstall = "remains installed for the current user; elevated WinUtil cannot uninstall it"
@@ -74,7 +74,7 @@ Describe "Install-WinUtilProgramWinget outcomes" {
         Should -Invoke -CommandName Start-Process -Times 2 -Exactly
     }
 
-    It "reports any other exit code as a failure" {
+    It "informa qualquer outro código de saída como falha" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = -1978335212 } }
 
         $result = Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
@@ -86,7 +86,7 @@ Describe "Install-WinUtilProgramWinget outcomes" {
         }
     }
 
-    It "returns one result per package" {
+    It "retorna um resultado por pacote" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
         $results = @(Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git", "VideoLAN.VLC"))
@@ -94,21 +94,21 @@ Describe "Install-WinUtilProgramWinget outcomes" {
         $results.Count | Should -Be 2
     }
 
-    It "treats a reboot requirement as success, not failure" {
-        # 3010 and 1641 mean the installer worked and Windows wants a restart. Counting them as
-        # failures marks a whole upgrade run broken when nothing went wrong.
+    It "trata a necessidade de reinício como sucesso, não falha" {
+        # 3010 e 1641 significam que o instalador funcionou e o Windows quer reiniciar. Contá-los como
+        # falhas marca toda a execução de atualização como quebrada quando nada deu errado.
         foreach ($code in @(3010, 1641)) {
             Mock Start-Process { [pscustomobject]@{ ExitCode = $code } }.GetNewClosure()
 
             $result = Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
 
-            $result.Outcome | Should -Be "Succeeded" -Because "exit code $code means the install worked"
+            $result.Outcome | Should -Be "Succeeded" -Because "código de saída $code significa que a instalação funcionou"
             $result.Detail | Should -Match "restart"
         }
     }
 }
 
-Describe "Install-WinUtilProgramChoco outcomes" {
+Describe "Resultados de Install-WinUtilProgramChoco" {
     BeforeAll {
         function choco { $global:LASTEXITCODE = 0 }
     }
@@ -119,7 +119,7 @@ Describe "Install-WinUtilProgramChoco outcomes" {
         Mock Get-Command { "choco" } -ParameterFilter { $Name -eq "choco" }
     }
 
-    It "treats a reboot-required exit code as success" {
+    It "trata um código de saída que exige reinício como sucesso" {
         Mock choco { $global:LASTEXITCODE = 3010 }
 
         $result = Install-WinUtilProgramChoco -Action Install -Programs @("git")
@@ -127,20 +127,20 @@ Describe "Install-WinUtilProgramChoco outcomes" {
         $result.Detail | Should -Match "restart"
     }
 
-    It "reports a non-zero exit code as a failure" {
+    It "informa um código de saída diferente de zero como falha" {
         Mock choco { $global:LASTEXITCODE = 1 }
 
         (Install-WinUtilProgramChoco -Action Install -Programs @("git")).Outcome | Should -Be "Failed"
     }
 
-    It "reports nothing-to-do as skipped rather than failed" {
+    It "informa nada a fazer como ignorado em vez de falho" {
         Mock choco { $global:LASTEXITCODE = 2 }
 
         (Install-WinUtilProgramChoco -Action Install -Programs @("git")).Outcome | Should -Be "Skipped"
     }
 
-    # The reason is in choco's own output, which is logged; the result carries the code
-    It "reports the exit code when choco fails" {
+    # O motivo está na própria saída do choco, que é registrada em log; o resultado carrega o código
+    It "informa o código de saída quando o choco falha" {
         Mock choco { $global:LASTEXITCODE = 1; "git is not installed. Cannot uninstall a non-existent package." }
 
         $result = Install-WinUtilProgramChoco -Action Uninstall -Programs @("git")
@@ -149,7 +149,7 @@ Describe "Install-WinUtilProgramChoco outcomes" {
         $result.Detail | Should -Be "exit code 1"
     }
 
-    It "fails instead of reusing a stale exit code when Chocolatey is unavailable" {
+    It "falha em vez de reutilizar um código de saída obsoleto quando o Chocolatey não está disponível" {
         $global:LASTEXITCODE = 0
         Mock Get-Command { $null } -ParameterFilter { $Name -eq "choco" }
 
@@ -168,7 +168,7 @@ Describe "Complete-WinUtilPackageRun" {
         Mock Write-Warning { }
     }
 
-    It "reports the counts of each outcome" {
+    It "informa as contagens de cada resultado" {
         $results = @(
             [pscustomobject]@{ Package = "a"; Outcome = "Succeeded"; Detail = "exit code 0" },
             [pscustomobject]@{ Package = "b"; Outcome = "Skipped"; Detail = "already installed" }
@@ -181,7 +181,7 @@ Describe "Complete-WinUtilPackageRun" {
         }
     }
 
-    It "does not fail an install when every selected package is already present" {
+    It "não falha uma instalação quando todos os pacotes selecionados já estão presentes" {
         $results = @(
             [pscustomobject]@{ Package = "Microsoft.Sysinternals.ProcessMonitor"; Outcome = "Skipped"; Detail = "no applicable update" },
             [pscustomobject]@{ Package = "Microsoft.Sysinternals.ProcessExplorer"; Action = "Install"; ExitCode = -1978335107; Outcome = "Skipped"; Detail = "already installed for the current user; elevated WinUtil cannot update it" }
@@ -196,7 +196,7 @@ Describe "Complete-WinUtilPackageRun" {
         }
     }
 
-    It "does not fail the reported two-package uninstall when elevated WinGet cannot act on user scope" {
+    It "não falha a desinstalação informada de dois pacotes quando o WinGet elevado não pode agir no escopo do usuário" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = -1978335107 } }
         $results = @(Install-WinUtilProgramWinget -Action Uninstall -Programs @(
             "Microsoft.Sysinternals.ProcessMonitor",
@@ -213,7 +213,7 @@ Describe "Complete-WinUtilPackageRun" {
         }
     }
 
-    It "fails the job when a package failed" {
+    It "falha o trabalho quando um pacote falhou" {
         $results = @(
             [pscustomobject]@{ Package = "a"; Outcome = "Succeeded"; Detail = "exit code 0" },
             [pscustomobject]@{ Package = "b"; Outcome = "Failed"; Detail = "exit code 5" }
@@ -230,7 +230,7 @@ Describe "Complete-WinUtilPackageRun" {
         $caught.Exception.Data["WinUtilErrorReported"] | Should -BeTrue
     }
 
-    It "accepts an empty run" {
+    It "aceita uma execução vazia" {
         { Complete-WinUtilPackageRun -Action "Install" -Results @() } | Should -Not -Throw
     }
 }

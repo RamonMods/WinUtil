@@ -1,18 +1,18 @@
-// Shares the `starlight-theme` storage key with ThemeProvider.astro, which applies the theme before first paint.
+// Compartilha a chave de armazenamento `starlight-theme` com ThemeProvider.astro, que aplica o tema antes da primeira pintura.
 import Icon from './Icon.jsx';
 import useStarlightTheme from '../../hooks/useStarlightTheme.js';
 
 const STORAGE_KEY = 'starlight-theme';
 
 export default function ThemeToggle() {
-	const label = `Switch to ${useStarlightTheme() === 'light' ? 'dark' : 'light'} theme`;
+	const label = `Mudar para o tema ${useStarlightTheme() === 'light' ? 'escuro' : 'claro'}`;
 	const toggle = () => {
 		const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
 		document.documentElement.dataset.theme = next;
 		try {
 			localStorage.setItem(STORAGE_KEY, next);
 		} catch {
-			// Storage can be blocked; the theme still changes for this page.
+			// O armazenamento pode estar bloqueado; o tema ainda muda nesta página.
 		}
 	};
 	return (

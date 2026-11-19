@@ -1,71 +1,71 @@
-name: "Bug report"
-description: "Report a bug to help us identify and fix issues in the project."
-title: "[Bug Report] - <your summary here>"
+name: "Relatório de bug"
+description: "Relate um bug para nos ajudar a identificar e corrigir problemas no projeto."
+title: "[Relatório de Bug] - <seu resumo aqui>"
 labels: ["bug"]
 
 body:
   - type: markdown
     attributes:
       value: |
-        - Remember, we only support Windows 11. If you encounter problems on Windows 10, please consider upgrading to Windows 11.
-        - For general questions, join our Community-driven [Discord Server](https://github.com/RamonMods/WinUtil).
-        - For issues related to WinOneShot, please address its [respective repo](https://github.com/CT-Tech-Group/winoneshot/issues) (if you are GH Sponsor) or on [public tracker](https://issues.RamonMods.com)
+        - Lembre-se: só damos suporte ao Windows 11. Se encontrar problemas no Windows 10, considere atualizar para o Windows 11.
+        - Para dúvidas gerais, entre no nosso [Servidor Discord](https://github.com/RamonMods/WinUtil) mantido pela comunidade.
+        - Para problemas relacionados ao WinOneShot, recorra ao [repositório respectivo](https://github.com/CT-Tech-Group/winoneshot/issues) (se você for patrocinador no GitHub) ou ao [rastreador público](https://issues.RamonMods.com)
 
   - type: checkboxes
     id: read_issues
     attributes:
-      label: "I have read the known issues"
-      description: "You [better do](https://github.com/RamonMods/WinUtil/knownissues/), cause your issue can be already there"
+      label: "Li os problemas conhecidos"
+      description: "Você [deveria](https://github.com/RamonMods/WinUtil/knownissues/), pois o seu problema pode já estar lá"
       options:
-        - label: Yes, I did
+        - label: Sim, li
           required: true
 
   - type: input
     id: winutil_version
     attributes:
-      label: "Version of WinUtil"
-      description: "Provide a version that you are using when issue submitted (it can be found in right corner of app)"
+      label: "Versão do WinUtil"
+      description: "Informe a versão que você está usando ao enviar o problema (ela pode ser vista no canto direito do aplicativo)"
     validations:
       required: true
 
   - type: dropdown
     id: affected_part
     attributes:
-      label: What part of WinUtil are you having issues with?
+      label: Em qual parte do WinUtil você está com problemas?
       options:
-        - Program Install Tab
-        - Tweaks Tab
-        - Config Tab
-        - Updates Tab
-        - Win11 Creator Tab
+        - Aba Instalar
+        - Aba Ajustes
+        - Aba Configurações
+        - Aba Atualizações
+        - Aba Criador do Win11
     validations:
       required: false
 
   - type: textarea
     id: issue_description
     attributes:
-      label: "Description of the issue"
-      description: Provide a clear and concise description of the issue.
+      label: "Descrição do problema"
+      description: Forneça uma descrição clara e concisa do problema.
     validations:
       required: true
 
   - type: textarea
     id: tweaks_applied
     attributes:
-      label: "List of Applied Tweaks"
-      description: List the tweaks you applied before the issue occurred.
+      label: "Lista de ajustes aplicados"
+      description: Liste os ajustes que você aplicou antes de o problema ocorrer.
     validations:
       required: false
 
   - type: textarea
     id: error_output
     attributes:
-      label: Error logs
-      description: "Paste the full error output (if available) or replace pre-filled text with a screenshot or video clip."
-      placeholder: "Include any relevant logs or error messages. Keep any sensitive info out of the presented log"
+      label: Logs de erro
+      description: "Cole a saída completa do erro (se disponível) ou substitua o texto preenchido por uma captura de tela ou clipe de vídeo."
+      placeholder: "Inclua quaisquer logs ou mensagens de erro relevantes. Não inclua informações sensíveis no log apresentado"
       value: |
         <details>
-        <summary>Click to expand</summary>
-        <!--Place your log under this tag-->
+        <summary>Clique para expandir</summary>
+        <!--Coloque seu log abaixo desta tag-->
 
         </details>

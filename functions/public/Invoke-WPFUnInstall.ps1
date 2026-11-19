@@ -25,9 +25,9 @@ function Invoke-WPFUnInstall {
     if ($confirm -ne "Yes") { return }
 
     $ManagerPreference = $sync.preferences.packagemanager
-    Write-WinUtilLog -Component "Uninstall" -Message "Uninstall requested for $(@($PackagesToUninstall).Count) selected package(s) using preference: $ManagerPreference"
+    Write-WinUtilLog -Component "Uninstall" -Message "Desinstalação solicitada para $(@($PackagesToUninstall).Count) pacote(s) selecionado(s) usando a preferência: $ManagerPreference"
     $packageSummary = Get-WinUtilPackageLogSummary -Packages $PackagesToUninstall -Preference $ManagerPreference
-    Write-WinUtilLog -Component "Uninstall" -Message "Uninstall selected package(s): $($packageSummary -join '; ')"
+    Write-WinUtilLog -Component "Uninstall" -Message "Desinstalar pacote(s) selecionado(s): $($packageSummary -join '; ')"
 
     Start-WinUtilJob -Name "Uninstall" -Description "Uninstalling apps" -DisableAppList -QueueIfBusy -Parameters @{
         PackagesToUninstall = $PackagesToUninstall
@@ -40,7 +40,7 @@ function Invoke-WPFUnInstall {
         $packagesChoco = $packagesSorted['Choco']
         $totalPackages = @($packagesWinget).Count + @($packagesChoco).Count
         $completedPackages = 0
-        Write-WinUtilLog -Component "Uninstall" -Message "Uninstall package manager split: winget=$(@($packagesWinget).Count), choco=$(@($packagesChoco).Count)"
+        Write-WinUtilLog -Component "Uninstall" -Message "Divisão dos pacotes por gerenciador na desinstalação: winget=$(@($packagesWinget).Count), choco=$(@($packagesChoco).Count)"
 
         if ($packagesWinget -contains "Microsoft.Edge") {
             New-Item -Path "$Env:SystemRoot\SystemApps\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\MicrosoftEdge.exe" -Force | Out-Null

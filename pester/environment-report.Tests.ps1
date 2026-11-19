@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Environment Report
+# Testes - Relatório de ambiente
 #===========================================================================
 
 BeforeAll {
@@ -16,8 +16,8 @@ BeforeAll {
 
 Describe "Get-WinUtilEnvironmentReport" {
     BeforeEach {
-        # Keep this Describe focused on the top-level schema; tweaksState grouping/detection has
-        # its own dedicated Describe below with its own registry fixture.
+        # Mantenha este Describe focado no esquema de nível superior; o agrupamento/detecção de
+        # tweaksState tem seu próprio Describe dedicado abaixo, com sua própria fixture de registro.
         Mock Get-WinUtilTweaksStateReport {
             [pscustomobject]@{
                 collectionStatus = "collected"
@@ -56,7 +56,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         Mock Write-Warning { }
     }
 
-    It "returns the versioned allowlisted report schema" {
+    It "retorna o esquema de relatório versionado com lista de permissões" {
         $report = Get-WinUtilEnvironmentReport
 
         $report.schemaVersion | Should -Be "1.0"
@@ -73,10 +73,10 @@ Describe "Get-WinUtilEnvironmentReport" {
         $report.PSObject.Properties.Name | Should -Contain "tweaksState"
     }
 
-    It "contains no fields outside the approved report schema" {
-        # Exact property-name assertions, not a blocklist of specific bad names - a blocklist only
-        # catches fields someone thought to list, and would miss e.g. a future "biosUuid" or "userSid".
-        # Dynamic tweak keys inside tweaksState's groups are intentionally not asserted here.
+    It "não contém campos fora do esquema de relatório aprovado" {
+        # Afirmações exatas de nomes de propriedades, não uma lista de bloqueio de nomes específicos - uma lista
+        # de bloqueio só pega campos que alguém lembrou de listar e deixaria passar um futuro "biosUuid" ou "userSid".
+        # As chaves dinâmicas de ajustes nos grupos de tweaksState não são verificadas aqui de propósito.
         $report = Get-WinUtilEnvironmentReport
 
         $report.PSObject.Properties.Name | Should -Be @(
@@ -93,7 +93,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         )
     }
 
-    It "does not report a package manager as installed unless Test-WinUtilPackageManager confirms it" {
+    It "não reporta um gerenciador de pacotes como instalado a menos que Test-WinUtilPackageManager confirme" {
         $report = Get-WinUtilEnvironmentReport
 
         $report.packageManagers.winget.installed | Should -BeFalse
@@ -102,7 +102,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         $report.packageManagers.chocolatey.version | Should -BeNullOrEmpty
     }
 
-    It "reads a package manager's version via its own -v flag once installed is confirmed" {
+    It "lê a versão de um gerenciador de pacotes por meio da própria opção -v após a instalação ser confirmada" {
         Mock Test-WinUtilPackageManager { "installed" } -ParameterFilter { $winget }
         Mock winget { "v1.29.290" }
 
@@ -112,7 +112,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         $report.packageManagers.winget.version | Should -Be "v1.29.290"
     }
 
-    It "does not treat a failed package-manager probe message as a version" {
+    It "não trata uma mensagem de falha na sondagem do gerenciador de pacotes como versão" {
         Mock Test-WinUtilPackageManager { "installed" } -ParameterFilter { $winget }
         Mock winget {
             $global:LASTEXITCODE = 7
@@ -131,7 +131,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         }
     }
 
-    It "surfaces an incomplete tweak-state report as a warning" {
+    It "expõe um relatório incompleto do estado dos ajustes como aviso" {
         Mock Get-WinUtilTweaksStateReport {
             [pscustomobject]@{ collectionStatus = "unavailable" }
         }
@@ -143,7 +143,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         }
     }
 
-    It "flags a pending reboot from PendingFileRenameOperations" {
+    It "sinaliza uma reinicialização pendente a partir de PendingFileRenameOperations" {
         Mock Get-ItemProperty {
             [pscustomobject]@{ PendingFileRenameOperations = @("a", "b") }
         }
@@ -153,7 +153,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         $report.system.pendingRebootRequired | Should -BeTrue
     }
 
-    It "does not flag a pending reboot for a present but empty PendingFileRenameOperations value" {
+    It "não sinaliza reinicialização pendente para um valor PendingFileRenameOperations presente, mas vazio" {
         Mock Get-ItemProperty {
             [pscustomobject]@{ PendingFileRenameOperations = @() }
         }
@@ -163,7 +163,7 @@ Describe "Get-WinUtilEnvironmentReport" {
         $report.system.pendingRebootRequired | Should -BeFalse
     }
 
-    It "reports pending reboot state as unknown when a registry read fails" {
+    It "reporta o estado de reinicialização pendente como desconhecido quando uma leitura do registro falha" {
         Mock Get-ItemProperty { throw "registry access denied" }
 
         $report = Get-WinUtilEnvironmentReport
@@ -177,25 +177,25 @@ Describe "Get-WinUtilEnvironmentReport" {
 }
 
 Describe "Get-WinUtilEnvironmentReportLogsPath" {
-    It "swaps the JSON extension for a _logs.txt suffix" {
+    It "troca a extensão JSON pelo sufixo _logs.txt" {
         Get-WinUtilEnvironmentReportLogsPath -JsonPath "C:\Reports\WinUtilEnvironmentReport_20260101.json" |
             Should -Be "C:\Reports\WinUtilEnvironmentReport_20260101_logs.txt"
     }
 
-    It "handles a path with no extension" {
+    It "lida com um caminho sem extensão" {
         Get-WinUtilEnvironmentReportLogsPath -JsonPath "C:\Reports\Report" |
             Should -Be "C:\Reports\Report_logs.txt"
     }
 }
 
-Describe "Invoke-WPFExportEnvironmentReport overwrite protection" {
-    It "checks the derived logs path literally" {
+Describe "Proteção contra sobrescrita em Invoke-WPFExportEnvironmentReport" {
+    It "verifica o caminho de logs derivado literalmente" {
         $source = Get-Content -LiteralPath (Join-Path $script:repoRoot "functions\public\Invoke-WPFExportEnvironmentReport.ps1") -Raw
 
         $source | Should -Match 'Test-Path\s+-LiteralPath\s+\$logsPath'
     }
 
-    It "aborts rather than retaining a stale companion when logs are excluded" {
+    It "aborta em vez de manter um arquivo complementar obsoleto quando os logs são excluídos" {
         $source = Get-Content -LiteralPath (Join-Path $script:repoRoot "functions\public\Invoke-WPFExportEnvironmentReport.ps1") -Raw
 
         $source | Should -Match 'if \(-not \$includeLogs\) \{[\s\S]*Choose another report filename[\s\S]*return'
@@ -209,7 +209,7 @@ Describe "Write-WinUtilEnvironmentReportExport" {
         $script:removeAttempts = [System.Collections.Generic.List[string]]::new()
     }
 
-    It "restores the previous JSON when publishing the log companion fails" {
+    It "restaura o JSON anterior quando a publicação do complemento de logs falha" {
         $jsonPath = Join-Path $TestDrive "report.json"
         $logsPath = Join-Path $TestDrive "report_logs.txt"
         [System.IO.File]::WriteAllText($jsonPath, "old report")
@@ -225,7 +225,7 @@ Describe "Write-WinUtilEnvironmentReportExport" {
         @(Get-ChildItem -LiteralPath $TestDrive -File).Name | Should -Be @("report.json")
     }
 
-    It "retains the recovery copy and still attempts log rollback when JSON restore fails" {
+    It "mantém a cópia de recuperação e ainda tenta a reversão dos logs quando a restauração do JSON falha" {
         $jsonPath = Join-Path $TestDrive "rollback-report.json"
         $logsPath = Join-Path $TestDrive "rollback-report_logs.txt"
         [System.IO.File]::WriteAllText($jsonPath, "old report")
@@ -250,7 +250,7 @@ Describe "Write-WinUtilEnvironmentReportExport" {
         [System.IO.Directory]::Exists($logsPath) | Should -BeTrue
     }
 
-    It "does not let one temporary-file cleanup failure mask a successful export" {
+    It "não permite que uma falha de limpeza de arquivo temporário oculte uma exportação bem-sucedida" {
         $jsonPath = Join-Path $TestDrive "cleanup-report.json"
         $logsPath = Join-Path $TestDrive "cleanup-report_logs.txt"
         Mock Remove-WinUtilEnvironmentReportExportFile {
@@ -320,7 +320,7 @@ Describe "Get-WinUtilTweaksStateReport" {
         Mock Write-WinUtilLog { }
     }
 
-    It "groups applied/not-applied tweaks and toggles by category" {
+    It "agrupa ajustes aplicados/não aplicados e interruptores por categoria" {
         $result = Get-WinUtilTweaksStateReport
 
         $result.collectionStatus | Should -Be "collected"
@@ -331,7 +331,7 @@ Describe "Get-WinUtilTweaksStateReport" {
         @($result.performancePlans.PSObject.Properties).Count | Should -Be 0
     }
 
-    It "reads live toggle state instead of the cached UI state" {
+    It "lê o estado ao vivo do interruptor em vez do estado em cache da interface" {
         $script:sync.ToggleStatusCache = @{ WPFToggleCustomize = $true }
         Mock Test-Path { $Path -eq "HKCU:\Fake3" }
         Mock Get-ItemProperty { [pscustomobject]@{ Enabled = "0" } } -ParameterFilter {
@@ -347,7 +347,7 @@ Describe "Get-WinUtilTweaksStateReport" {
         }
     }
 
-    It "reports collection as unavailable when a live registry read fails" {
+    It "reporta a coleta como indisponível quando uma leitura ao vivo do registro falha" {
         Mock Test-Path { $Path -eq "HKCU:\Fake3" }
         Mock Get-ItemProperty { Write-Error -Message "Registry access denied" -ErrorAction Stop } -ParameterFilter {
             $Path -eq "HKCU:\Fake3"
@@ -359,7 +359,7 @@ Describe "Get-WinUtilTweaksStateReport" {
         @($result.customizePreferences.PSObject.Properties).Count | Should -Be 0
     }
 
-    It "reports collection as unavailable when a configured service cannot be read" {
+    It "reporta a coleta como indisponível quando um serviço configurado não pode ser lido" {
         $script:sync.configs.tweaks | Add-Member -MemberType NoteProperty -Name WPFTweaksMissingService -Value ([pscustomobject]@{
             category = "Essential Tweaks"
             service = @([pscustomobject]@{ Name = "MissingService"; StartupType = "Disabled" })
@@ -372,7 +372,7 @@ Describe "Get-WinUtilTweaksStateReport" {
         @($result.essentialTweaks.PSObject.Properties).Count | Should -Be 0
     }
 
-    It "marks only the affected tweak false when a configured service is absent" {
+    It "marca como falso apenas o ajuste afetado quando um serviço configurado está ausente" {
         $script:sync.configs.tweaks | Add-Member -MemberType NoteProperty -Name WPFTweaksMissingService -Value ([pscustomobject]@{
             category = "Essential Tweaks"
             service = @([pscustomobject]@{ Name = "MissingService"; StartupType = "Disabled" })
@@ -389,14 +389,14 @@ Describe "Get-WinUtilTweaksStateReport" {
         $result.essentialTweaks.WPFTweaksMissingService | Should -BeFalse
     }
 
-    It "lists combobox and script-only tweaks as not evaluable instead of silently dropping them" {
+    It "lista os ajustes do tipo lista suspensa e apenas script como não avaliáveis, em vez de descartá-los silenciosamente" {
         $result = Get-WinUtilTweaksStateReport
 
         $result.notEvaluable | Should -Contain "WPFComboExample"
         $result.notEvaluable | Should -Contain "WPFScriptOnly"
     }
 
-    It "excludes action buttons and unmapped categories entirely" {
+    It "exclui totalmente botões de ação e categorias não mapeadas" {
         $result = Get-WinUtilTweaksStateReport
 
         $result.advancedTweaks.PSObject.Properties.Name | Should -Not -Contain "WPFButtonExample"
@@ -408,16 +408,16 @@ Describe "Get-WinUtilTweaksStateReport" {
          $result.performancePlans.PSObject.Properties.Name) | Should -Not -Contain "WPFUnknownCategory"
     }
 
-    It "returns empty groups instead of throwing when Invoke-WinUtilCurrentSystem fails" {
+    It "retorna grupos vazios em vez de lançar exceção quando Invoke-WinUtilCurrentSystem falha" {
         Mock Invoke-WinUtilCurrentSystem { throw "Registry access denied" }
 
-        # Calling this directly (rather than via a wrapped scriptblock piped to Should -Not -Throw)
-        # avoids a PowerShell scoping pitfall where an assignment inside such a scriptblock doesn't
-        # reliably propagate to this scope - an uncaught exception here still fails the test anyway.
+        # Chamar isso diretamente (em vez de um bloco de script encapsulado encaminhado a Should -Not -Throw) evita
+        # uma armadilha de escopo do PowerShell em que uma atribuição nesse bloco não se propaga de forma
+        # confiável a este escopo - uma exceção não capturada aqui ainda falha o teste de qualquer forma.
         $result = Get-WinUtilTweaksStateReport
 
-        # Empty groups alone would be indistinguishable from a successful scan that found nothing
-        # notable, so collectionStatus is what actually records that this run failed.
+        # Grupos vazios sozinhos seriam indistinguíveis de uma varredura bem-sucedida que não
+        # encontrou nada relevante, então collectionStatus é o que realmente registra que esta execução falhou.
         $result.collectionStatus | Should -Be "unavailable"
         $result.essentialTweaks.PSObject.Properties.Name | Should -Not -Contain "WPFTweaksApplied"
         @($result.essentialTweaks.PSObject.Properties).Count | Should -Be 0

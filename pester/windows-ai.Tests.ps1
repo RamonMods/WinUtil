@@ -38,7 +38,7 @@ BeforeAll {
     }
 }
 
-Describe 'Windows AI Recall host workaround' {
+Describe 'Solução alternativa de host do Windows AI Recall' {
     BeforeEach {
         $script:savedExitCode = $global:LASTEXITCODE
         Mock Get-AppxPackage { }
@@ -56,7 +56,7 @@ Describe 'Windows AI Recall host workaround' {
 
     AfterEach { $global:LASTEXITCODE = $script:savedExitCode }
 
-    It 'runs Recall through a noninteractive Windows PowerShell process' {
+    It 'executa o Recall por meio de um processo do Windows PowerShell não interativo' {
         & $script:windowsAI
 
         Should -Invoke powershell.exe -Times 1 -Exactly -ParameterFilter {
@@ -66,7 +66,7 @@ Describe 'Windows AI Recall host workaround' {
         Should -Invoke Write-Host -Times 1 -Exactly -ParameterFilter { $Object -eq 'Windows AI Disabled' }
     }
 
-    It 'disables only Recall in the running OS without restarting' {
+    It 'desativa apenas o Recall no sistema operacional em execução sem reiniciar' {
         $output = & $script:recallCommand
 
         $output | Should -BeNullOrEmpty
@@ -75,13 +75,13 @@ Describe 'Windows AI Recall host workaround' {
         }
     }
 
-    It 'lets a DISM failure stop the child command' {
+    It 'permite que uma falha do DISM interrompa o comando filho' {
         Mock Disable-WindowsOptionalFeature { throw 'DISM failed' }
 
         { & $script:recallCommand } | Should -Throw '*DISM failed*'
     }
 
-    It 'keeps a successful child warning visible without treating it as failure' {
+    It 'mantém um aviso bem-sucedido do filho visível sem tratá-lo como falha' {
         Mock powershell.exe {
             $global:LASTEXITCODE = 0
             'WARNING: Restart is suppressed because NoRestart is specified.'
@@ -93,7 +93,7 @@ Describe 'Windows AI Recall host workaround' {
         Should -Invoke Write-Host -Times 1 -Exactly -ParameterFilter { $Object -eq 'Windows AI Disabled' }
     }
 
-    It 'reports a failed child exit with details and no success message' {
+    It 'relata uma saída com falha do filho com detalhes e sem mensagem de sucesso' {
         Mock powershell.exe {
             $global:LASTEXITCODE = 1
             'Class not registered'
@@ -103,7 +103,7 @@ Describe 'Windows AI Recall host workaround' {
         Should -Invoke Write-Host -Times 0 -Exactly -ParameterFilter { $Object -eq 'Windows AI Disabled' }
     }
 
-    It 'reports the child failure through the existing tweak logging wrapper' {
+    It 'relata a falha do filho pelo wrapper de log de ajustes existente' {
         Mock powershell.exe {
             $global:LASTEXITCODE = 1
             'DISM failed'

@@ -12,7 +12,7 @@ BeforeAll {
     }
 }
 
-Describe "Service-host splitting registry scripts" {
+Describe "Scripts de registro da divisão de host de serviço" {
     BeforeEach {
         Mock Get-CimInstance {
             [pscustomobject]@{ Capacity = 8GB }
@@ -21,7 +21,7 @@ Describe "Service-host splitting registry scripts" {
         Mock Set-ItemProperty { }
     }
 
-    It "writes the summed physical memory in KB with an explicit DWORD type" {
+    It "grava a memória física somada em KB com um tipo DWORD explícito" {
         & $script:applySplitting
 
         Should -Invoke Get-CimInstance -Times 1 -Exactly -ParameterFilter {
@@ -34,7 +34,7 @@ Describe "Service-host splitting registry scripts" {
         }
     }
 
-    It "undoes directly to the Windows client DWORD default without querying memory" {
+    It "reverte diretamente para o padrão DWORD do cliente Windows sem consultar a memória" {
         & $script:undoSplitting
 
         Should -Invoke Get-CimInstance -Times 0 -Exactly

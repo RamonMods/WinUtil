@@ -1,4 +1,4 @@
-# Native WPF queue layout and routed-event checks. No system-changing jobs run here.
+# Verificações de layout da fila WPF nativa e de eventos roteados. Nenhum trabalho que altere o sistema é executado aqui.
 BeforeAll {
     Add-Type -AssemblyName PresentationFramework
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -7,7 +7,7 @@ BeforeAll {
     function Write-WinUtilLog { param($Message, $Level, $Component) }
 }
 
-Describe 'Native job queue controls' {
+Describe 'Controles nativos da fila de trabalhos' {
     BeforeEach {
         [xml]$xaml = Get-Content (Join-Path $script:repoRoot 'xaml/inputXML.xaml') -Raw
         $form = [Windows.Markup.XamlReader]::Load([Xml.XmlNodeReader]::new($xaml))
@@ -21,7 +21,7 @@ Describe 'Native job queue controls' {
             JobQueueCount = $form.FindName('JobQueueCount')
             JobQueueRunning = $form.FindName('JobQueueRunning')
             JobQueueItems = $form.FindName('JobQueueItems')
-            # Open state only: measure the actual XAML child without displaying a popup in CI.
+            # Somente estado aberto: medir o filho XAML real sem exibir um popup no CI.
             JobQueuePopup = [pscustomobject]@{ IsOpen = $true }
         })
         $script:queueBorder = $form.FindName('JobQueuePopup').Child
@@ -32,7 +32,7 @@ Describe 'Native job queue controls' {
         Remove-Variable sync, queueBorder -Scope Script
     }
 
-    It 'keeps the running header visible while every queued row remains reachable (<Theme>)' -TestCases @(
+    It 'mantém o cabeçalho de execução visível enquanto todas as linhas enfileiradas permanecem acessíveis (<Theme>)' -TestCases @(
         @{ Theme = 'Light' }
         @{ Theme = 'Dark' }
     ) {
@@ -62,7 +62,7 @@ Describe 'Native job queue controls' {
         $script:sync.JobQueueItems.Children[34].Children[0].Text | Should -Be 'Harmless queued job 35'
     }
 
-    It 'announces each queue action and its job through native automation peers after reordering' {
+    It 'anuncia cada ação da fila e seu trabalho por meio de pares de automação nativos após a reordenação' {
         Invoke-WinutilThemeChange -theme Dark
         foreach ($name in @('Package updates', 'Selected tweaks')) {
             $script:sync.JobQueue.Add([pscustomobject]@{ Id = $name; Name = $name })
@@ -83,7 +83,7 @@ Describe 'Native job queue controls' {
         $peer.GetName() | Should -Be 'Cancel: Selected tweaks'
     }
 
-    It 'routes row buttons by stable job identity through reorder and cancellation' {
+    It 'roteia os botões das linhas pela identidade estável do trabalho durante reordenação e cancelamento' {
         Invoke-WinutilThemeChange -theme Dark
         foreach ($index in 1..3) {
             $script:sync.JobQueue.Add([pscustomobject]@{ Id = "$index"; Name = "Job$index" })

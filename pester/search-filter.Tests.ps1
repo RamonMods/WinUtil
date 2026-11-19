@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Search and Filter Helpers
+# Testes - Auxiliares de busca e filtragem
 #===========================================================================
 
 BeforeAll {
@@ -348,7 +348,7 @@ Describe "Find-AppsByNameOrDescription" {
         Remove-WinUtilSearchGlobals
     }
 
-    It "restores app visibility and respects collapsed category state for empty search" {
+    It "restaura a visibilidade dos aplicativos e respeita o estado recolhido das categorias em uma busca vazia" {
         $browserItem = New-WinUtilAppSearchItem -Tag "WPFInstallBrowser"
         $mediaItem = New-WinUtilAppSearchItem -Tag "WPFInstallMedia"
         $browserItem.Visibility = [Windows.Visibility]::Collapsed
@@ -370,7 +370,7 @@ Describe "Find-AppsByNameOrDescription" {
         $mediaItem.Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "shows matching apps by description and hides categories without matches" {
+    It "mostra aplicativos correspondentes por descrição e oculta categorias sem correspondências" {
         $browserItem = New-WinUtilAppSearchItem -Tag "WPFInstallBrowser"
         $mediaItem = New-WinUtilAppSearchItem -Tag "WPFInstallMedia"
         $editorItem = New-WinUtilAppSearchItem -Tag "WPFInstallEditor"
@@ -389,7 +389,7 @@ Describe "Find-AppsByNameOrDescription" {
         $editorItem.Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "matches apps by preset key" {
+    It "corresponde aplicativos por chave de predefinição" {
         $browserItem = New-WinUtilAppSearchItem -Tag "WPFInstallBrowser"
         $mediaItem = New-WinUtilAppSearchItem -Tag "WPFInstallMedia"
         $category = New-WinUtilAppCategory -Label "- Browsers" -Items @($browserItem, $mediaItem)
@@ -402,7 +402,7 @@ Describe "Find-AppsByNameOrDescription" {
         $category.Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "treats wildcard characters as literal app search text" {
+    It "trata caracteres curinga como texto literal de busca de aplicativos" {
         $literalItem = New-WinUtilAppSearchItem -Tag "WPFInstallLiteral"
         $mediaItem = New-WinUtilAppSearchItem -Tag "WPFInstallMedia"
         $category = New-WinUtilAppCategory -Label "- Tools" -Items @($literalItem, $mediaItem)
@@ -415,7 +415,7 @@ Describe "Find-AppsByNameOrDescription" {
         $category.Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "filters category chips by exact application category" {
+    It "filtra as etiquetas de categoria pela categoria exata de aplicativo" {
         $utilityItem = New-WinUtilAppSearchItem -Tag "WPFInstallLiteral"
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $category = New-WinUtilAppCategory -Label "- Tools" -Items @($utilityItem, $powerToysItem)
@@ -428,7 +428,7 @@ Describe "Find-AppsByNameOrDescription" {
         $category.Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "shows apps from every selected category when several chips are active" {
+    It "mostra aplicativos de todas as categorias selecionadas quando várias etiquetas estão ativas" {
         $utilityItem = New-WinUtilAppSearchItem -Tag "WPFInstallLiteral"
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $browserItem = New-WinUtilAppSearchItem -Tag "WPFInstallBrowser"
@@ -442,7 +442,7 @@ Describe "Find-AppsByNameOrDescription" {
         $browserItem.Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "applies the search text and the category filter together" {
+    It "aplica o texto de busca e o filtro de categoria juntos" {
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $literalItem = New-WinUtilAppSearchItem -Tag "WPFInstallLiteral"
         $category = New-WinUtilAppCategory -Label "- Tools" -Items @($powerToysItem, $literalItem)
@@ -454,7 +454,7 @@ Describe "Find-AppsByNameOrDescription" {
         $literalItem.Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "hides a category when the search text matches nothing inside the selected categories" {
+    It "oculta uma categoria quando o texto de busca não corresponde a nada dentro das categorias selecionadas" {
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $category = New-WinUtilAppCategory -Label "- Tools" -Items @($powerToysItem)
         New-WinUtilAppSearchContext -Categories @($category)
@@ -465,7 +465,7 @@ Describe "Find-AppsByNameOrDescription" {
         $category.Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "expands a collapsed category that has matches for the selected filter" {
+    It "expande uma categoria recolhida que tem correspondências para o filtro selecionado" {
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $category = New-WinUtilAppCategory -Label "+ Tools" -Items @($powerToysItem)
         New-WinUtilAppSearchContext -Categories @($category)
@@ -476,7 +476,7 @@ Describe "Find-AppsByNameOrDescription" {
         $category.Children[1].Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "re-collapses a category it expanded once the filter is cleared" {
+    It "recolhe novamente uma categoria que expandiu após o filtro ser limpo" {
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $category = New-WinUtilAppCategory -Label "+ Tools" -Items @($powerToysItem)
         New-WinUtilAppSearchContext -Categories @($category)
@@ -490,7 +490,7 @@ Describe "Find-AppsByNameOrDescription" {
         $category.Children[1].Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "leaves a category the user had expanded alone when the filter is cleared" {
+    It "mantém como está uma categoria que o usuário havia expandido quando o filtro é limpo" {
         $powerToysItem = New-WinUtilAppSearchItem -Tag "WPFInstallPowerToys"
         $category = New-WinUtilAppCategory -Label "- Tools" -Items @($powerToysItem)
         New-WinUtilAppSearchContext -Categories @($category)
@@ -504,7 +504,7 @@ Describe "Find-AppsByNameOrDescription" {
 }
 
 Describe "Find-TweaksByNameOrDescription" {
-    It "restores collapsed categories after literal search in <ContainerType>" -TestCases @(
+    It "restaura categorias recolhidas após busca literal em <ContainerType>" -TestCases @(
         @{ ContainerType = "StackPanel" }
         @{ ContainerType = "ScrollViewer" }
     ) {
@@ -529,7 +529,7 @@ Describe "Find-TweaksByNameOrDescription" {
         Remove-WinUtilSearchGlobals
     }
 
-    It "restores category labels and respects collapsed category state for empty search" {
+    It "restaura os rótulos das categorias e respeita o estado recolhido das categorias em uma busca vazia" {
         $collapsedItem = New-WinUtilTweakLabelItem -Content "Disable Telemetry" -ToolTip "Stop tracking"
         $expandedItem = New-WinUtilTweakCheckboxItem -Content "Show Extensions" -ToolTip "File extension display"
         $collapsedCategory = New-WinUtilTweakCategory -Label "+ Privacy" -Items @($collapsedItem)
@@ -553,7 +553,7 @@ Describe "Find-TweaksByNameOrDescription" {
         $expandedItem.Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "shows tweak matches by label tooltip and checkbox content" {
+    It "mostra correspondências de ajustes por dica do rótulo e conteúdo da caixa de seleção" {
         $telemetryItem = New-WinUtilTweakLabelItem -Content "Disable Telemetry" -ToolTip "Stop tracking"
         $extensionsItem = New-WinUtilTweakCheckboxItem -Content "Show Extensions" -ToolTip "File extension display"
         $nonMatchItem = New-WinUtilTweakLabelItem -Content "Enable NumLock" -ToolTip "Keyboard setting"
@@ -577,7 +577,7 @@ Describe "Find-TweaksByNameOrDescription" {
         $nonMatchItem.Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "hides tweak category panels when no items match" {
+    It "oculta os painéis de categorias de ajustes quando nenhum item corresponde" {
         $item = New-WinUtilTweakLabelItem -Content "Disable Telemetry" -ToolTip "Stop tracking"
         $category = New-WinUtilTweakCategory -Label "- Privacy" -Items @($item)
         $panel = New-WinUtilTweakPanel -Categories @($category)
@@ -590,7 +590,7 @@ Describe "Find-TweaksByNameOrDescription" {
         $item.Visibility | Should -Be ([Windows.Visibility]::Collapsed)
     }
 
-    It "searches the AppX panel when AppX is the current tab" {
+    It "pesquisa no painel AppX quando AppX é a aba atual" {
         $tweakItem = New-WinUtilTweakLabelItem -Content "Disable Telemetry" -ToolTip "Stop tracking"
         $appxItem = New-WinUtilTweakCheckboxItem -Content "Xbox Overlay" -ToolTip "Gaming overlay package"
         $tweakCategory = New-WinUtilTweakCategory -Label "- Privacy" -Items @($tweakItem)
@@ -608,7 +608,7 @@ Describe "Find-TweaksByNameOrDescription" {
         $tweakItem.Visibility | Should -Be ([Windows.Visibility]::Visible)
     }
 
-    It "matches checkbox descriptions and preset keys but not the preset key label" {
+    It "corresponde descrições de caixas de seleção e chaves de predefinição, mas não o rótulo da chave de predefinição" {
         $servicesItem = New-WinUtilTweakCheckboxItem -Content "Services - Set to Manual" -ToolTip (Get-WinUtilEntryToolTip -Description "Reduces the number of svchost.exe processes." -Key "WPFTweaksServices")
         $telemetryItem = New-WinUtilTweakCheckboxItem -Content "Telemetry - Disable" -ToolTip (Get-WinUtilEntryToolTip -Description "Disables Microsoft Telemetry." -Key "WPFTweaksTelemetry")
         $category = New-WinUtilTweakCategory -Label "- Essential Tweaks" -Items @($servicesItem, $telemetryItem)

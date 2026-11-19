@@ -41,7 +41,7 @@ BeforeAll {
     }
 }
 
-Describe 'Classic context menu apply and undo' {
+Describe 'Aplicação e desfazer do menu de contexto clássico' {
     BeforeEach {
         $script:sync = @{ configs = @{ tweaks = $script:classicMenuTweaks } }
         $script:previousClassicMenuErrorCount = $global:WinUtilJobErrorCount
@@ -91,7 +91,7 @@ Describe 'Classic context menu apply and undo' {
         Remove-Variable sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It 'creates the newer unattended registration and preserves it on a repeated run' {
+    It 'cria o registro mais recente no modo autônomo e o preserva em uma execução repetida' {
         & $script:unattendedClassicMenu
         & $script:unattendedClassicMenu
         $script:menuRegistry[$script:workaroundServerPath].Values[''] | Should -BeExactly ''
@@ -99,14 +99,14 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke New-ItemProperty -Times 1 -Exactly
     }
 
-    It 'preserves a pre-existing unattended registration' {
+    It 'preserva um registro autônomo pré-existente' {
         $script:menuRegistry[$script:workaroundMenuPath] = New-TestRegistryKey -Values @{ Vendor = 'Custom' }
         & $script:unattendedClassicMenu
         $script:menuRegistry[$script:workaroundMenuPath].Values['Vendor'] | Should -Be 'Custom'
         Should -Invoke New-ItemProperty -Times 0 -Exactly
     }
 
-    It 'reports an unattended marker failure without terminating user setup' {
+    It 'reporta uma falha de marcador no modo autônomo sem encerrar a configuração do usuário' {
         Mock New-ItemProperty {
             if (-not $script:allowMenuMarkerWrite) { throw 'Marker write denied' }
             $script:menuRegistry[[string]$LiteralPath].Values[$Name] = $Value
@@ -121,7 +121,7 @@ Describe 'Classic context menu apply and undo' {
         $script:menuRegistry[$script:workaroundServerPath].Values[''] | Should -BeExactly ''
     }
 
-    It 'creates the second registration once and removes both overrides on undo' {
+    It 'cria o segundo registro uma vez e remove ambas as substituições ao desfazer' {
         Invoke-WinUtilTweaks -CheckBox $script:classicMenuTweakName
         Invoke-WinUtilTweaks -CheckBox $script:classicMenuTweakName
         $script:menuRegistry[$script:workaroundServerPath].Values[''] | Should -BeExactly ''
@@ -135,7 +135,7 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke Stop-Process -Times 3 -Exactly -ParameterFilter { $Id -eq 12345 }
     }
 
-    It 'leaves Explorer in other sessions running on apply and undo' {
+    It 'mantém o Explorer em execução em outras sessões ao aplicar e desfazer' {
         Mock Get-Process {
             $currentSession = [System.Diagnostics.Process]::GetCurrentProcess().SessionId
             [pscustomobject]@{ Id = 12345; SessionId = $currentSession }
@@ -147,7 +147,7 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke Stop-Process -Times 0 -Exactly -ParameterFilter { $Id -eq 23456 -or $Name }
     }
 
-    It 'preserves a pre-existing second registration across apply and undo' {
+    It 'preserva um segundo registro pré-existente ao aplicar e desfazer' {
         $script:menuRegistry[$script:workaroundMenuPath] = New-TestRegistryKey -Values @{ Vendor = 'Custom' } -SubKeys @('InprocServer32', 'Other')
         $script:menuRegistry[$script:workaroundServerPath] = New-TestRegistryKey -Values @{ '' = 'custom.dll' }
 
@@ -160,7 +160,7 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke Remove-Item -Times 0 -Exactly -ParameterFilter { [string]$LiteralPath -eq $script:workaroundMenuPath }
     }
 
-    It 'leaves later changes to a WinUtil-owned registration intact' {
+    It 'mantém intactas alterações posteriores em um registro pertencente ao WinUtil' {
         Invoke-WinUtilTweaks -CheckBox $script:classicMenuTweakName
         $script:menuRegistry[$script:workaroundServerPath].Values[''] = 'custom.dll'
         Invoke-WinUtilTweaks -CheckBox $script:classicMenuTweakName -undo $true
@@ -170,14 +170,14 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke Stop-Process -Times 1 -Exactly
     }
 
-    It 'accepts already absent keys on undo' {
+    It 'aceita chaves já ausentes ao desfazer' {
         Invoke-WinUtilTweaks -CheckBox $script:classicMenuTweakName -undo $true
 
         $global:WinUtilJobErrorCount | Should -Be 0
         Should -Invoke Stop-Process -Times 1 -Exactly
     }
 
-    It 'reports a denied deletion and skips the Explorer restart for the <Registration> override' -ForEach @(
+    It 'reporta uma exclusão negada e ignora a reinicialização do Explorer para a substituição <Registration>' -ForEach @(
         @{ Registration = 'original' }
         @{ Registration = 'newer' }
     ) {
@@ -194,7 +194,7 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke Stop-Process -Times 1 -Exactly
     }
 
-    It 'completes an empty owned server key after a partial creation failure' {
+    It 'completa uma chave de servidor vazia pertencente ao WinUtil após uma falha parcial de criação' {
         Mock New-Item {
             $script:menuRegistry[$script:workaroundServerPath] = New-TestRegistryKey
             $script:menuRegistry[$script:workaroundMenuPath].SubKeys = @('InprocServer32')
@@ -211,7 +211,7 @@ Describe 'Classic context menu apply and undo' {
         Should -Invoke Stop-Process -Times 1 -Exactly
     }
 
-    It 'retries a failed server creation without overwriting the owned root' {
+    It 'tenta novamente uma criação de servidor falha sem sobrescrever a raiz pertencente ao WinUtil' {
         Mock New-Item { throw [System.UnauthorizedAccessException]::new('Registry creation denied') } -ParameterFilter {
             [string]$Path -eq $script:workaroundServerPath -and -not $script:menuCreationAllowed
         }

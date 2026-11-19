@@ -2,16 +2,16 @@ function Invoke-WPFPresets {
     <#
 
     .SYNOPSIS
-        Sets the checkboxes in winutil to the given preset
+        Define as caixas de seleção no winutil de acordo com a predefinição informada
 
     .PARAMETER preset
-        The preset to set the checkboxes to
+        A predefinição a ser aplicada às caixas de seleção
 
     .PARAMETER imported
-        If the preset is imported from a file, defaults to false
+        Se a predefinição foi importada de um arquivo; o padrão é false
 
     .PARAMETER checkboxfilterpattern
-        The Pattern to use when filtering through CheckBoxes, defaults to "**"
+        O padrão usado ao filtrar as caixas de seleção; o padrão é "**"
 
     #>
 
@@ -32,8 +32,8 @@ function Invoke-WPFPresets {
         $CheckBoxesToCheck = $sync.configs.preset.$preset
     }
 
-    # clear out the filtered pattern so applying a preset replaces the current
-    # state rather than merging with it
+    # Limpa o padrão filtrado para que aplicar uma predefinição substitua o estado
+    # atual em vez de mesclá-lo
     switch ($checkboxfilterpattern) {
         "WPFTweak*" { $sync.selectedTweaks = [System.Collections.Generic.List[string]]::new() }
         "WPFInstall*" { $sync.selectedApps = [System.Collections.Generic.List[string]]::new() }

@@ -1,4 +1,4 @@
-name: Auto-merge Automated Update PRs
+name: Mesclagem automática de PRs de atualizações automatizadas
 
 on:
   pull_request:
@@ -14,17 +14,17 @@ jobs:
       pull-requests: write
       contents: write
     steps:
-      - name: Checkout
+      - name: Checkout do repositório
         uses: actions/checkout@v7
 
-      - name: Auto-approve PR
+      - name: Aprovar PR automaticamente
         if: github.event.pull_request.user.login == 'github-actions[bot]'
         run: gh pr review "$PR_NUMBER" --approve
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.AUTO_MERGE }}
 
-      - name: Enable auto-merge
+      - name: Ativar mesclagem automática
         run: gh pr merge "$PR_NUMBER" --squash --delete-branch --admin
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}

@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - App card width and pre-show rendering
+# Testes - Largura do cartão de aplicativo e renderização antes da exibição
 
 BeforeAll {
     Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
@@ -28,7 +28,7 @@ Describe "Update-WinUtilAppEntryWidth" {
         $script:sync.Form.Close()
     }
 
-    It "shares a row of <Viewport> px between <Columns> cards with nothing left over" -TestCases @(
+    It "divide uma linha de <Viewport> px entre <Columns> cartões sem sobrar nada" -TestCases @(
         @{ Viewport = 1130.0; Columns = 4 }
         @{ Viewport = 1500.0; Columns = 6 }
         @{ Viewport = 800.0; Columns = 3 }
@@ -42,20 +42,20 @@ Describe "Update-WinUtilAppEntryWidth" {
         $Viewport - $Columns * ($width + 6) | Should -BeLessThan $Columns
     }
 
-    It "keeps a card at its minimum width in a viewport narrower than that" {
+    It "mantém o cartão na largura mínima quando a viewport é mais estreita que isso" {
         $script:sync.ItemsControl.Parent.ViewportWidth = 200.0
         Update-WinUtilAppEntryWidth
 
         $script:sync.Form.Resources["AppEntryCardWidth"] | Should -Be 242
     }
 
-    It "leaves the width alone until the list has been laid out" {
+    It "não altera a largura até que a lista tenha sido disposta" {
         Update-WinUtilAppEntryWidth
 
         $script:sync.Form.Resources["AppEntryCardWidth"] | Should -Be 242
     }
 
-    It "follows a larger minimum width, as set by font scaling" {
+    It "respeita uma largura mínima maior, definida pela escala da fonte" {
         $script:sync.ItemsControl.Parent.ViewportWidth = 1130.0
         $script:sync.Form.Resources["AppEntryWidth"] = 400.0
         Update-WinUtilAppEntryWidth
@@ -64,7 +64,7 @@ Describe "Update-WinUtilAppEntryWidth" {
     }
 }
 
-Describe "Install list rendering before the window is shown" {
+Describe "Renderização da lista de instalação antes da exibição da janela" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             InstallAppRenderQueue = [System.Collections.Queue]::new()
@@ -76,7 +76,7 @@ Describe "Install list rendering before the window is shown" {
         Mock Start-WinUtilBackgroundQueue { throw "Nothing may be queued for the dispatcher before the window exists" }
     }
 
-    It "renders every batch in one pass with no size limit" {
+    It "renderiza todos os lotes em uma única passada sem limite de tamanho" {
         Start-WinUtilInstallAppRendering
 
         $script:budgets.Count | Should -Be 3
@@ -85,7 +85,7 @@ Describe "Install list rendering before the window is shown" {
         $script:sync.InstallAppEntriesRendered | Should -BeTrue
     }
 
-    It "uses the dispatcher queue once the window is open" {
+    It "usa a fila do dispatcher quando a janela está aberta" {
         $script:sync.BuildingBeforeShow = $false
         Mock Start-WinUtilBackgroundQueue { }
         Start-WinUtilInstallAppRendering

@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - System Helper Functions
+# Testes - Funções auxiliares do sistema
 #===========================================================================
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -19,7 +19,7 @@ BeforeAll {
     function choco {
         param([Parameter(ValueFromRemainingArguments = $true)]$Arguments)
     }
-    # The CLI path is what these tests cover; the module path is verified against real winget
+    # O caminho da CLI é o que estes testes cobrem; o caminho do módulo é verificado com o winget real
     function Step-WinUtilJob { param([string]$Status, [int]$Percent, [string]$State, [string]$Overlay, [switch]$Hide) }
     function Write-WinUtilLog { param($Message, $Level, $Component, [switch]$Detail) }
 }
@@ -31,7 +31,7 @@ Describe "Invoke-WPFPanelAutologin" {
         Mock Start-Process { }
     }
 
-    It "uses the shared WinUtil data directory from a worker runspace" {
+    It "usa o diretório de dados compartilhado do WinUtil em um runspace de worker" {
         Invoke-WPFPanelAutologin
 
         $expectedPath = Join-Path $TestDrive "autologin.exe"
@@ -41,7 +41,7 @@ Describe "Invoke-WPFPanelAutologin" {
 }
 
 Describe "Get-WinUtilPowerShell7Path" {
-    It "finds a new standard install even before the current process PATH refreshes" {
+    It "encontra uma instalação padrão nova mesmo antes de a PATH do processo atual ser atualizada" {
         $expectedPath = "$env:ProgramFiles\PowerShell\7\pwsh.exe"
         Mock Get-Command { $null } -ParameterFilter { $Name -eq "pwsh" }
         Mock Test-Path { $LiteralPath -eq $expectedPath }
@@ -49,7 +49,7 @@ Describe "Get-WinUtilPowerShell7Path" {
         Get-WinUtilPowerShell7Path | Should -Be $expectedPath
     }
 
-    It "is also used by profile removal so a stale process PATH is supported" {
+    It "também é usado pela remoção de perfil para dar suporte a uma PATH desatualizada do processo" {
         $source = Get-Content (Join-Path $script:repoRoot "functions\private\Invoke-WinUtilUninstallPSProfile.ps1") -Raw
 
         $source | Should -Match '\$pwshPath = Get-WinUtilPowerShell7Path'
@@ -58,7 +58,7 @@ Describe "Get-WinUtilPowerShell7Path" {
     }
 }
 
-Describe "Invoke-WinUtilCurrentSystem installed apps" {
+Describe "Invoke-WinUtilCurrentSystem aplicativos instalados" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             configs = [pscustomobject]@{
@@ -92,7 +92,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         Remove-Variable -Name chocoArguments -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "matches single standard and Microsoft Store package IDs" {
+    It "corresponde a IDs de pacote padrão e da Microsoft Store" {
         $result = @(Invoke-WinUtilCurrentSystem -CheckBox "winget")
 
         $result | Should -HaveCount 2
@@ -103,7 +103,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         $script:wingetArguments | Should -Be @("list", "--accept-source-agreements", "--disable-interactivity")
     }
 
-    It "matches a package whose name is the widest in the winget list" {
+    It "corresponde a um pacote cujo nome é o mais largo na lista do winget" {
         Mock winget {
             $global:LASTEXITCODE = 0
             @(
@@ -123,7 +123,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         $result | Should -Not -Contain "WPFInstallMissing"
     }
 
-    It "matches the widest ID when its version has only one preceding space (<Mode>)" -TestCases @(
+    It "corresponde ao ID mais largo quando sua versão tem apenas um espaço anterior (<Mode>)" -TestCases @(
         @{ Mode = "winget" }
         @{ Mode = "choco" }
     ) {
@@ -147,10 +147,10 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         Should -Invoke -CommandName winget -Times 1 -Exactly
     }
 
-    It "matches IDs only in the Id column, not inside a package name" {
+    It "corresponde a IDs apenas na coluna Id, não dentro de um nome de pacote" {
         Mock winget {
             $global:LASTEXITCODE = 0
-            # "a" plus 16 combining accents is 17 characters but one column, which puts Git.Git at the Id column offset
+            # "a" mais 16 acentos combinantes são 17 caracteres, mas uma coluna, o que coloca Git.Git na posição da coluna Id
             $accentedName = "a" + ([string][char]0x0301 * 16) + " Git.Git"
             @(
                 "Name              Id         Version Source",
@@ -166,7 +166,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         $result | Should -Be @("WPFInstallOther")
     }
 
-    It "fails promptly when Winget cannot list applications" {
+    It "falha prontamente quando o Winget não consegue listar aplicativos" {
         Mock winget {
             $global:LASTEXITCODE = 1
             "winget failed"
@@ -175,7 +175,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         { Invoke-WinUtilCurrentSystem -CheckBox "winget" } | Should -Throw "winget list failed with exit code 1."
     }
 
-    It "matches the primary Chocolatey package ID in one list call" {
+    It "corresponde ao ID de pacote primário do Chocolatey em uma única chamada de listagem" {
         $result = @(Invoke-WinUtilCurrentSystem -CheckBox "choco")
 
         $result | Should -Be @("WPFInstallGit", "WPFInstallChatGPT")
@@ -183,7 +183,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         $script:chocoArguments | Should -Be @("list")
     }
 
-    It "checks WinGet only for apps that Chocolatey mode installs through WinGet" {
+    It "verifica o WinGet apenas para aplicativos que o modo Chocolatey instala por meio do WinGet" {
         $apps = $script:sync.configs.applicationsHashtable
         $apps["WPFInstallVLC"] = [pscustomobject]@{ winget = "VideoLAN.VLC"; choco = "vlc" }
         $apps["WPFInstallNoChoco"] = [pscustomobject]@{ winget = "No.Choco"; choco = "" }
@@ -214,7 +214,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         Should -Invoke -CommandName winget -Times 1 -Exactly
     }
 
-    It "keeps Chocolatey results when WinGet cannot list applications" {
+    It "mantém os resultados do Chocolatey quando o WinGet não consegue listar aplicativos" {
         Mock winget {
             $global:LASTEXITCODE = 1
             "winget failed"
@@ -227,7 +227,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         Should -Invoke -CommandName Write-Warning -Times 1 -Exactly -ParameterFilter { $Message -like "*WinGet*exit code 1*" }
     }
 
-    It "does not run WinGet in Chocolatey mode when no app needs it" {
+    It "não executa o WinGet no modo Chocolatey quando nenhum aplicativo precisa dele" {
         $script:sync.configs.applicationsHashtable.Remove("WPFInstallChatGPT")
         $script:sync.configs.applicationsHashtable["WPFInstallNoSource"] = [pscustomobject]@{ winget = "na"; choco = "na" }
 
@@ -237,7 +237,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
         Should -Invoke -CommandName winget -Times 0 -Exactly
     }
 
-    It "skips the WinGet check in Chocolatey mode when WinGet is not installed" {
+    It "ignora a verificação do WinGet no modo Chocolatey quando o WinGet não está instalado" {
         Mock Test-WinUtilPackageManager { "not-installed" } -ParameterFilter { $winget }
 
         $result = @(Invoke-WinUtilCurrentSystem -CheckBox "choco")
@@ -247,7 +247,7 @@ Describe "Invoke-WinUtilCurrentSystem installed apps" {
     }
 }
 
-Describe "Invoke-WinUtilCurrentSystem service tweaks" {
+Describe "Invoke-WinUtilCurrentSystem ajustes de serviço" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             configs = @{
@@ -266,15 +266,15 @@ Describe "Invoke-WinUtilCurrentSystem service tweaks" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "tolerates a missing optional service during UI detection" {
+    It "tolera um serviço opcional ausente durante a detecção da interface" {
         @(Invoke-WinUtilCurrentSystem -CheckBox "tweaks") | Should -Be @("WPFServiceTweak")
     }
 
-    It "marks a missing service as a mismatch during strict report collection" {
+    It "marca um serviço ausente como uma divergência durante a coleta rigorosa de relatório" {
         @(Invoke-WinUtilCurrentSystem -CheckBox "tweaks" -StopOnReadError).Count | Should -Be 0
     }
 
-    It "marks a tweak applied when its service startup type matches" {
+    It "marca um ajuste como aplicado quando o tipo de inicialização do serviço corresponde" {
         Mock Get-Service { [pscustomobject]@{ StartType = "Disabled" } }
         @(Invoke-WinUtilCurrentSystem -CheckBox "tweaks") | Should -Be @("WPFServiceTweak")
     }
@@ -300,7 +300,7 @@ Describe "Set-WinUtilRegistry" {
         Mock New-Item { }
         Mock Set-ItemProperty { }
         Mock Remove-ItemProperty { }
-        # A value exists unless a test throws the provider's error for a missing key or value
+        # Um valor existe a menos que um teste lance o erro do provedor para uma chave ou valor ausente
         Mock Get-ItemProperty { }
     }
 
@@ -308,7 +308,7 @@ Describe "Set-WinUtilRegistry" {
         Remove-Variable -Name absentLookupError -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "creates a missing registry path before setting a value" {
+    It "cria um caminho de registro ausente antes de definir um valor" {
         $registryPath = "HKCU:\Software\WinUtilTest"
         $script:testPathResults["HKU:\"] = $true
         $script:testPathResults[$registryPath] = $false
@@ -330,7 +330,7 @@ Describe "Set-WinUtilRegistry" {
         Should -Invoke -CommandName Remove-ItemProperty -Times 0 -Exactly
     }
 
-    It "creates the HKU PSDrive when it is missing" {
+    It "cria a PSDrive HKU quando ela está ausente" {
         $registryPath = "HKCU:\Software\WinUtilTest"
         $script:testPathResults["HKU:\"] = $false
         $script:testPathResults[$registryPath] = $true
@@ -348,7 +348,7 @@ Describe "Set-WinUtilRegistry" {
         }
     }
 
-    It "removes a registry value when requested" {
+    It "remove um valor do registro quando solicitado" {
         $registryPath = "HKLM:\Software\WinUtilTest"
         $script:testPathResults["HKU:\"] = $true
         $script:testPathResults[$registryPath] = $true
@@ -367,13 +367,13 @@ Describe "Set-WinUtilRegistry" {
         }
     }
 
-    It "treats a missing <Reason> as a value that is already removed" -ForEach @(
+    It "trata um <Reason> ausente como um valor que já foi removido" -ForEach @(
         @{ Reason = "value"; LookupError = [System.Management.Automation.PSArgumentException]::new("Property MissingValue does not exist at path HKEY_CURRENT_USER\Software\WinUtilTest.") }
         @{ Reason = "key"; LookupError = [System.Management.Automation.ItemNotFoundException]::new("Cannot find path 'HKCU:\Software\WinUtilTest' because it does not exist.") }
     ) {
-        # Remove-ItemProperty on a missing value raises PSArgumentException, which the generic
-        # catch logged as an error, so undoing a tweak that was never applied failed (#5145).
-        # Only the HKU check is expected: the path must not be created just to remove nothing.
+        # Remove-ItemProperty em um valor ausente gera PSArgumentException, que o
+        # catch genérico registrava como erro, então reverter um ajuste nunca aplicado falhava (#5145).
+        # Apenas a verificação do HKU é esperada: o caminho não deve ser criado só para não remover nada.
         $registryPath = "HKCU:\Software\WinUtilTest"
         $script:testPathResults["HKU:\"] = $true
         $script:absentLookupError = $LookupError
@@ -391,8 +391,8 @@ Describe "Set-WinUtilRegistry" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter { $Message -like "*already absent*" }
     }
 
-    It "reports a lookup failure instead of treating the value as absent" {
-        # Access denied is not "nothing to remove": the existing handlers must see it
+    It "relata uma falha de consulta em vez de tratar o valor como ausente" {
+        # Acesso negado não é "nada a remover": os manipuladores existentes precisam vê-lo
         $registryPath = "HKLM:\SECURITY\WinUtilTest"
         $script:testPathResults["HKU:\"] = $true
         Mock Get-ItemProperty { throw [System.UnauthorizedAccessException]::new("Requested registry access is not allowed.") }
@@ -419,7 +419,7 @@ Describe "Set-WinUtilService" {
         Mock Set-Service { }
     }
 
-    It "sets the startup type for an existing service" {
+    It "define o tipo de inicialização de um serviço existente" {
         Mock Get-Service {
             [pscustomobject]@{
                 Name = "DiagTrack"
@@ -437,7 +437,7 @@ Describe "Set-WinUtilService" {
         }
     }
 
-    It "does not change a service that already has the requested startup type" {
+    It "não altera um serviço que já tem o tipo de inicialização solicitado" {
         Mock Get-Service {
             [pscustomobject]@{
                 Name = "DiagTrack"
@@ -451,7 +451,7 @@ Describe "Set-WinUtilService" {
         Should -Invoke -CommandName Set-Service -Times 0 -Exactly
     }
 
-    It "does not call Set-Service when the service is missing" {
+    It "não chama Set-Service quando o serviço está ausente" {
         Mock Get-Service {
             $exception = [Microsoft.PowerShell.Commands.ServiceCommandException]::new("Cannot find any service with service name '$Name'.")
             $errorRecord = [System.Management.Automation.ErrorRecord]::new(

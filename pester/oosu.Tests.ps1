@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - O&O ShutUp10++ Download Workflow
+# Testes - Fluxo de download do O&O ShutUp10++
 #===========================================================================
 
 BeforeAll {
@@ -38,7 +38,7 @@ BeforeAll {
 }
 
 Describe "Save-WinUtilFile" {
-    It "copies a download and reports its percentage" {
+    It "copia um download e informa sua porcentagem" {
         $sourcePath = Join-Path $TestDrive "source.bin"
         $destinationPath = Join-Path $TestDrive "destination.bin"
         $sourceBytes = [byte[]](0..255)
@@ -54,7 +54,7 @@ Describe "Save-WinUtilFile" {
         $reportedProgress[-1] | Should -Be 100
     }
 
-    It "passes the total size in bytes alongside the percentage" {
+    It "informa o tamanho total em bytes junto com a porcentagem" {
         $sourcePath = Join-Path $TestDrive "sized.bin"
         $destinationPath = Join-Path $TestDrive "sized-copy.bin"
         [System.IO.File]::WriteAllBytes($sourcePath, [byte[]](0..255))
@@ -93,14 +93,14 @@ Describe "Invoke-WPFOOSU" {
         Remove-Variable -Name capturedJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "queues the download as a job with the download path" {
+    It "enfileira o download como um trabalho com o caminho de download" {
         Invoke-WPFOOSU
 
         Should -Invoke Start-WinUtilJob -Times 1 -Exactly -ParameterFilter { $Name -eq "OOSU" }
         $script:capturedJob.Parameters.DownloadPath | Should -Be (Join-Path $TestDrive "ooshutup10.exe")
     }
 
-    It "maps download progress to the job indicator and launches O&O ShutUp10++" {
+    It "mapeia o progresso do download para o indicador do trabalho e lança o O&O ShutUp10++" {
         Mock Save-WinUtilFile {
             & $ProgressCallback 35
             & $ProgressCallback 100
@@ -121,7 +121,7 @@ Describe "Invoke-WPFOOSU" {
         }
     }
 
-    It "shows the download size next to the percentage" {
+    It "mostra o tamanho do download ao lado da porcentagem" {
         Mock Save-WinUtilFile {
             & $ProgressCallback 35 85689344
         }
@@ -135,7 +135,7 @@ Describe "Invoke-WPFOOSU" {
         }
     }
 
-    It "falls back to the plain percentage when the server sends no size" {
+    It "usa apenas a porcentagem quando o servidor não envia o tamanho" {
         Mock Save-WinUtilFile {
             & $ProgressCallback 100 -1
         }
@@ -149,7 +149,7 @@ Describe "Invoke-WPFOOSU" {
         }
     }
 
-    It "lets a download failure surface so the job layer can handle it" {
+    It "permite que uma falha de download apareça para que a camada de trabalhos possa tratá-la" {
         Mock Save-WinUtilFile { throw "download failed" }
 
         Invoke-WPFOOSU
@@ -160,15 +160,15 @@ Describe "Invoke-WPFOOSU" {
     }
 }
 
-Describe "O&O ShutUp10++ button" {
-    It "tells the user it downloads the tool before anything starts" {
+Describe "Botão O&O ShutUp10++" {
+    It "informa ao usuário que baixa a ferramenta antes de qualquer coisa começar" {
         $tweaks = Get-Content (Join-Path $script:repoRoot "config\tweaks.json") -Raw | ConvertFrom-Json
 
         $tweaks.WPFOOSUbutton.Description | Should -Match "(?i)download"
         $tweaks.WPFOOSUbutton.Description | Should -Match "MB"
     }
 
-    It "is rendered with its description as the tooltip" {
+    It "é renderizado com sua descrição como dica" {
         $renderer = Get-Content (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
 
         $renderer | Should -Match '\$button\.ToolTip\s*=\s*\$entryInfo\.Description'

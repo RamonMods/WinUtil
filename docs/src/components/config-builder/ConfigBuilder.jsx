@@ -1,18 +1,18 @@
-// Builds a -Config file from the latest release's catalog, so every key it offers is one that release will import.
+// Cria um arquivo -Config a partir do catálogo da versão mais recente, para que toda chave oferecida seja uma que essa versão importará.
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Icon from '../docs/Icon.jsx';
 import { RATE_LIMITED, loadReleaseConfig } from '../../lib/winutil-release.js';
 import { configLink, readConfigLink } from '../../lib/config-link.js';
 import './ConfigBuilder.css';
 
-// Each download gets its own name. A browser renames a clash to "name (1).json", and the command would then run the
-// older file.
+// Cada download recebe seu próprio nome. O navegador renomeia um conflito para "nome (1).json" e o comando executaria
+// o arquivo mais antigo.
 function configFileName() {
 	const stamp = new Date().toISOString().slice(0, 23).replace(/[-:.]/g, '').replace('T', '-');
 	return `winutil-config-${stamp}.json`;
 }
 
-// Buttons share the WPFFeature prefix but can't be imported, so only checkbox and toggle entries are offered.
+// Botões compartilham o prefixo WPFFeature, mas não podem ser importados, então só são oferecidas entradas de caixa de seleção e de interruptor.
 function entries(catalog, pattern) {
 	return Object.entries(catalog)
 		.filter(([key, entry]) => pattern.test(key) && entry.Type !== 'Button')
@@ -30,13 +30,13 @@ async function loadCatalog() {
 		release,
 		files: [applications, tweaks, features, appx, presets],
 	} = await loadReleaseConfig(['applications', 'tweaks', 'feature', 'appx', 'preset']);
-	// Tab order matches WinUtil's export order: apps, tweaks, toggles, features, AppX.
+	// A ordem das abas segue a ordem de exportação do WinUtil: aplicativos, ajustes, interruptores, recursos, AppX.
 	return {
 		release,
 		tabs: [
 			{
 				id: 'apps',
-				label: 'Applications',
+				label: 'Aplicativos',
 				items: Object.entries(applications).map(([name, app]) => ({
 					key: `WPFInstall${name}`,
 					name: app.content,
@@ -47,24 +47,24 @@ async function loadCatalog() {
 			},
 			{
 				id: 'tweaks',
-				label: 'Tweaks',
+				label: 'Ajustes',
 				items: [...entries(tweaks, /^WPFTweaks/), ...entries(tweaks, /^WPFToggle/)],
 				presetScope: 'WPFTweaks',
 				presets: ['Standard', 'Minimal', 'Advanced'].map((name) => ({ label: name, keys: presets[name] ?? [] })),
 			},
-			{ id: 'features', label: 'Features', items: entries(features, /^WPFFeature/) },
+			{ id: 'features', label: 'Recursos', items: entries(features, /^WPFFeature/) },
 			{
 				id: 'appx',
-				label: 'AppX removal',
+				label: 'Remoção de AppX',
 				items: entries(appx, /^WPFAppx/),
 				presetScope: 'WPFAppx',
-				presets: [{ label: 'Default removals', keys: presets.AppxDefault ?? [] }],
+				presets: [{ label: 'Remoções padrão', keys: presets.AppxDefault ?? [] }],
 			},
 		],
 	};
 }
 
-// WinUtil exports with Out-File, which writes UTF-16 with a byte order mark in Windows PowerShell 5.1.
+// O WinUtil exporta com Out-File, que grava UTF-16 com uma marca de ordem de byte no Windows PowerShell 5.1.
 async function readText(file) {
 	const bytes = new Uint8Array(await file.arrayBuffer());
 	let encoding = 'utf-8';
@@ -73,7 +73,7 @@ async function readText(file) {
 	return new TextDecoder(encoding).decode(bytes);
 }
 
-// Current exports are a key or an array of keys; older ones grouped them under WPFInstall, WPFTweaks and so on.
+// As exportações atuais são uma chave ou uma matriz de chaves; as antigas as agrupavam sob WPFInstall, WPFTweaks e assim por diante.
 function readConfig(json) {
 	if (typeof json === 'string') return [json];
 	if (Array.isArray(json)) return json.filter((key) => typeof key === 'string');
@@ -83,7 +83,7 @@ function readConfig(json) {
 		.filter((key) => typeof key === 'string');
 }
 
-// WinUtil sorts categories by name; the z__ prefix is only there to push the advanced ones last.
+// O WinUtil ordena as categorias por nome; o prefixo z__ só serve para empurrar as avançadas para o fim.
 function groupByCategory(items) {
 	const groups = new Map();
 	for (const item of items) {
@@ -130,31 +130,31 @@ export default function ConfigBuilder() {
 	const loadKeys = useCallback(
 		(loaded, source) => {
 			const skipped = loaded.filter((key) => !known.has(key));
-			// Like WinUtil's import, a file or link with nothing usable in it leaves the current selection alone.
+			// Como a importação do WinUtil, um arquivo ou link sem nada aproveitável não altera a seleção atual.
 			if (skipped.length === loaded.length) {
 				const text = loaded.length
-					? `None of the keys in ${source} are in WinUtil ${catalog.release.tag}: ${skipped.join(', ')}`
-					: `${source} doesn't have any WinUtil selections in it.`;
+					? `Nenhuma das chaves em ${source} está no WinUtil ${catalog.release.tag}: ${skipped.join(', ')}`
+					: `${source} não contém nenhuma seleção do WinUtil.`;
 				setNotice({ kind: 'error', text });
 				return;
 			}
 			setSelected(new Set(loaded.filter((key) => known.has(key))));
 			if (skipped.length) {
-				const message = `Left out ${skipped.length} key(s) that WinUtil ${catalog.release.tag} doesn't have: ${skipped.join(', ')}`;
+				const message = `Foram omitidas ${skipped.length} chave(s) que o WinUtil ${catalog.release.tag} não possui: ${skipped.join(', ')}`;
 				setNotice({ kind: 'warning', text: message });
 			} else {
-				setNotice({ kind: 'info', text: `Loaded ${loaded.length} selection(s) from ${source}.` });
+				setNotice({ kind: 'info', text: `Carregadas ${loaded.length} seleção(ões) de ${source}.` });
 			}
 		},
 		[catalog, known]
 	);
 
-	// A shared link opened in a tab that's already on this page only changes the hash, so listen for that too.
+	// Um link compartilhado aberto em uma aba que já está nesta página só altera o hash; por isso, escute isso também.
 	useEffect(() => {
 		if (!catalog) return;
 		const loadLink = () => {
 			const linked = readConfigLink(window.location.hash);
-			if (linked) loadKeys(linked, 'the link');
+			if (linked) loadKeys(linked, 'o link');
 		};
 		loadLink();
 		window.addEventListener('hashchange', loadLink);
@@ -167,10 +167,10 @@ export default function ConfigBuilder() {
 				<p className="wu-builder-status">
 					{error === RATE_LIMITED
 						? RATE_LIMITED
-						: `Couldn't load the catalog from GitHub (${error}). You can still export a config from WinUtil itself.`}
+						: `Não foi possível carregar o catálogo do GitHub (${error}). Você ainda pode exportar uma configuração pelo próprio WinUtil.`}
 				</p>
 				<button type="button" className="wu-builder-button" onClick={() => setAttempt((count) => count + 1)}>
-					Try again
+					Tentar novamente
 				</button>
 			</div>
 		);
@@ -179,14 +179,14 @@ export default function ConfigBuilder() {
 	if (!catalog) {
 		return (
 			<div className="wu-builder not-content">
-				<p className="wu-builder-status">Loading the catalog from the latest WinUtil release…</p>
+				<p className="wu-builder-status">Carregando o catálogo da versão mais recente do WinUtil…</p>
 			</div>
 		);
 	}
 
 	const keys = order.filter((key) => selected.has(key));
 	const json = JSON.stringify(keys, null, 2);
-	// The catalog can stay cached across a release, so run the release that recognizes its keys.
+	// O catálogo pode ficar em cache entre versões, então execute a versão que reconhece suas chaves.
 	const script = `https://github.com/RamonMods/WinUtil/releases/download/${catalog.release.tag}/winutil.ps1`;
 	const command = `& ([ScriptBlock]::Create((irm "${script}"))) -Config "$env:USERPROFILE\\Downloads\\${fileName}"`;
 	const tab = catalog.tabs.find((candidate) => candidate.id === tabId);
@@ -203,7 +203,7 @@ export default function ConfigBuilder() {
 			return next;
 		});
 
-	// Like the preset buttons in WinUtil, a preset replaces that part of the selection rather than adding to it.
+	// Como os botões de predefinição no WinUtil, uma predefinição substitui essa parte da seleção em vez de acrescentar a ela.
 	const applyPreset = (preset) =>
 		setSelected((current) => {
 			const next = new Set([...current].filter((key) => !key.startsWith(tab.presetScope)));
@@ -224,7 +224,7 @@ export default function ConfigBuilder() {
 		try {
 			loaded = readConfig(JSON.parse(await readText(file)));
 		} catch {
-			setNotice({ kind: 'error', text: `${file.name} isn't a WinUtil config file.` });
+			setNotice({ kind: 'error', text: `${file.name} não é um arquivo de configuração do WinUtil.` });
 			return;
 		}
 		loadKeys(loaded, file.name);
@@ -238,19 +238,19 @@ export default function ConfigBuilder() {
 			setCopied(null);
 			const text =
 				what === 'link'
-					? "Couldn't copy the link, but it's in the address bar."
-					: "Couldn't copy to the clipboard. Select the text and copy it instead.";
+					? 'Não foi possível copiar o link, mas ele está na barra de endereço.'
+					: 'Não foi possível copiar para a área de transferência. Selecione o texto e copie-o manualmente.';
 			setNotice({ kind: 'error', text });
 		}
 	};
 
-	// The address bar gets the link as well, so it can still be copied from there if the clipboard is blocked.
+	// A barra de endereço também recebe o link, então ele ainda pode ser copiado dali se a área de transferência estiver bloqueada.
 	const share = () => {
 		window.history.replaceState(null, '', configLink(keys));
 		copy('link', window.location.href);
 	};
 
-	// The first download uses the name the command already shows; later ones get a new name and update the command.
+	// O primeiro download usa o nome que o comando já mostra; os seguintes recebem um novo nome e atualizam o comando.
 	const download = () => {
 		const name = savedJson === null ? fileName : configFileName();
 		setFileName(name);
@@ -258,7 +258,7 @@ export default function ConfigBuilder() {
 		const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
 		const link = Object.assign(document.createElement('a'), { href: url, download: name });
 		link.click();
-		// Revoking in the same task can cancel the download before the browser has read the blob.
+		// Revogar na mesma tarefa pode cancelar o download antes de o navegador ler o blob.
 		setTimeout(() => URL.revokeObjectURL(url));
 	};
 
@@ -266,17 +266,17 @@ export default function ConfigBuilder() {
 		<div className="wu-builder not-content">
 			<div className="wu-builder-toolbar">
 				<p className="wu-builder-release">
-					Catalog from{' '}
+					Catálogo de{' '}
 					<a href={catalog.release.url} target="_blank" rel="noreferrer">
 						WinUtil {catalog.release.tag}
 					</a>
 				</p>
 				<label className="wu-builder-button">
-					Open a config
+					Abrir uma configuração
 					<input type="file" accept=".json,application/json" onChange={openConfig} />
 				</label>
 			</div>
-			{/* Always rendered, so screen readers announce a notice when it appears. */}
+			{/* Sempre renderizado, para que leitores de tela anunciem um aviso quando ele aparece. */}
 			<p role="status" className={notice ? `wu-builder-notice wu-builder-notice--${notice.kind}` : 'sr-only'}>
 				{notice?.text}
 			</p>
@@ -304,8 +304,8 @@ export default function ConfigBuilder() {
 						<Icon name="magnifier" />
 						<input
 							type="search"
-							placeholder={`Search ${tab.label.toLowerCase()}`}
-							aria-label={`Search ${tab.label.toLowerCase()}`}
+							placeholder={`Buscar ${tab.label.toLowerCase()}`}
+							aria-label={`Buscar ${tab.label.toLowerCase()}`}
 							autoComplete="off"
 							spellCheck="false"
 							value={query}
@@ -318,13 +318,13 @@ export default function ConfigBuilder() {
 						</button>
 					))}
 					<button type="button" className="wu-builder-chip" onClick={clearTab}>
-						Clear
+						Limpar
 					</button>
 				</div>
 				<div className="wu-builder-list">
 					{groups.length === 0 && (
 						<p className="wu-builder-status">
-							No {tab.label.toLowerCase()} match "{query.trim()}".
+							Nenhum resultado em {tab.label.toLowerCase()} para "{query.trim()}".
 						</p>
 					)}
 					{groups.map((group) => (
@@ -346,7 +346,7 @@ export default function ConfigBuilder() {
 												target="_blank"
 												rel="noreferrer"
 												className="wu-builder-item-link"
-												aria-label={`More about ${item.name}`}
+												aria-label={`Mais sobre ${item.name}`}
 											>
 												<Icon name="external" />
 											</a>
@@ -362,16 +362,16 @@ export default function ConfigBuilder() {
 			<div className="wu-builder-output">
 				{keys.some((key) => key.startsWith('WPFAppx')) && (
 					<p className="wu-builder-notice wu-builder-notice--warning">
-						This config removes the selected AppX packages when run. It does not install or keep them.
+						Esta configuração remove os pacotes AppX selecionados quando executada. Ela não os instala nem os mantém.
 					</p>
 				)}
 				<div className="wu-builder-output-header">
-					<span>{keys.length} selected</span>
+					<span>{keys.length} selecionado(s)</span>
 					<button type="button" className="wu-builder-button" disabled={!keys.length} onClick={() => copy('json', json)}>
-						{copied === 'json' ? 'Copied' : 'Copy JSON'}
+						{copied === 'json' ? 'Copiado' : 'Copiar JSON'}
 					</button>
 					<button type="button" className="wu-builder-button" disabled={!keys.length} onClick={share}>
-						{copied === 'link' ? 'Copied' : 'Share link'}
+						{copied === 'link' ? 'Copiado' : 'Compartilhar link'}
 					</button>
 					<button
 						type="button"
@@ -379,19 +379,19 @@ export default function ConfigBuilder() {
 						disabled={!keys.length}
 						onClick={download}
 					>
-						Download config
+						Baixar configuração
 					</button>
 				</div>
 				{keys.length > 0 ? (
 					<pre className="wu-builder-json">{json}</pre>
 				) : (
-					<p className="wu-builder-status">Select at least one item to build a config.</p>
+					<p className="wu-builder-status">Selecione pelo menos um item para criar uma configuração.</p>
 				)}
-				{/* The command runs the last downloaded file, so it can't be copied until that file has this selection. */}
+				{/* O comando executa o último arquivo baixado, então só pode ser copiado quando esse arquivo tiver esta seleção. */}
 				<p className="wu-builder-hint">
 					{savedJson === json
-						? 'Then run this in an elevated PowerShell window:'
-						: 'Download the config, then run this in an elevated PowerShell window:'}
+						? 'Em seguida, execute isto em uma janela do PowerShell elevada:'
+						: 'Baixe a configuração e execute isto em uma janela do PowerShell elevada:'}
 				</p>
 				<div className="wu-builder-command">
 					<code>{command}</code>
@@ -401,7 +401,7 @@ export default function ConfigBuilder() {
 						disabled={savedJson !== json}
 						onClick={() => copy('command', command)}
 					>
-						{copied === 'command' ? 'Copied' : 'Copy'}
+						{copied === 'command' ? 'Copiado' : 'Copiar'}
 					</button>
 				</div>
 			</div>

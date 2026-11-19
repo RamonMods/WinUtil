@@ -19,7 +19,7 @@ function Invoke-WPFundoall {
         param($Tweaks)
 
         $total = @($Tweaks).Count
-        Write-WinUtilLog -Component "Tweaks" -Message "Undo tweaks requested: $total selected tweak(s)."
+        Write-WinUtilLog -Component "Tweaks" -Message "Desfazer ajustes solicitado: $total ajuste(s) selecionado(s)."
 
         for ($i = 0; $i -lt $total; $i++) {
             $tweakLabel = Get-WinUtilTweakDisplayName -Key $Tweaks[$i]

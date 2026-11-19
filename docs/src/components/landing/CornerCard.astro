@@ -1,5 +1,5 @@
 ---
-// Feature card: icon beside the title and description, with small corner brackets instead of a shadow/colored border.
+// Cartão de recurso: ícone ao lado do título e da descrição, com pequenos cantoneiras em vez de sombra/borda colorida.
 import { Icon } from '@astrojs/starlight/components';
 import type { ComponentProps } from 'astro/types';
 
@@ -12,13 +12,13 @@ const { icon, title } = Astro.props;
 ---
 
 <div class="wu-corner-card">
-	{/* Corner brackets decoration. */}
+	{/* Decoração com cantoneiras. */}
 	<span class="wu-corner-marks" aria-hidden="true">
 		<span class="mark top-left" /><span class="mark top-right" /><span class="mark bottom-left" /><span
 			class="mark bottom-right"
 		/>
 	</span>
-	{/* Icon badge + heading + description. */}
+	{/* Selo de ícone + título + descrição. */}
 	<div class="wu-corner-card-icon">
 		<Icon name={icon} size="1.25rem" />
 	</div>
@@ -42,7 +42,7 @@ const { icon, title } = Astro.props;
 				box-shadow 0.4s ease;
 		}
 
-		/* Highlight for the card being read (set by the landing page script). */
+		/* Destaque para o cartão que está sendo lido (definido pelo script da página inicial). */
 		.wu-corner-card.is-active {
 			border-color: hsl(var(--wu-accent-h) 100% 51% / 0.6);
 			box-shadow: 0 24px 48px -24px hsl(var(--wu-accent-h) 100% 51% / 0.45);
@@ -51,7 +51,7 @@ const { icon, title } = Astro.props;
 			background: var(--sl-color-accent);
 		}
 
-		/* Corner brackets decoration (four small L-shaped marks). */
+		/* Decoração com cantoneiras (quatro pequenas marcas em forma de L). */
 		.wu-corner-marks {
 			position: absolute;
 			inset: 0;
@@ -109,7 +109,7 @@ const { icon, title } = Astro.props;
 			right: 0;
 		}
 
-		/* Icon badge + heading + description. */
+		/* Selo de ícone + título + descrição. */
 		.wu-corner-card-icon {
 			grid-row: span 2;
 			display: flex;
@@ -132,7 +132,7 @@ const { icon, title } = Astro.props;
 		}
 	}
 
-	/* Unlayered, so these beat Starlight's content heading sizes and block spacing. */
+	/* Sem camada, para prevalecer sobre os tamanhos de título e o espaçamento de blocos do conteúdo do Starlight. */
 	.wu-corner-card h3 {
 		display: flex;
 		align-items: center;

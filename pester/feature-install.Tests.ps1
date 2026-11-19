@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Feature Installation
+# Testes - Instalação de recursos
 #===========================================================================
 
 BeforeAll {
@@ -45,7 +45,7 @@ Describe "Invoke-WinUtilFeatureInstall" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "enables every selected feature" {
+    It "habilita cada recurso selecionado" {
         Invoke-WinUtilFeatureInstall -CheckBox "WPFFeaturesMulti"
 
         Should -Invoke -CommandName Enable-WindowsOptionalFeature -Times 1 -Exactly -ParameterFilter {
@@ -56,7 +56,7 @@ Describe "Invoke-WinUtilFeatureInstall" {
         }
     }
 
-    It "continues with the remaining features when one fails" {
+    It "continua com os demais recursos quando um falha" {
         Mock Enable-WindowsOptionalFeature { throw "simulated missing feature" } -ParameterFilter {
             $FeatureName -eq "FeatureA"
         }
@@ -74,7 +74,7 @@ Describe "Invoke-WinUtilFeatureInstall" {
         }
     }
 
-    It "skips dependent scripts after an enable failure and allows the next selection" {
+    It "ignora scripts dependentes após uma falha de habilitação e permite a próxima seleção" {
         $script:sync.configs.feature.WPFFeaturesMulti | Add-Member -NotePropertyName InvokeScript -NotePropertyValue @("throw 'dependent command unavailable'")
         Mock Enable-WindowsOptionalFeature { throw "simulated missing feature" } -ParameterFilter {
             $FeatureName -eq "FeatureA"
@@ -94,7 +94,7 @@ Describe "Invoke-WinUtilFeatureInstall" {
         }
     }
 
-    It "runs the configured feature scripts" {
+    It "executa os scripts de recursos configurados" {
         Invoke-WinUtilFeatureInstall -CheckBox "WPFFeaturesScriptOnly"
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {

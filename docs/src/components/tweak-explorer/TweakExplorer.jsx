@@ -1,4 +1,4 @@
-// Shows what each tweak in the latest release changes, and what Undo puts back, without reading the raw JSON.
+// Mostra o que cada ajuste da versão mais recente altera e o que o Desfazer restaura, sem ler o JSON bruto.
 import { useEffect, useMemo, useState } from 'react';
 import Icon from '../docs/Icon.jsx';
 import { RATE_LIMITED, loadReleaseConfig } from '../../lib/winutil-release.js';
@@ -7,12 +7,12 @@ import './TweakExplorer.css';
 
 const PRESETS = ['Standard', 'Minimal', 'Advanced'];
 const CHANGES = [
-	{ id: 'registry', label: 'Registry' },
-	{ id: 'services', label: 'Services' },
+	{ id: 'registry', label: 'Registro' },
+	{ id: 'services', label: 'Serviços' },
 	{ id: 'script', label: 'Scripts' },
 ];
 
-// The scripts are stored indented to match the JSON around them.
+// Os scripts são armazenados com indentação para corresponder ao JSON ao redor.
 function dedent(blocks) {
 	return blocks
 		.map((block) => {
@@ -48,10 +48,10 @@ function toTweak(key, entry, presets) {
 			registry.some((item) => !item.Values && Object.hasOwn(item, 'OriginalValue')) ||
 			services.some((item) => Object.hasOwn(item, 'OriginalType')) || Boolean(undoScript)
 		),
-		// Dropdowns use manual state selection rather than the checkbox Undo action.
+		// As listas suspensas usam seleção manual de estado em vez da ação Desfazer da caixa de seleção.
 		oneWay: states.length
-			? 'No Undo action'
-			: appx.length ? 'AppX removal has no undo' : script && !undoScript ? 'Script has no undo' : null,
+			? 'Sem ação de desfazer'
+			: appx.length ? 'A remoção de AppX não tem desfazer' : script && !undoScript ? 'O script não tem desfazer' : null,
 		haystack: [
 			entry.Content,
 			entry.Description,
@@ -68,22 +68,22 @@ function toTweak(key, entry, presets) {
 }
 
 function registryValue(value) {
-	return value === '<RemoveEntry>' ? <em>removed</em> : value;
+	return value === '<RemoveEntry>' ? <em>removido</em> : value;
 }
 
 function TweakDetails({ tweak, picked, onPick }) {
-	const [applied, undone] = tweak.toggle ? ['When on', 'When off'] : ['Applied', 'Undo restores'];
+	const [applied, undone] = tweak.toggle ? ['Quando ativado', 'Quando desativado'] : ['Aplicado', 'Desfazer restaura'];
 	return (
 		<div className="wu-explorer-details">
 			{tweak.registry.length > 0 && (
 				<section>
-					<h4>Registry</h4>
+					<h4>Registro</h4>
 					<div className="wu-explorer-table">
 						<table>
 							<thead>
 								<tr>
-									<th>Value</th>
-									<th>Type</th>
+									<th>Valor</th>
+									<th>Tipo</th>
 									{(tweak.states.length ? tweak.states : [applied, undone]).map((label) => (
 										<th key={label}>{label}</th>
 									))}
@@ -96,7 +96,7 @@ function TweakDetails({ tweak, picked, onPick }) {
 											<span className="wu-explorer-path">{item.Path}\</span>
 											{item.Name}
 										</td>
-										<td data-label="Type">{item.Type}</td>
+										<td data-label="Tipo">{item.Type}</td>
 										{tweak.states.length ? (
 											tweak.states.map((state) => (
 												<td key={state} data-label={state}>{registryValue(item.Values[state])}</td>
@@ -114,20 +114,20 @@ function TweakDetails({ tweak, picked, onPick }) {
 					</div>
 					{tweak.states.length > 0 && (
 						<p className="wu-explorer-note">
-							Changes apply immediately when you choose a state in WinUtil. To revert, choose another state;
-							Undo Selected Tweaks does not manage this control.
+							As alterações são aplicadas imediatamente quando você escolhe um estado no WinUtil. Para reverter, escolha outro estado;
+							Desfazer ajustes selecionados não gerencia este controle.
 						</p>
 					)}
 				</section>
 			)}
 			{tweak.services.length > 0 && (
 				<section>
-					<h4>Services</h4>
+					<h4>Serviços</h4>
 					<div className="wu-explorer-table">
 						<table>
 							<thead>
 								<tr>
-									<th>Service</th>
+									<th>Serviço</th>
 									<th>{applied}</th>
 									<th>{undone}</th>
 								</tr>
@@ -144,35 +144,35 @@ function TweakDetails({ tweak, picked, onPick }) {
 						</table>
 					</div>
 					<p className="wu-explorer-note">
-						Applying skips a service whose startup type isn't the original one, so changes you made yourself are kept.
+						A aplicação ignora um serviço cujo tipo de inicialização não é o original, preservando as alterações feitas por você.
 					</p>
 				</section>
 			)}
 			{tweak.appx.length > 0 && (
 				<section>
-					<h4>Removes AppX packages</h4>
-					<p className="wu-explorer-note">{tweak.appx.join(', ')}. Undo does not reinstall them.</p>
+					<h4>Remove pacotes AppX</h4>
+					<p className="wu-explorer-note">{tweak.appx.join(', ')}. O desfazer não os reinstala.</p>
 				</section>
 			)}
 			{tweak.script && (
 				<details>
-					<summary>Script it runs</summary>
+					<summary>Script executado</summary>
 					<pre>{tweak.script}</pre>
 				</details>
 			)}
 			{tweak.undoScript && (
 				<details>
-					<summary>Undo script</summary>
+					<summary>Script de desfazer</summary>
 					<pre>{tweak.undoScript}</pre>
 				</details>
 			)}
 			<div className="wu-explorer-details-footer">
 				<code>{tweak.key}</code>
 				<span className="wu-explorer-details-actions">
-					{tweak.link && <a href={tweak.link}>Reference page</a>}
+					{tweak.link && <a href={tweak.link}>Página de referência</a>}
 					{/^WPF(?:Tweaks|Toggle)/.test(tweak.key) && (
 						<button type="button" className="wu-explorer-chip" aria-pressed={picked} onClick={onPick}>
-							{picked ? 'Added to config' : 'Add to config'}{tweak.toggle ? ' (When on)' : ''}
+							{picked ? 'Adicionado à configuração' : 'Adicionar à configuração'}{tweak.toggle ? ' (Quando ativado)' : ''}
 						</button>
 					)}
 				</span>
@@ -212,7 +212,7 @@ export default function TweakExplorer() {
 		};
 	}, [attempt]);
 
-	// WinUtil sorts categories by name; the z__ prefix is only there to push the advanced ones last.
+	// O WinUtil ordena as categorias por nome; o prefixo z__ só serve para empurrar as avançadas para o fim.
 	const categories = useMemo(
 		() => [...new Set(data?.tweaks.map((tweak) => tweak.category))].sort((a, b) => a.localeCompare(b)),
 		[data]
@@ -222,10 +222,10 @@ export default function TweakExplorer() {
 		return (
 			<div className="wu-explorer not-content">
 				<p className="wu-explorer-status">
-					{error === RATE_LIMITED ? RATE_LIMITED : `Couldn't load the tweaks from GitHub (${error}).`}
+					{error === RATE_LIMITED ? RATE_LIMITED : `Não foi possível carregar os ajustes do GitHub (${error}).`}
 				</p>
 				<button type="button" className="wu-explorer-chip" onClick={() => setAttempt((count) => count + 1)}>
-					Try again
+					Tentar novamente
 				</button>
 			</div>
 		);
@@ -234,7 +234,7 @@ export default function TweakExplorer() {
 	if (!data) {
 		return (
 			<div className="wu-explorer not-content">
-				<p className="wu-explorer-status">Loading the tweaks from the latest WinUtil release…</p>
+				<p className="wu-explorer-status">Carregando os ajustes da versão mais recente do WinUtil…</p>
 			</div>
 		);
 	}
@@ -272,8 +272,8 @@ export default function TweakExplorer() {
 					<Icon name="magnifier" />
 					<input
 						type="search"
-						placeholder="Search names, registry paths, services, and scripts"
-						aria-label="Search tweaks"
+						placeholder="Buscar nomes, caminhos do registro, serviços e scripts"
+						aria-label="Buscar ajustes"
 						autoComplete="off"
 						spellCheck="false"
 						value={query}
@@ -281,29 +281,29 @@ export default function TweakExplorer() {
 					/>
 				</div>
 				<div className="wu-explorer-filter-row">
-					<span>Category</span>
-					{chip('All', !category, () => setCategory(null))}
+					<span>Categoria</span>
+					{chip('Todas', !category, () => setCategory(null))}
 					{categories.map((name) =>
 						chip(name.replace(/^z__/, ''), category === name, () => setCategory(category === name ? null : name))
 					)}
 				</div>
 				<div className="wu-explorer-filter-row">
-					<span>Preset</span>
-					{chip('Any', !preset, () => setPreset(null))}
+					<span>Predefinição</span>
+					{chip('Qualquer', !preset, () => setPreset(null))}
 					{PRESETS.map((name) => chip(name, preset === name, () => setPreset(preset === name ? null : name)))}
 				</div>
 				<div className="wu-explorer-filter-row">
-					<span>Changes</span>
+					<span>Alterações</span>
 					{CHANGES.map(({ id, label }) => chip(label, changes.has(id), () => toggleIn(setChanges, id)))}
-					{chip('Has undo', hasUndoOnly, () => setHasUndoOnly(!hasUndoOnly))}
+					{chip('Com desfazer', hasUndoOnly, () => setHasUndoOnly(!hasUndoOnly))}
 				</div>
 			</div>
 
 			<p className="wu-explorer-note">
-				An undo action may reset defaults or reinstall software without restoring deleted data or your previous settings.
+				Uma ação de desfazer pode restaurar os padrões ou reinstalar programas sem recuperar dados excluídos nem suas configurações anteriores.
 			</p>
 			<p className="wu-explorer-status">
-				Showing {visible.length} of {data.tweaks.length} tweaks from{' '}
+				Exibindo {visible.length} de {data.tweaks.length} ajustes do{' '}
 				<a href={data.release.url} target="_blank" rel="noreferrer">
 					WinUtil {data.release.tag}
 				</a>
@@ -311,7 +311,7 @@ export default function TweakExplorer() {
 					<>
 						{' · '}
 						<a href={configLink([...picked])}>
-							Open {picked.size} {picked.size === 1 ? 'tweak' : 'tweaks'} in the Config Builder
+							Abrir {picked.size} {picked.size === 1 ? 'ajuste' : 'ajustes'} no Construtor de Configurações
 						</a>
 					</>
 				)}
@@ -339,16 +339,16 @@ export default function TweakExplorer() {
 											</span>
 										))}
 										{tweak.registry.length > 0 && (
-											<span className="wu-explorer-badge">{tweak.registry.length} registry</span>
+											<span className="wu-explorer-badge">{tweak.registry.length} registro(s)</span>
 										)}
 										{tweak.services.length > 0 && (
 											<span className="wu-explorer-badge">
-												{tweak.services.length} {tweak.services.length === 1 ? 'service' : 'services'}
+												{tweak.services.length} {tweak.services.length === 1 ? 'serviço' : 'serviços'}
 											</span>
 										)}
 										{tweak.script && <span className="wu-explorer-badge">Script</span>}
 										{tweak.hasUndo && (
-											<span className="wu-explorer-badge wu-explorer-badge--good">Has undo</span>
+											<span className="wu-explorer-badge wu-explorer-badge--good">Com desfazer</span>
 										)}
 										{tweak.oneWay && (
 											<span className="wu-explorer-badge wu-explorer-badge--warn">{tweak.oneWay}</span>
@@ -368,7 +368,7 @@ export default function TweakExplorer() {
 					);
 				})}
 			</ul>
-			{visible.length === 0 && <p className="wu-explorer-status">No tweaks match these filters.</p>}
+			{visible.length === 0 && <p className="wu-explorer-status">Nenhum ajuste corresponde a estes filtros.</p>}
 		</div>
 	);
 }

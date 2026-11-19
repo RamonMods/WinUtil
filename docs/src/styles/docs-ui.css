@@ -1,10 +1,10 @@
-/* Docs UI styles. Unlayered so they win over Starlight's layered component styles. */
+/* Estilos da interface dos documentos. Sem camada, para prevalecer sobre os estilos em camadas dos componentes do Starlight. */
 
 .docs-icon {
 	flex: none;
 }
 
-/* Shared square icon button (social links, theme toggle, menu buttons). */
+/* Botão quadrado de ícone compartilhado (links sociais, alternador de tema, botões de menu). */
 .docs-icon-button,
 .docs-theme-toggle {
 	display: inline-grid;
@@ -32,7 +32,7 @@
 	height: 1.15rem;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Cabeçalho ---------- */
 .docs-header {
 	display: flex;
 	align-items: center;
@@ -42,7 +42,7 @@
 .docs-header-title {
 	display: flex;
 	min-width: 0;
-	/* Clip long titles; the padding/negative margin keeps the focus ring visible. */
+	/* Corta títulos longos; o preenchimento/margem negativa mantém o anel de foco visível. */
 	overflow: clip;
 	padding: 0.25rem;
 	margin: -0.25rem;
@@ -64,7 +64,7 @@
 	}
 }
 
-/* Search trigger: a full field on wide screens, an icon button on narrow ones. */
+/* Gatilho da busca: um campo completo em telas largas e um botão de ícone em telas estreitas. */
 .docs-search-trigger {
 	display: inline-flex;
 	align-items: center;
@@ -124,7 +124,7 @@
 	}
 }
 
-/* Top navigation. */
+/* Navegação superior. */
 .docs-nav {
 	display: flex;
 	align-items: center;
@@ -181,7 +181,7 @@
 .docs-nav-dropdown {
 	position: relative;
 }
-/* Keeps hover alive across the gap between trigger and menu. */
+/* Mantém o hover ativo através do espaço entre o gatilho e o menu. */
 .docs-nav-dropdown::after {
 	content: '';
 	position: absolute;
@@ -246,7 +246,7 @@
 	opacity: 0.6;
 }
 
-/* Narrow splash pages: site navigation panel under the header. */
+/* Páginas de abertura estreitas: painel de navegação do site abaixo do cabeçalho. */
 .docs-nav-panel {
 	position: fixed;
 	inset-inline: 0;
@@ -283,7 +283,7 @@
 	color: var(--sl-color-white);
 }
 
-/* Social links: wide screens only (narrow screens get them in the menu footer). */
+/* Links sociais: apenas em telas largas (em telas estreitas ficam no rodapé do menu). */
 .docs-social {
 	display: none;
 }
@@ -294,13 +294,13 @@
 	}
 }
 
-/* Theme toggle: show the icon for the theme you'd switch to. */
+/* Alternador de tema: mostra o ícone do tema para o qual você mudará. */
 :root:not([data-theme='light']) .docs-theme-moon,
 :root[data-theme='light'] .docs-theme-sun {
 	display: none;
 }
 
-/* Sidebar menu button (narrow screens). */
+/* Botão de menu da barra lateral (telas estreitas). */
 .docs-menu-toggle {
 	position: fixed;
 	top: calc((var(--sl-nav-height) - 2.25rem) / 2);
@@ -322,16 +322,16 @@
 		display: none;
 	}
 }
-/* The replacement toggle must retain Starlight's background scroll lock. */
+/* O alternador substituto deve manter o bloqueio de rolagem de fundo do Starlight. */
 body[data-mobile-menu-expanded] {
 	overflow: hidden;
 }
-/* Starlight shows the sidebar via the toggle's sibling selector, which the island wrapper breaks. */
+/* O Starlight mostra a barra lateral por meio do seletor de irmão do alternador, que o wrapper da ilha quebra. */
 body[data-mobile-menu-expanded] .sidebar-pane {
 	--sl-sidebar-visibility: visible;
 }
 
-/* ---------- Sidebar ---------- */
+/* ---------- Barra lateral ---------- */
 .docs-sidebar {
 	padding-bottom: 1rem;
 }
@@ -424,7 +424,7 @@ body[data-mobile-menu-expanded] .sidebar-pane {
 	opacity: 0.6;
 }
 
-/* ---------- Table of contents (wide screens) ---------- */
+/* ---------- Índice (telas largas) ---------- */
 .docs-toc h2 {
 	margin: 0 0 0.75rem;
 	font-size: var(--sl-text-xs);
@@ -474,7 +474,7 @@ body[data-mobile-menu-expanded] .sidebar-pane {
 	color: var(--sl-color-white);
 }
 
-/* ---------- Table of contents (narrow screens) ---------- */
+/* ---------- Índice (telas estreitas) ---------- */
 .docs-mobile-toc {
 	position: fixed;
 	z-index: var(--sl-z-index-toc);
@@ -488,7 +488,7 @@ body[data-mobile-menu-expanded] .sidebar-pane {
 		inset-inline-start: var(--sl-content-inline-start, 0);
 	}
 }
-/* Starlight's wrapper already hides it here; this keeps the bar hidden without relying on that. */
+/* O wrapper do Starlight já oculta aqui; isso mantém a barra oculta sem depender disso. */
 @media (min-width: 72rem) {
 	.docs-mobile-toc {
 		display: none;
@@ -557,7 +557,7 @@ body[data-mobile-menu-expanded] .sidebar-pane {
 	color: var(--sl-color-accent-high);
 }
 
-/* ---------- Search dialog ---------- */
+/* ---------- Diálogo de busca ---------- */
 html[data-search-open] {
 	overflow: hidden;
 }
@@ -732,7 +732,7 @@ html[data-search-open] {
 	}
 }
 
-/* ---------- Page title ---------- */
+/* ---------- Título da página ---------- */
 .docs-page-title {
 	margin-top: 1rem;
 }
@@ -761,7 +761,7 @@ html[data-search-open] {
 	color: var(--sl-color-white);
 }
 
-/* ---------- Pagination ---------- */
+/* ---------- Paginação ---------- */
 .docs-pagination {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));

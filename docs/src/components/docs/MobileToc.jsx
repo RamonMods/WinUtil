@@ -10,7 +10,7 @@ export default function MobileToc({ items }) {
 	const rootRef = useRef(null);
 	const current = flat.find((item) => item.slug === active);
 
-	// Hidden from 72rem up, so it closes there instead of coming back open when the window narrows again.
+	// Fica oculto a partir de 72rem, então ele se fecha nesse ponto em vez de reabrir quando a janela volta a ficar estreita.
 	useEffect(() => {
 		const wide = matchMedia('(min-width: 72rem)');
 		const close = () => setOpen(false);
@@ -25,7 +25,7 @@ export default function MobileToc({ items }) {
 		};
 		const onKey = (event) => {
 			if (event.key !== 'Escape') return;
-			// Closing hides a focused link in the list, so focus goes back to the toggle.
+			// Ao fechar, o link focado na lista fica oculto, então o foco volta para o alternador.
 			if (rootRef.current?.contains(document.activeElement)) rootRef.current.querySelector('button').focus();
 			setOpen(false);
 		};
@@ -37,16 +37,16 @@ export default function MobileToc({ items }) {
 		};
 	}, [open]);
 
-	// Closes once focus moves out of it, so tabbing on doesn't leave the list over the page.
+	// Fecha quando o foco sai dele, para que navegar com Tab não deixe a lista sobre a página.
 	const closeOnBlur = (event) => {
 		if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
 	};
 
 	return (
-		<nav className="docs-mobile-toc" aria-label="On this page" ref={rootRef} onBlur={closeOnBlur}>
+		<nav className="docs-mobile-toc" aria-label="Nesta página" ref={rootRef} onBlur={closeOnBlur}>
 			<button type="button" className="docs-mobile-toc-toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
 				<span className="docs-mobile-toc-label">
-					On this page
+					Nesta página
 					<Icon name="right-caret" className="docs-mobile-toc-caret" />
 				</span>
 				<span className="docs-mobile-toc-current">{current?.text}</span>

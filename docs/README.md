@@ -1,32 +1,32 @@
-# WinUtil Docs
+# Documentação do WinUtil
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+[![Feito com Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
-Documentation site for [WinUtil](https://github.com/ChrisTitusTech/winutil), built with [Astro](https://astro.build), [Starlight](https://starlight.astro.build), and [React](https://react.dev). Served at [winutil.christitus.com](https://winutil.christitus.com/).
+Site de documentação do [WinUtil](https://github.com/RamonMods/WinUtil), feito com [Astro](https://astro.build), [Starlight](https://starlight.astro.build) e [React](https://react.dev).
 
-Starlight handles routing, Markdown rendering, and the search index. The site's own UI is plugged in through Starlight's component overrides: static parts (sidebar, page titles, pagination) are Astro components, and interactive parts (search, menus, table of contents, theme toggle) are React islands.
+O Starlight cuida das rotas, da renderização do Markdown e do índice de busca. A interface do site entra pelos overrides de componente do Starlight: as partes estáticas (barra lateral, títulos, paginação) são componentes Astro, e as interativas (busca, menus, sumário, troca de tema) são ilhas React.
 
-## 🚀 Project Structure
+## 🚀 Estrutura do projeto
 
 ```
 .
-├── public/                  # Static files served as-is (favicon, robots.txt, social preview)
+├── public/                  # Arquivos servidos como estão (favicon, robots.txt, preview social)
 ├── src/
-│   ├── assets/              # Images used by pages (optimized at build time); icons/ holds the docs UI icons
+│   ├── assets/              # Imagens das páginas (otimizadas no build); icons/ guarda os ícones da interface
 │   ├── components/
-│   │   ├── config-builder/  # Config Builder page component and styles
-│   │   ├── docs/            # Docs UI: React islands (search, menus, table of contents, theme toggle) and the sidebar list
-│   │   ├── landing/         # Landing-page-only components (stats, cards, motion wrapper)
-│   │   ├── overrides/       # Starlight component overrides (thin .astro wrappers, registered in astro.config.mjs)
-│   │   ├── react-bits/      # Vendored React Bits components (see react-bits/LICENSE.md)
-│   │   ├── tweak-explorer/  # Tweak Explorer page component and styles
+│   │   ├── config-builder/  # Componente e estilos da página Config Builder
+│   │   ├── docs/            # Interface dos docs: ilhas React (busca, menus, sumário, tema) e a lista da barra lateral
+│   │   ├── landing/         # Componentes só da landing page (estatísticas, cards, wrapper de animação)
+│   │   ├── overrides/       # Overrides do Starlight (wrappers .astro finos, registrados no astro.config.mjs)
+│   │   ├── react-bits/      # Componentes do React Bits copiados para cá (veja react-bits/LICENSE.md)
+│   │   ├── tweak-explorer/  # Componente e estilos da página Tweak Explorer
 │   │   └── YouTubeEmbed.astro
 │   ├── content/
-│   │   └── docs/            # Pages (.md/.mdx); code-reference/tweaks and /features are generated
-│   ├── hooks/               # React hooks
-│   ├── lib/                 # Shared code (site links, release config loader, config links)
-│   ├── scripts/             # Client-side scripts (landing-page GSAP + Lenis motion)
-│   ├── styles/              # Global CSS: theme, fonts, docs UI
+│   │   └── docs/            # Páginas (.md/.mdx); code-reference/tweaks e /features são gerados
+│   ├── hooks/               # Hooks React
+│   ├── lib/                 # Código compartilhado (links do site, leitor de release, links de configuração)
+│   ├── scripts/             # Scripts do cliente (animação GSAP + Lenis da landing)
+│   ├── styles/              # CSS global: tema, fontes, interface dos docs
 │   └── content.config.ts
 ├── astro.config.mjs
 ├── docker-compose.yml
@@ -35,45 +35,45 @@ Starlight handles routing, Markdown rendering, and the search index. The site's 
 └── tsconfig.json
 ```
 
-Each `.md` or `.mdx` file in `src/content/docs/` becomes a route based on its file path. Don't hand-edit `src/content/docs/code-reference/tweaks/` or `.../features/`; they're generated from `config/tweaks.json` and `config/feature.json` by `tools/devdocs-generator.ps1`.
+Cada arquivo `.md` ou `.mdx` em `src/content/docs/` vira uma rota conforme o caminho do arquivo. Não edite à mão `src/content/docs/code-reference/tweaks/` nem `.../features/`: eles são gerados a partir de `config/tweaks.json` e `config/feature.json` pelo `tools/devdocs-generator.ps1`.
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+Imagens podem ficar em `src/assets/` e ser embutidas no Markdown com link relativo.
 
-Static assets, like favicons, can be placed in the `public/` directory.
+Arquivos estáticos, como favicons, ficam em `public/`.
 
-## 🧰 Tools Pages
+## 🧰 Páginas de ferramentas
 
-The Config Builder (`/config-builder/`) and Tweak Explorer (`/tweak-explorer/`) load `config/*.json` in the browser from the latest stable WinUtil release, through `src/lib/winutil-release.js`. They don't use the copy in this repo, because `-Config` runs the stable release and rejects any key it doesn't know.
+O Config Builder (`/config-builder/`) e o Tweak Explorer (`/tweak-explorer/`) carregam os `config/*.json` no navegador a partir da última versão estável do WinUtil, por meio de `src/lib/winutil-release.js`. Eles não usam a cópia deste repositório, porque o `-Config` roda a versão estável e rejeita qualquer chave que não conheça.
 
-New apps, tweaks, toggles, features, AppX packages, and categories appear in the next browser session after a release is marked Latest. No docs rebuild is needed, and pre-releases are ignored. A few things are hard-coded and need updating here when WinUtil changes them:
+Apps, ajustes, toggles, recursos, pacotes AppX e categorias novos aparecem na próxima sessão do navegador depois que uma versão é marcada como Latest. Não precisa rebuildar os docs, e pré-versões são ignoradas. Algumas coisas são fixas no código e precisam ser atualizadas aqui quando o WinUtil mudar:
 
-- Preset names (`Standard`, `Minimal`, `Advanced`, `AppxDefault`), in `ConfigBuilder.jsx` and `TweakExplorer.jsx`.
-- The key prefixes WinUtil can import (`WPFInstall`, `WPFTweaks`, `WPFToggle`, `WPFFeature`, `WPFAppx`), in `ConfigBuilder.jsx`. These mirror `Update-WinUtilSelections`.
-- The tweak fields the explorer shows (`registry`, `service`, `InvokeScript`, `UndoScript`, `appx`, and registry `Values` mappings for `Combobox` entries), in `TweakExplorer.jsx`. These mirror `Invoke-WinUtilTweaks` and `Set-WinUtilRegistryComboState`.
+- Nomes de predefinição (`Standard`, `Minimal`, `Advanced`, `AppxDefault`), em `ConfigBuilder.jsx` e `TweakExplorer.jsx`.
+- Os prefixos de chave que o WinUtil importa (`WPFInstall`, `WPFTweaks`, `WPFToggle`, `WPFFeature`, `WPFAppx`), em `ConfigBuilder.jsx`. Eles espelham o `Update-WinUtilSelections`.
+- Os campos de ajuste que o explorer mostra (`registry`, `service`, `InvokeScript`, `UndoScript`, `appx` e os mapeamentos de `Values` de registro para entradas `Combobox`), em `TweakExplorer.jsx`. Eles espelham o `Invoke-WinUtilTweaks` e o `Set-WinUtilRegistryComboState`.
 
-Config Builder links carry the selected keys in the URL hash, e.g. `/config-builder/#WPFInstall7zip,WPFTweaksTelemetry`. `src/lib/config-link.js` builds and reads them for both pages. People post these links on Discord and the forums, so keep reading the existing format if you ever change it.
+Os links do Config Builder carregam as chaves selecionadas no hash da URL, por exemplo `/config-builder/#WPFInstall7zip,WPFTweaksTelemetry`. O `src/lib/config-link.js` monta e lê esses links nas duas páginas. As pessoas compartilham esses links, então mantenha a leitura do formato atual se um dia mudar.
 
-If you add another tool page, or anything else that has to be kept in sync by hand, list it here and in SPEC.md's Docs Site section.
+Se você adicionar outra página de ferramenta, ou qualquer coisa que precise ser mantida em sincronia à mão, liste aqui e na seção Docs Site do SPEC.md.
 
-## 🧞 Commands
+## 🧞 Comandos
 
-All commands run in a Docker container — there's no need to install Node or npm dependencies on your host. This is deliberate, not just convenience: npm/pnpm/yarn have seen a steady stream of supply-chain attacks (malicious `postinstall`/`preinstall` scripts, credential-stealing packages), so `npm install` and friends never run directly on a contributor's machine here. Note the container still has read-write access to this `docs/` directory (it's bind-mounted for live reload), so this only contains a compromised package to the project folder plus the container itself — it doesn't reach the rest of your host (SSH keys, other repos, cloud credentials elsewhere on disk). Don't keep real secrets in `docs/` as a result.
+Todos os comandos rodam num container Docker — não precisa instalar Node nem dependências npm na sua máquina. Isso é de propósito: npm/pnpm/yarn sofrem ataques de cadeia de suprimentos com frequência (scripts `postinstall`/`preinstall` maliciosos, pacotes que roubam credenciais), então `npm install` e similares nunca rodam direto na máquina de quem contribui. O container tem acesso de leitura e escrita a esta pasta `docs/` (ela é montada para o live reload), então o estrago de um pacote comprometido fica na pasta do projeto e no container — não chega ao resto do host (chaves SSH, outros repositórios, credenciais na nuvem). Por isso, não guarde segredo real em `docs/`.
 
-[Docker](https://www.docker.com/) (with Compose) is required — install Docker Desktop (or Docker Engine + the `docker compose` plugin on Linux) and make sure the daemon is running before using any of the commands below.
+É preciso ter [Docker](https://www.docker.com/) (com Compose) — instale o Docker Desktop (ou Docker Engine + plugin `docker compose` no Linux) e deixe o daemon rodando antes dos comandos abaixo.
 
-All commands are run from the `docs/` directory, from a terminal:
+Todos os comandos rodam a partir da pasta `docs/`, num terminal:
 
-| Command                                          | Action                                           |
+| Comando                                          | O que faz                                        |
 | :------------------------------------------------ | :----------------------------------------------- |
-| `docker compose build`                             | Builds the dev image (needed after Dockerfile or dependency changes) |
-| `docker compose up winutil-astro`                                | Starts local dev server at `localhost:4321`      |
-| `docker compose run --rm winutil-astro npm run build`   | Build the production site to `./dist/`           |
-| `docker compose run --rm --service-ports winutil-astro npm run preview -- --host 0.0.0.0` | Preview the build locally, before deploying      |
-| `docker compose run --rm winutil-astro npm run astro ...` | Run CLI commands like `astro add`, `astro check` |
-| `docker compose run --rm winutil-astro npx --no-install playwright ...` | Run Playwright against Chromium, Firefox, or WebKit |
-| `docker compose down`                              | Stop and remove the dev container                |
+| `docker compose build`                             | Monta a imagem de desenvolvimento (necessário após mudar o Dockerfile ou dependências) |
+| `docker compose up winutil-astro`                                | Sobe o servidor local em `localhost:4321`      |
+| `docker compose run --rm winutil-astro npm run build`   | Gera o site de produção em `./dist/`           |
+| `docker compose run --rm --service-ports winutil-astro npm run preview -- --host 0.0.0.0` | Pré-visualiza o build localmente, antes de publicar |
+| `docker compose run --rm winutil-astro npm run astro ...` | Roda comandos da CLI, como `astro add` e `astro check` |
+| `docker compose run --rm winutil-astro npx --no-install playwright ...` | Roda o Playwright no Chromium, Firefox ou WebKit |
+| `docker compose down`                              | Para e remove o container de desenvolvimento     |
 
-Source files are bind-mounted into the container, so edits on the host are picked up immediately by the dev server — no rebuild needed for normal content or code changes. After changing `package.json`, `package-lock.json`, or the `Dockerfile`, rebuild the image *and* drop the `node_modules` volume, since Docker only seeds a named volume from the image the first time it's created — a plain rebuild leaves the old `node_modules` in place:
+Os arquivos ficam montados no container, então edições na máquina aparecem na hora no servidor — não precisa rebuildar para mudanças normais de conteúdo ou código. Depois de mudar `package.json`, `package-lock.json` ou o `Dockerfile`, rebuilda a imagem **e** apaga o volume `node_modules`, porque o Docker só popula um volume nomeado a partir da imagem na primeira criação — um rebuild simples mantém o `node_modules` antigo:
 
 ```sh
 docker compose build
@@ -81,10 +81,10 @@ docker compose down -v
 docker compose up winutil-astro
 ```
 
-The image also installs Playwright's browsers for the `@playwright/test` version pinned in `package.json`, so bumping that version needs the same rebuild to fetch matching browsers.
+A imagem também instala os navegadores do Playwright na versão de `@playwright/test` fixada no `package.json`, então subir essa versão exige o mesmo rebuild para baixar os navegadores correspondentes.
 
-The first `docker compose up` (or any command before an image exists) builds the image and runs `npm ci` from scratch, which can take a few minutes. Subsequent runs reuse the cached image and start almost immediately.
+O primeiro `docker compose up` (ou qualquer comando antes de existir imagem) monta a imagem e roda `npm ci` do zero, o que pode levar alguns minutos. Depois disso a imagem em cache é reaproveitada e sobe quase na hora.
 
-## 👀 Want to learn more?
+## 👀 Quer saber mais?
 
-Check out [Starlight's docs](https://starlight.astro.build/) (including its [component overrides guide](https://starlight.astro.build/guides/overriding-components/)), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+Veja a [documentação do Starlight](https://starlight.astro.build/) (inclusive o [guia de overrides de componente](https://starlight.astro.build/guides/overriding-components/)), leia a [documentação do Astro](https://docs.astro.build) ou entre no [Discord do Astro](https://astro.build/chat).

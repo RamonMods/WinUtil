@@ -1,5 +1,5 @@
 ---
-// Sidebar override: the docs navigation plus Starlight's mobile menu footer.
+// Substituição da barra lateral: a navegação dos documentos mais o rodapé do menu mobile do Starlight.
 import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
 import SidebarList from '../docs/SidebarList.astro';
 import '../../styles/docs-ui.css';
@@ -7,7 +7,7 @@ import '../../styles/docs-ui.css';
 const { sidebar } = Astro.locals.starlightRoute;
 ---
 
-<nav class="docs-sidebar" aria-label="Docs">
+<nav class="docs-sidebar" aria-label="Documentação">
 	<SidebarList entries={sidebar} />
 </nav>
 
@@ -15,7 +15,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 	<MobileMenuFooter />
 </div>
 
-{/* Scroll the current page's link into view on long sidebars. */}
+{/* Traz o link da página atual para a área visível em barras laterais longas. */}
 <script is:inline>
 	(() => {
 		const pane = document.getElementById('starlight__sidebar');

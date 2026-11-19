@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - DNS
+# Testes - DNS
 #===========================================================================
 
 BeforeAll {
@@ -106,7 +106,7 @@ Describe "Set-WinUtilDNS" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "sets IPv4 and IPv6 DNS server addresses separately and applies DoH templates" {
+    It "define os endereços de servidores DNS IPv4 e IPv6 separadamente e aplica modelos DoH" {
         $result = Set-WinUtilDNS -DNSProvider "Cloudflare"
 
         $result | Should -BeTrue
@@ -132,7 +132,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Clear-DnsClientCache -Times 1 -Exactly
     }
 
-    It "preserves DNS when Fastest has no successful probes" {
+    It "preserva o DNS quando Fastest não tem sondagens bem-sucedidas" {
         Mock Get-WinUtilDNSBenchmark {
             [pscustomobject]@{ Provider = 'Cloudflare'; LatencyMs = 9999 }
         }
@@ -142,14 +142,14 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke New-ItemProperty -Times 0 -Exactly
     }
 
-    It "preserves DNS when Fastest returns no results" {
+    It "preserva o DNS quando Fastest não retorna resultados" {
         Mock Get-WinUtilDNSBenchmark { }
         Set-WinUtilDNS -DNSProvider 'Fastest' | Should -BeFalse
         Should -Invoke Get-NetAdapter -Times 0 -Exactly
         Should -Invoke Set-DnsClientServerAddress -Times 0 -Exactly
     }
 
-    It "applies the successful Fastest provider through the existing DNS and DoH path" {
+    It "aplica o provedor Fastest bem-sucedido pelo caminho existente de DNS e DoH" {
         Mock Get-WinUtilDNSBenchmark {
             [pscustomobject]@{ Provider = 'Cloudflare'; LatencyMs = 12 }
             [pscustomobject]@{ Provider = 'Google'; LatencyMs = 9999 }
@@ -161,7 +161,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke Add-DnsClientDohServerAddress -Times 4 -Exactly
     }
 
-    It "updates an existing DoH entry with the selected provider settings" {
+    It "atualiza uma entrada DoH existente com as configurações do provedor selecionado" {
         Mock Get-DnsClientDohServerAddress {
             if ($ServerAddress -eq "1.1.1.1") {
                 return [pscustomobject]@{ ServerAddress = $ServerAddress }
@@ -180,7 +180,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Add-DnsClientDohServerAddress -Times 3 -Exactly
     }
 
-    It "filters empty DNS server addresses" {
+    It "filtra endereços de servidores DNS vazios" {
         Set-WinUtilDNS -DNSProvider "DohOnlyNoSecondary"
 
         Should -Invoke -CommandName Set-DnsClientServerAddress -Times 1 -Exactly -ParameterFilter {
@@ -196,7 +196,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Add-DnsClientDohServerAddress -Times 2 -Exactly
     }
 
-    It "applies the matching DoH template to secondary resolvers" {
+    It "aplica o modelo DoH correspondente aos resolvedores secundários" {
         Set-WinUtilDNS -DNSProvider "DohOnlyProvider"
 
         Should -Invoke -CommandName Add-DnsClientDohServerAddress -Times 2 -Exactly -ParameterFilter {
@@ -209,7 +209,7 @@ Describe "Set-WinUtilDNS" {
         }
     }
 
-    It "does not apply a DoH-only provider when DoH is unsupported" {
+    It "não aplica um provedor somente DoH quando o DoH não é compatível" {
         Mock Get-Command { return $null } -ParameterFilter { $Name -eq "Add-DnsClientDohServerAddress" }
 
         $result = Set-WinUtilDNS -DNSProvider "DohOnlyProvider"
@@ -222,7 +222,7 @@ Describe "Set-WinUtilDNS" {
         }
     }
 
-    It "does not change adapter DNS when DoH registration fails" {
+    It "não altera o DNS do adaptador quando o registro DoH falha" {
         Mock Add-DnsClientDohServerAddress { throw "DoH registration failed" }
 
         $result = Set-WinUtilDNS -DNSProvider "DohOnlyProvider"
@@ -236,7 +236,7 @@ Describe "Set-WinUtilDNS" {
         }
     }
 
-    It "falls back to plain DNS when optional DoH registration fails" {
+    It "recorre ao DNS comum quando o registro opcional do DoH falha" {
         Mock Add-DnsClientDohServerAddress { throw "DoH registration failed" }
 
         $result = Set-WinUtilDNS -DNSProvider "Cloudflare"
@@ -253,7 +253,7 @@ Describe "Set-WinUtilDNS" {
         }
     }
 
-    It "resets DNS to DHCP and removes the applied DoH configuration" {
+    It "redefine o DNS para DHCP e remove a configuração DoH aplicada" {
         Mock Test-Path { return $true } -ParameterFilter { $Path -like "*DohInterfaceSettings*" }
         Mock Get-ChildItem {
             if ($Path -like "*\Doh6") {
@@ -300,7 +300,7 @@ Describe "Set-WinUtilDNS" {
         Should -Invoke -CommandName Remove-DnsClientDohServerAddress -Times 4 -Exactly
     }
 
-    It "catches non-terminating DNS setter failures so the tweak runspace can continue" {
+    It "captura falhas não terminantes na definição de DNS para que o runspace do ajuste possa continuar" {
         Mock Set-DnsClientServerAddress { Write-Error "DNS failed" -ErrorAction $ErrorAction }
 
         $result = Set-WinUtilDNS -DNSProvider "Cloudflare"
@@ -313,7 +313,7 @@ Describe "Set-WinUtilDNS" {
         }
     }
 
-    It "returns failure for an unknown DNS provider" {
+    It "retorna falha para um provedor DNS desconhecido" {
         $result = Set-WinUtilDNS -DNSProvider "Unknown"
 
         $result | Should -BeFalse

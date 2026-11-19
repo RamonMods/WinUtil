@@ -1,18 +1,18 @@
 function Test-WinUtilPackageManager {
     <#
     .SYNOPSIS
-        Checks if WinGet and/or Choco are installed.
+        Verifica se o WinGet e/ou o Choco estão instalados.
     .PARAMETER winget
-        Check if WinGet is installed.
+        Verifica se o WinGet está instalado.
     .PARAMETER choco
-        Check if Chocolatey is installed.
+        Verifica se o Chocolatey está instalado.
     #>
     Param(
         [System.Management.Automation.SwitchParameter]$winget,
         [System.Management.Automation.SwitchParameter]$choco
     )
 
-    # Handle missing switch - callers rely on the return value
+    # Trata a ausência do parâmetro - os chamadores dependem do valor retornado
     if (-not $winget -and -not $choco) { return "not-installed" }
 
     $cmds = @()

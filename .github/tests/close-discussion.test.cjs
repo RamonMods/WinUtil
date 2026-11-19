@@ -54,7 +54,7 @@ function run(lookup, close) {
   };
 }
 
-test('looks up the discussion number and closes the returned node ID', () => {
+test('busca o número da discussão e fecha o ID do nó retornado', () => {
   const result = run(
     { data: { repository: { discussion: { id: 'D_node' } } } },
     { data: { closeDiscussion: { discussion: { closed: true } } } }
@@ -67,13 +67,13 @@ test('looks up the discussion number and closes the returned node ID', () => {
   assert.match(result.output, /Successfully closed discussion #123/);
 });
 
-test('does not close when the GraphQL lookup fails', () => {
+test('não fecha quando a busca GraphQL falha', () => {
   const result = run({ errors: [{ message: 'Not found' }] }, {});
   assert.equal(result.requests.length, 1);
   assert.match(result.output, /Warning: Failed to look up discussion #123/);
 });
 
-test('reports GraphQL mutation failures instead of claiming success', () => {
+test('relata falhas na mutação GraphQL em vez de afirmar sucesso', () => {
   const result = run(
     { data: { repository: { discussion: { id: 'D_node' } } } },
     { errors: [{ message: 'Not authorized' }] }

@@ -1,14 +1,14 @@
 function New-WinUtilFossBadge {
     <#
         .SYNOPSIS
-            Creates the FOSS marker: the open source keyhole on a green backdrop
+            Cria o marcador FOSS: o buraco de fechadura de código aberto sobre um fundo verde
         .DESCRIPTION
-            Returns a fresh element on every call, because a WPF element can only have one parent.
-            The artwork is authored in a 22x22 box and scaled by the Viewbox, so callers only pick a size.
+            Retorna um elemento novo a cada chamada, porque um elemento WPF só pode ter um pai.
+            A arte é criada em uma caixa de 22x22 e escalada pelo Viewbox, portanto os chamadores só escolhem um tamanho.
         .PARAMETER Size
-            Edge length of the badge in pixels
+            Comprimento da borda do selo em pixels
         .PARAMETER Round
-            Use a full circle instead of the corner triangle, for the legend rather than an app entry
+            Usa um círculo completo em vez do triângulo no canto, para a legenda em vez de uma entrada de aplicativo
     #>
     param(
         [double]$Size = 24,
@@ -26,14 +26,14 @@ function New-WinUtilFossBadge {
 
     if ($Round) {
         $backdrop.Data = [Windows.Media.EllipseGeometry]::new([Windows.Point]::new(11, 11), 11, 11)
-        # Keyhole centred in the circle, which has room for a larger ring than the triangle does
+        # Buraco de fechadura centralizado no círculo, que tem espaço para um anel maior do que o triângulo
         $keyhole.Data = [Windows.Media.Geometry]::Parse("M 7.673,15.751 A 5.8,5.8 0 1 1 14.327,15.751")
         $keyhole.StrokeThickness = 3.4
     } else {
-        # Triangle filling the top right corner, its outer corner rounded to match AppEntryBorderStyle
+        # Triângulo preenchendo o canto superior direito, com o canto externo arredondado para combinar com AppEntryBorderStyle
         $backdrop.Data = [Windows.Media.Geometry]::Parse("M 0,0 L 17,0 A 5,5 0 0 1 22,5 L 22,22 Z")
-        # Keyhole centred on the triangle's incentre (15.56, 6.44) so it keeps the same
-        # 1.8 clearance from all three edges
+        # Buraco de fechadura centralizado no incentro do triângulo (15.56, 6.44) para manter a mesma
+        # folga de 1.8 em relação às três bordas
         $keyhole.Data = [Windows.Media.Geometry]::Parse("M 13.61,9.225 A 3.4,3.4 0 1 1 17.51,9.225")
         $keyhole.StrokeThickness = 2.4
     }
@@ -47,7 +47,7 @@ function New-WinUtilFossBadge {
     $badge.Width = $Size
     $badge.Height = $Size
     $badge.Child = $artwork
-    $badge.ToolTip = "Free and Open Source Software"
+    $badge.ToolTip = "Software Livre e de Código Aberto"
 
     return $badge
 }

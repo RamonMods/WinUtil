@@ -9,14 +9,14 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="sl-flex">
-	{/* Edit link + last-updated timestamp, and prev/next pagination. */}
+	{/* Link de edição + data da última atualização e paginação anterior/próxima. */}
 	<div class="meta sl-flex">
 		<EditLink />
 		<LastUpdated />
 	</div>
 	<Pagination />
 
-	{/* "Built with Starlight" credit (only shown if Starlight's `credits` config is enabled). */}
+	{/* Crédito "Built with Starlight" (exibido apenas se a configuração `credits` do Starlight estiver ativada). */}
 	{
 		config.credits && (
 			<a class="kudos sl-flex" href="https://starlight.astro.build">
@@ -25,13 +25,13 @@ const year = new Date().getFullYear();
 		)
 	}
 
-	{/* Copyright line. */}
+	{/* Linha de direitos autorais. */}
 	<div class="site-footer-copyright">© {year} <a href="https://github.com/RamonMods/WinUtil">RamonMods</a>. Todos os direitos reservados. · <a href="https://pixgg.com/ramon">Apoiar via Pix</a></div>
 </footer>
 
 <style>
 	@layer starlight.core {
-		/* Footer layout: stacked meta row + pagination. */
+		/* Layout do rodapé: linha de metadados empilhada + paginação. */
 		footer {
 			flex-direction: column;
 			gap: 1.5rem;
@@ -48,7 +48,7 @@ const year = new Date().getFullYear();
 			margin-inline-start: auto;
 		}
 
-		/* "Built with Starlight" credit link. */
+		/* Link de crédito "Built with Starlight". */
 		.kudos {
 			align-items: center;
 			gap: 0.5em;
@@ -68,14 +68,14 @@ const year = new Date().getFullYear();
 		}
 	}
 
-	/* Collapse the meta/pagination rows entirely when they have nothing in them (e.g. editUrl: false and no prev/next), instead of leaving an empty gap. */
+	/* Recolhe totalmente as linhas de metadados/paginação quando não há nada nelas (ex.: editUrl: false e sem anterior/próxima), em vez de deixar um espaço vazio. */
 	footer .meta:empty,
 	footer :global(.pagination-links):empty {
 		display: none;
 		margin: 0;
 	}
 
-	/* Site-wide copyright line, matching the previous Hugo docs site's footer. The divider above it comes from Starlight's own .content-panel border. */
+	/* Linha de direitos autorais de todo o site, equivalente ao rodapé do antigo site de documentos em Hugo. O divisor acima vem da própria borda .content-panel do Starlight. */
 	.site-footer-copyright {
 		font-size: var(--sl-text-xs);
 		color: var(--sl-color-gray-3);

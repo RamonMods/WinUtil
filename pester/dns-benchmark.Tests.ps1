@@ -35,7 +35,7 @@ Describe 'Get-WinUtilDNSBenchmark' {
         Remove-Variable sync -Scope Script
     }
 
-    It 'only probes explicitly eligible unfiltered providers, including when an unknown provider is added' {
+    It 'sonda apenas provedores explicitamente elegíveis e sem filtro, inclusive quando um provedor desconhecido é adicionado' {
         $script:sync.configs.dns | Add-Member NoteProperty UnknownProvider ([pscustomobject]@{ Primary = '192.0.2.1' })
         $results = @(Get-WinUtilDNSBenchmark)
         $results.Count | Should -Be 2
@@ -49,7 +49,7 @@ Describe 'Get-WinUtilDNSBenchmark' {
         $script:disposed | Should -Be 2
     }
 
-    It 'disposes timed out probes and marks them unavailable' {
+    It 'descarta as sondagens que expiraram e as marca como indisponíveis' {
         $script:probeCompleted = $false
         $results = @(Get-WinUtilDNSBenchmark)
         @($results | Where-Object LatencyMs -eq 9999).Count | Should -Be 2
@@ -57,7 +57,7 @@ Describe 'Get-WinUtilDNSBenchmark' {
         $script:ended | Should -Be 0
     }
 
-    It 'does not treat EndConnect failures as successful latency measurements' {
+    It 'não trata falhas de EndConnect como medições de latência bem-sucedidas' {
         $script:connectFails = $true
         $results = @(Get-WinUtilDNSBenchmark)
         @($results | Where-Object LatencyMs -eq 9999).Count | Should -Be 2
@@ -65,14 +65,14 @@ Describe 'Get-WinUtilDNSBenchmark' {
         $script:ended | Should -Be 2
     }
 
-    It 'returns no results when no providers are eligible' {
+    It 'não retorna resultados quando nenhum provedor é elegível' {
         $script:sync.configs.dns.Google.BenchmarkEligible = $false
         $script:sync.configs.dns.Cloudflare.BenchmarkEligible = $false
         @(Get-WinUtilDNSBenchmark).Count | Should -Be 0
         Should -Invoke New-Object -Times 0 -Exactly
     }
 
-    It 'rejects infinite or out-of-range timeouts' {
+    It 'rejeita tempos limite infinitos ou fora da faixa' {
         { Get-WinUtilDNSBenchmark -TimeoutMs -1 } | Should -Throw
         { Get-WinUtilDNSBenchmark -TimeoutMs 10000 } | Should -Throw
     }

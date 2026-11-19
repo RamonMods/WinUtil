@@ -13,11 +13,11 @@ BeforeAll {
     }
     function Invoke-WPFSelectedCheckboxesUpdate { param($type, $checkboxName) }
 
-    # 1x1 transparent PNG
+    # PNG transparente de 1x1
     $script:pixel = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
 }
 
-Describe "App entries" {
+Describe "Entradas de aplicativos" {
     BeforeEach {
         $script:WinUtilAppIconCache = $null
         $script:sync = [Hashtable]::Synchronized(@{
@@ -38,8 +38,8 @@ Describe "App entries" {
         if ($script:sync.Form) { $script:sync.Form.Close() }
     }
 
-    Context "with a bundled icon" {
-        It "draws the icon as a frozen bitmap with no download" {
+    Context "com um ícone incorporado" {
+        It "desenha o ícone como um bitmap congelado sem download" {
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
             $content = $checkbox.Content
             $logo = $content.Children[0].Child.Children[1]
@@ -54,7 +54,7 @@ Describe "App entries" {
             Should -Invoke Invoke-WPFRunspace -Times 0
         }
 
-        It "decodes each icon once and shares it between entries" {
+        It "decodifica cada ícone uma vez e o compartilha entre as entradas" {
             $script:sync.configs.applicationsHashtable.WPFInstallOther = $script:sync.configs.applicationsHashtable.WPFInstallTestApp
             $first = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
             $second = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
@@ -62,7 +62,7 @@ Describe "App entries" {
             [object]::ReferenceEquals($first.Content.Children[0].Child.Children[1].Source, $second.Content.Children[0].Child.Children[1].Source) | Should -BeTrue
         }
 
-        It "returns the check boxes in the order of the keys and places every card" {
+        It "retorna as caixas de seleção na ordem das chaves e posiciona cada cartão" {
             foreach ($name in "B", "C") {
                 $script:sync.configs.applicationsHashtable["WPFInstall$name"] = [pscustomobject]@{ content = "App $name"; description = ""; link = ""; foss = $false }
             }
@@ -72,7 +72,7 @@ Describe "App entries" {
             @($script:panel.Children.Tag) | Should -Be @("WPFInstallC", "WPFInstallTestApp", "WPFInstallB")
         }
 
-        It "keeps names that need escaping intact" {
+        It "mantém intactos os nomes que precisam de escape" {
             $script:sync.configs.applicationsHashtable.WPFInstallTestApp.content = 'R&D "Tool" <beta>'
             $script:sync.configs.applicationsHashtable.WPFInstallTestApp.description = "Fast & `"free`"`nsecond line"
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
@@ -81,7 +81,7 @@ Describe "App entries" {
             $script:panel.Children[0].ToolTip | Should -Be "Fast & `"free`"`nsecond line`n`nPreset key: WPFInstallTestApp"
         }
 
-        It "marks free and open source apps with the corner badge only" {
+        It "marca aplicativos livres e de código aberto apenas com o selo no canto" {
             $script:sync.configs.applicationsHashtable.WPFInstallB = [pscustomobject]@{ content = "Free app"; description = ""; link = ""; foss = $true }
             Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp, WPFInstallB | Out-Null
 
@@ -90,14 +90,14 @@ Describe "App entries" {
             $script:panel.Children[1].Child.Children[1] | Should -BeOfType ([Windows.Controls.Viewbox])
         }
 
-        It "checks an app that was already selected" {
+        It "marca um aplicativo que já estava selecionado" {
             $script:sync.selectedApps = @("WPFInstallTestApp")
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
 
             $checkbox.IsChecked | Should -BeTrue
         }
 
-        It "needs no handler of its own: the category panel's shared handlers see the check box change" {
+        It "não precisa de manipulador próprio: os manipuladores compartilhados do painel de categoria detectam a mudança da caixa de seleção" {
             $handlers = Get-WinUtilAppEntryHandlers
             $script:panel.AddHandler([Windows.Controls.Primitives.ToggleButton]::CheckedEvent, $handlers.Checked)
             $script:panel.AddHandler([Windows.Controls.Primitives.ToggleButton]::UncheckedEvent, $handlers.Unchecked)
@@ -114,8 +114,8 @@ Describe "App entries" {
         }
     }
 
-    Context "without a bundled icon" {
-        It "falls back to the favicon service for an app with no icon file" {
+    Context "sem um ícone incorporado" {
+        It "recorre ao serviço de favicon para um aplicativo sem arquivo de ícone" {
             $script:sync.configs.icons = [pscustomobject]@{}
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
             $logo = $checkbox.Content.Children[0].Child.Children[1]
@@ -126,14 +126,14 @@ Describe "App entries" {
             Should -Invoke Invoke-WPFRunspace -Times 0
         }
 
-        It "falls back to the favicon service when a bundled icon cannot be decoded" {
+        It "recorre ao serviço de favicon quando um ícone incorporado não pode ser decodificado" {
             $script:sync.configs.icons = [pscustomobject]@{ TestApp = "bm90IGEgcG5n" }
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
 
             $checkbox.Content.Children[0].Child.Children[1].Source.UriSource.AbsoluteUri | Should -BeLike "https://www.google.com/s2/favicons*"
         }
 
-        It "shows the letter fallback when WPF reports a download failure" {
+        It "mostra a letra como alternativa quando o WPF relata falha de download" {
             $script:sync.configs.icons = [pscustomobject]@{}
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
             $icon = $checkbox.Content.Children[0].Child
@@ -147,7 +147,7 @@ Describe "App entries" {
             $icon.Children[0].Visibility | Should -Be "Visible"
         }
 
-        It "keeps the letter fallback for apps without a website" {
+        It "mantém a letra como alternativa para aplicativos sem site" {
             $script:sync.configs.icons = [pscustomobject]@{}
             $script:sync.configs.applicationsHashtable.WPFInstallTestApp.link = $null
             $checkbox = Initialize-InstallAppEntries -TargetElement $script:panel -AppKeys WPFInstallTestApp
@@ -159,23 +159,23 @@ Describe "App entries" {
         }
     }
 
-    Context "the shipped icon set" {
+    Context "o conjunto de ícones incluído" {
         BeforeAll {
             $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
             $script:applicationKeys = (Get-Content (Join-Path $script:repoRoot "config/applications.json") -Raw | ConvertFrom-Json).PSObject.Properties.Name
             $script:iconFiles = Get-ChildItem (Join-Path $script:repoRoot "config/icons") -File
-            # What Compile.ps1 embeds: icon file name -> base64
+            # O que Compile.ps1 incorpora: nome do arquivo de ícone -> base64
             $embedded = [ordered]@{}
             foreach ($file in $script:iconFiles) { $embedded[$file.BaseName] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($file.FullName)) }
             $script:embeddedIcons = [pscustomobject]$embedded
         }
 
-        It "has an icon file named after every application it belongs to" {
+        It "tem um arquivo de ícone nomeado após cada aplicativo ao qual pertence" {
             $orphans = $script:iconFiles | Where-Object { $_.Extension -ne ".png" -or $script:applicationKeys -cnotcontains $_.BaseName } | ForEach-Object { $_.Name }
             $orphans | Should -BeNullOrEmpty
         }
 
-        It "has a 48px icon of at most 8 KB for every application, so the script stays small" {
+        It "tem um ícone de 48px de no máximo 8 KB para cada aplicativo, para que o script permaneça pequeno" {
             $script:sync.configs.icons = $script:embeddedIcons
             $problems = foreach ($key in $script:applicationKeys) {
                 $file = $script:iconFiles | Where-Object { $_.BaseName -ceq $key }
@@ -188,7 +188,7 @@ Describe "App entries" {
             $problems | Should -BeNullOrEmpty
         }
 
-        It "builds every application's entry in one parse" {
+        It "constrói a entrada de cada aplicativo em uma única análise" {
             $applications = Get-Content (Join-Path $script:repoRoot "config/applications.json") -Raw | ConvertFrom-Json
             $hashtable = @{}
             foreach ($property in $applications.PSObject.Properties) { $hashtable["WPFInstall$($property.Name)"] = $property.Value }
@@ -203,7 +203,7 @@ Describe "App entries" {
     }
 }
 
-Describe "Icon generation helper" {
+Describe "Auxiliar de geração de ícones" {
     BeforeAll {
         Add-Type -AssemblyName System.Drawing
         $script:iconHelperSource = Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")).Path "tools/New-WinUtilIcon.ps1"
@@ -226,7 +226,7 @@ Describe "Icon generation helper" {
         }
     }
 
-    It "uses the catalog key casing for a newly generated icon" {
+    It "usa a capitalização da chave do catálogo para um ícone recém-gerado" {
         & $script:iconHelper -Key "Brave" -Path $script:iconInput
 
         $icons = @(Get-ChildItem -LiteralPath (Join-Path $script:iconFixtureRoot "config/icons") -File)
@@ -234,7 +234,7 @@ Describe "Icon generation helper" {
         $icons[0].Name | Should -BeExactly "brave.png"
     }
 
-    It "rejects an unknown key before creating an icon" {
+    It "rejeita uma chave desconhecida antes de criar um ícone" {
         { & $script:iconHelper -Key "not-in-catalog" -Path $script:iconInput } |
             Should -Throw "'not-in-catalog' is not a key in config/applications.json."
 

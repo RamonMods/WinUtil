@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - UI Helpers During Headless (-Preset / -Config) Runs
+# Testes - Auxiliares de interface durante execuções headless (-Preset / -Config)
 #===========================================================================
 
 BeforeAll {
@@ -46,12 +46,12 @@ namespace Windows
     }
 }
 
-Describe "Invoke-WPFUIThread without a window" {
+Describe "Invoke-WPFUIThread sem janela" {
     AfterEach {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "does nothing when the automation paths run before the form is created" {
+    It "não faz nada quando os caminhos de automação executam antes do formulário ser criado" {
         $script:sync = [Hashtable]::Synchronized(@{})
         $script:blockRan = $false
 
@@ -59,7 +59,7 @@ Describe "Invoke-WPFUIThread without a window" {
         $script:blockRan | Should -BeFalse
     }
 
-    It "does nothing when the form exists but has no dispatcher" {
+    It "não faz nada quando o formulário existe mas não tem dispatcher" {
         $script:sync = [Hashtable]::Synchronized(@{ Form = [pscustomobject]@{ Dispatcher = $null } })
         $script:blockRan = $false
 
@@ -67,7 +67,7 @@ Describe "Invoke-WPFUIThread without a window" {
         $script:blockRan | Should -BeFalse
     }
 
-    It "still marshals onto the dispatcher when a window exists" {
+    It "ainda encaminha para o dispatcher quando existe uma janela" {
         $form = New-WinUtilFakeForm
         $script:sync = [Hashtable]::Synchronized(@{ Form = $form })
 

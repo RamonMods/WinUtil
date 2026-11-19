@@ -1,4 +1,4 @@
-name: Repo Contributors' Issue Triage Tools
+name: Ferramentas de triagem de issues para colaboradores do repositório
 
 on:
   issue_comment:
@@ -13,7 +13,7 @@ jobs:
       pull-requests: none
       contents: none
     steps:
-      - name: Process issue command
+      - name: Processar comando de issue
         uses: actions/github-script@v9
         with:
           script: |
@@ -30,7 +30,7 @@ jobs:
             ];
 
             if (context.payload.issue.pull_request) {
-              console.log("Pull request comments are not supported. Exiting.");
+              console.log("Comentários em pull requests não são suportados. Saindo.");
               return;
             }
 
@@ -38,7 +38,7 @@ jobs:
             const commentAuthor = comment.user;
 
             if (!trustedUsers.includes(commentAuthor.id)) {
-              console.log(`Comment author ${commentAuthor.login} is not a trusted user. Exiting.`);
+              console.log(`O autor do comentário ${commentAuthor.login} não é um usuário confiável. Saindo.`);
               return;
             }
 
@@ -62,7 +62,7 @@ jobs:
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: "This issue already has the 'needs-triage' label. Use /triageoff to remove it."
+                  body: "Esta issue já possui o rótulo 'needs-triage'. Use /triageoff para removê-lo."
                 });
               } else {
                 await github.rest.issues.addLabels({
@@ -75,7 +75,7 @@ jobs:
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: `${commentAuthor.login} requested maintainer triage for this issue.`
+                  body: `${commentAuthor.login} solicitou a triagem desta issue por um mantenedor.`
                 });
               }
             } else if (triageOffMatch) {
@@ -96,14 +96,14 @@ jobs:
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: `${commentAuthor.login} removed the triage request from this issue.`
+                  body: `${commentAuthor.login} removeu a solicitação de triagem desta issue.`
                 });
               } else {
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: "This issue is not currently marked for triage."
+                  body: "Esta issue não está marcada para triagem no momento."
                 });
               }
             } else if (notPlannedMatch) {
@@ -136,7 +136,7 @@ jobs:
                 owner,
                 repo,
                 issue_number: issueNumber,
-                body: `${commentAuthor.login} closed this issue as not planned.`
+                body: `${commentAuthor.login} fechou esta issue como não planejada.`
               });
             } else if (duplicateMatch) {
               const duplicateIssueNumber = Number(duplicateMatch[1]);
@@ -146,14 +146,14 @@ jobs:
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: "The duplicate target must be a positive issue number."
+                  body: "O alvo da duplicação deve ser um número de issue positivo."
                 });
               } else if (duplicateIssueNumber === issueNumber) {
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: "An issue cannot be marked as a duplicate of itself."
+                  body: "Uma issue não pode ser marcada como duplicada dela mesma."
                 });
               } else {
                 let duplicateIssue;
@@ -175,7 +175,7 @@ jobs:
                     owner,
                     repo,
                     issue_number: issueNumber,
-                    body: `#${duplicateIssueNumber} is a pull request, not an issue.`
+                    body: `#${duplicateIssueNumber} é um pull request, não uma issue.`
                   });
                 } else if (duplicateIssue) {
                   await github.rest.issues.update({
@@ -190,19 +190,19 @@ jobs:
                     owner,
                     repo,
                     issue_number: issueNumber,
-                    body: `${commentAuthor.login} closed this issue as a duplicate of #${duplicateIssueNumber}.`
+                    body: `${commentAuthor.login} fechou esta issue como duplicada de #${duplicateIssueNumber}.`
                   });
                 } else {
                   await github.rest.issues.createComment({
                     owner,
                     repo,
                     issue_number: issueNumber,
-                    body: `Issue #${duplicateIssueNumber} does not exist.`
+                    body: `A issue #${duplicateIssueNumber} não existe.`
                   });
                 }
               }
             } else {
-              console.log("Comment does not contain a supported issue command. Exiting.");
+              console.log("O comentário não contém um comando de issue suportado. Saindo.");
               return;
             }
 

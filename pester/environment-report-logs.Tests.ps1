@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Environment report log bundling
+# Testes - Agrupamento de logs do relatório de ambiente
 #===========================================================================
 
 BeforeAll {
@@ -24,7 +24,7 @@ Describe "Get-WinUtilRecentLogs" {
         (Get-Item $unrelatedPath).LastWriteTime = (Get-Date).AddDays(-1)
     }
 
-    It "includes only winutil_*.log files within the day window" {
+    It "inclui apenas arquivos winutil_*.log dentro da janela de dias" {
         $result = Get-WinUtilRecentLogs -Days 7 -LogDirectory $script:logDir
 
         $result | Should -Match "recent session log"
@@ -32,19 +32,19 @@ Describe "Get-WinUtilRecentLogs" {
         $result | Should -Not -Match "unrelated file"
     }
 
-    It "prefixes each included file with a header naming it" {
+    It "prefixa cada arquivo incluído com um cabeçalho que o identifica" {
         $result = Get-WinUtilRecentLogs -Days 7 -LogDirectory $script:logDir
 
         $result | Should -Match "=== winutil_2026-08-20_10-00-00\.log ==="
     }
 
-    It "returns an empty string when the log directory does not exist" {
+    It "retorna uma string vazia quando o diretório de logs não existe" {
         $result = Get-WinUtilRecentLogs -Days 7 -LogDirectory (Join-Path $TestDrive "missing")
 
         $result | Should -BeNullOrEmpty
     }
 
-    It "reads an exact log directory whose name contains wildcard characters" {
+    It "lê um diretório de logs exato cujo nome contém caracteres curinga" {
         $literalDirectory = Join-Path $TestDrive "logs[1]"
         [System.IO.Directory]::CreateDirectory($literalDirectory) | Out-Null
         $literalLog = Join-Path $literalDirectory "winutil_2026-08-20_11-00-00.log"
@@ -56,14 +56,14 @@ Describe "Get-WinUtilRecentLogs" {
         $result | Should -Match "literal path session log"
     }
 
-    It "fails the bundle when the log directory cannot be enumerated" {
+    It "falha no agrupamento quando o diretório de logs não pode ser enumerado" {
         Mock Get-ChildItem { throw "log directory access denied" }
 
         { Get-WinUtilRecentLogs -Days 7 -LogDirectory $script:logDir } |
             Should -Throw "*log directory access denied*"
     }
 
-    It "fails the bundle when a selected log disappears before it is read" {
+    It "falha no agrupamento quando um log selecionado desaparece antes de ser lido" {
         Mock Get-Content { throw "log disappeared" }
 
         { Get-WinUtilRecentLogs -Days 7 -LogDirectory $script:logDir } |

@@ -1,4 +1,4 @@
-name: Pre-Release WinUtil
+name: Pré-lançamento do WinUtil
 
 permissions:
   contents: write
@@ -6,7 +6,7 @@ permissions:
   pull-requests: write
 
 on:
-  workflow_dispatch: # Manual trigger added
+  workflow_dispatch: # Gatilho manual adicionado
 
 jobs:
   build-runspace:
@@ -16,29 +16,29 @@ jobs:
     env:
       CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout do repositório
         uses: actions/checkout@v7
 
-      - name: Generate Dev Docs and Update JSON Links
+      - name: Gerar documentação de dev e atualizar links JSON
         shell: pwsh
         run: |
           Set-Location tools
           ./devdocs-generator.ps1
 
-      - name: Compile project
+      - name: Compilar projeto
         shell: pwsh
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; ./Compile.ps1
-        continue-on-error: false # Directly fail the job on error, removing the need for a separate check
+        continue-on-error: false # Falha o job diretamente em caso de erro, eliminando a necessidade de uma verificação separada
 
-      - name: Create Pull Request for Updated Docs and JSON Links
+      - name: Criar pull request para documentação e links JSON atualizados
         id: cpr
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.AUTO_MERGE }}
           commit-message: 'chore: Update generated dev docs and JSON links'
           title: 'chore: Update generated dev docs and JSON links'
-          body: 'Automated update of generated documentation and JSON config links from pre-release build'
+          body: 'Atualização automática da documentação gerada e dos links de configuração JSON a partir do build de pré-lançamento'
           branch: docs-update
           delete-branch: true
           add-paths: |
@@ -50,13 +50,13 @@ jobs:
             documentation
             skip-changelog
 
-      - name: Check outputs
+      - name: Verificar saídas
         shell: bash
         run: |
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Número do pull request - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "URL do pull request - ${{ steps.cpr.outputs.pull-request-url }}"
 
-      - name: Set Version to Todays Date
+      - name: Definir versão como a data de hoje
         id: extract_version
         run: |
           $version = (Get-Date -Format "yy.MM.dd")
@@ -64,27 +64,27 @@ jobs:
           echo "version=$version" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
-      - name: Create Tag
+      - name: Criar tag
         id: create_tag
         run: |
           $tagExists = git tag -l $env:VERSION
           if ($tagExists -eq "") {
             git tag $env:VERSION
             if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to create tag $env:VERSION"
+              Write-Error "Falha ao criar a tag $env:VERSION"
               exit 1
             }
             git push origin $env:VERSION
             if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to push tag $env:VERSION"
+              Write-Error "Falha ao enviar a tag $env:VERSION"
               exit 1
             }
           } else {
-            Write-Host "Tag $env:VERSION already exists, skipping tag creation"
+            Write-Host "A tag $env:VERSION já existe; ignorando a criação da tag"
           }
         shell: pwsh
 
-      - name: Upload compiled script
+      - name: Enviar script compilado como artefato
         uses: actions/upload-artifact@v7
         with:
           name: winutil-ps1
@@ -94,15 +94,15 @@ jobs:
     needs: build-runspace
     runs-on: ubuntu-latest
     steps:
-      - name: Download compiled script
+      - name: Baixar script compilado
         uses: actions/download-artifact@v8
         with:
           name: winutil-ps1
 
-      - name: Set version from build job
+      - name: Definir versão a partir do job de compilação
         run: echo "VERSION=${{ needs.build-runspace.outputs.version }}" >> $GITHUB_ENV
 
-      - name: Generate Release Notes
+      - name: Gerar notas de lançamento
         id: generate_notes
         uses: release-drafter/release-drafter@v7
         env:
@@ -111,7 +111,7 @@ jobs:
           config-name: release-drafter.yml
           version: ${{ env.VERSION }}
 
-      - name: Remove Automated Updates from Release Notes
+      - name: Remover atualizações automáticas das notas de lançamento
         id: filter_notes
         shell: pwsh
         env:
@@ -126,16 +126,16 @@ jobs:
           $filteredNotes >> $env:GITHUB_OUTPUT
           $delimiter >> $env:GITHUB_OUTPUT
 
-      - name: Create and Upload Release
+      - name: Criar e publicar lançamento
         id: create_release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.VERSION }}
-          name: Pre-Release ${{ env.VERSION }}
+          name: Pré-lançamento ${{ env.VERSION }}
           body: |
             ${{ steps.filter_notes.outputs.body }}
 
-            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/RamonMods/winutil/${{ env.VERSION }}/winutil.ps1)
+            ![Downloads do GitHub (asset específico, tag específica)](https://img.shields.io/github/downloads/RamonMods/winutil/${{ env.VERSION }}/winutil.ps1)
           append_body: false
           files: ./winutil.ps1
           prerelease: true

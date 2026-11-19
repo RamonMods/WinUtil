@@ -1,17 +1,17 @@
 function Invoke-WPFUIElements {
     <#
     .SYNOPSIS
-        Adds UI elements to a specified Grid in the WinUtil GUI based on a JSON configuration.
+        Adiciona elementos de interface a um Grid especificado na GUI do WinUtil com base em uma configuração JSON.
     .PARAMETER configVariable
-        The variable/link containing the JSON configuration.
+        A variável/link que contém a configuração JSON.
     .PARAMETER targetGridName
-        The name of the grid to which the UI elements should be added.
+        O nome do grid ao qual os elementos de interface devem ser adicionados.
     .PARAMETER columncount
-        The number of columns to be used in the Grid. If not provided, a default value is used based on the panel.
+        O número de colunas a ser usado no Grid. Se não for informado, é usado um valor padrão com base no painel.
     .EXAMPLE
         Invoke-WPFUIElements -configVariable $sync.configs.applications -targetGridName "install" -columncount 5
     .NOTES
-        Future me/contributor: If possible, please wrap this into a runspace to make it load all panels at the same time.
+        Eu futuro/colaborador: se possível, encapsule isso em um runspace para carregar todos os painéis ao mesmo tempo.
     #>
 
     param(
@@ -24,8 +24,8 @@ function Invoke-WPFUIElements {
         [Parameter(Mandatory, Position = 2)]
         [int]$columncount,
 
-        # Let the interface answer between batches of entries. Only for content nobody is
-        # waiting on: a user who just clicked the tab is better served by finishing at once.
+        # Permite que a interface responda entre lotes de entradas. Apenas para conteúdo que
+        # ninguém está aguardando: quem acabou de clicar na aba prefere que tudo termine de uma vez.
         [switch]$Yield
     )
 
@@ -37,20 +37,20 @@ function Invoke-WPFUIElements {
     $ToggleButtonStyle = $window.FindResource("ToggleButtonStyle")
 
     if (!$borderstyle -or !$HoverTextBlockStyle -or !$ColorfulToggleSwitchStyle) {
-        throw "Failed to retrieve Styles using 'FindResource' from main window element."
+        throw "Falha ao recuperar os estilos usando 'FindResource' no elemento da janela principal."
     }
 
     $targetGrid = $window.FindName($targetGridName)
 
     if (!$targetGrid) {
-        throw "Failed to retrieve Target Grid by name, provided name: $targetGrid"
+        throw "Falha ao recuperar o Grid de destino pelo nome; nome informado: $targetGrid"
     }
 
-    # Clear existing ColumnDefinitions and Children
+    # Limpa as ColumnDefinitions e os filhos existentes
     $targetGrid.ColumnDefinitions.Clear() | Out-Null
     $targetGrid.Children.Clear() | Out-Null
 
-    # Add ColumnDefinitions to the target Grid
+    # Adiciona ColumnDefinitions ao Grid de destino
     for ($i = 0; $i -lt $columncount; $i++) {
         $colDef = New-Object Windows.Controls.ColumnDefinition
         $colDef.Width = New-Object System.Windows.GridLength([double]1, [System.Windows.GridUnitType]::Star)
@@ -60,7 +60,7 @@ function Invoke-WPFUIElements {
     $radioButtonGroups = @{}
     $organizedData = @{}
 
-    # Iterate through JSON data and organize by panel and category using generic lists
+    # Itera pelos dados JSON e organiza por painel e categoria usando listas genéricas
     foreach ($prop in $configVariable.PSObject.Properties) {
         $entryInfo = $prop.Value
 
@@ -93,29 +93,29 @@ function Invoke-WPFUIElements {
         $organizedData[$panel][$cat].Add($entryObject)
     }
 
-    # Initialize panel count
+    # Inicializa a contagem de painéis
     $panelcount = 0
 
-    # Iterate through 'organizedData' by panel, category, and application
+    # Itera por 'organizedData' por painel, categoria e aplicação
     $yieldClock = [System.Diagnostics.Stopwatch]::StartNew()
     foreach ($panelKey in ($organizedData.Keys | Sort-Object)) {
-        # Create a Border for each column
+        # Cria uma Border para cada coluna
         $border = New-Object Windows.Controls.Border
         $border.VerticalAlignment = "Stretch"
         [System.Windows.Controls.Grid]::SetColumn($border, $panelcount)
         $border.style = $borderstyle
         $targetGrid.Children.Add($border) | Out-Null
 
-        # Use a DockPanel to contain the content
+        # Usa um DockPanel para conter o conteúdo
         $dockPanelContainer = New-Object Windows.Controls.DockPanel
         $border.Child = $dockPanelContainer
 
-        # Create a StackPanel for application content controls
+        # Cria um StackPanel para os controles de conteúdo das aplicações
         $stackPanelContainer = New-Object Windows.Controls.StackPanel
         $stackPanelContainer.HorizontalAlignment = 'Stretch'
         $stackPanelContainer.VerticalAlignment = 'Stretch'
 
-        # Check if the target grid (or any ancestor) is already inside a ScrollViewer
+        # Verifica se o grid de destino (ou algum ancestral) já está dentro de um ScrollViewer
         $hasOuterScrollViewer = $false
         $currentElement = $targetGrid
         while ($null -ne $currentElement) {
@@ -127,12 +127,12 @@ function Invoke-WPFUIElements {
         }
 
         if ($hasOuterScrollViewer) {
-            # Add StackPanel directly to DockPanel without nesting a ScrollViewer
+            # Adiciona o StackPanel diretamente ao DockPanel sem aninhar um ScrollViewer
             [Windows.Controls.DockPanel]::SetDock($stackPanelContainer, [Windows.Controls.Dock]::Bottom)
             $dockPanelContainer.Children.Add($stackPanelContainer) | Out-Null
         }
         else {
-            # Create a ScrollViewer for targets that do not already have an outer ScrollViewer
+            # Cria um ScrollViewer para destinos que ainda não possuem um ScrollViewer externo
             $scrollViewer = New-Object Windows.Controls.ScrollViewer
             $scrollViewer.VerticalScrollBarVisibility = "Auto"
             $scrollViewer.HorizontalScrollBarVisibility = "Disabled"
@@ -145,7 +145,7 @@ function Invoke-WPFUIElements {
         }
         $panelcount++
 
-        # Now proceed with adding category labels and entries to $stackPanelContainer
+        # Agora segue adicionando rótulos de categoria e entradas a $stackPanelContainer
         foreach ($category in ($organizedData[$panelKey].Keys | Sort-Object)) {
 
             $label = New-Object Windows.Controls.Label
@@ -160,7 +160,7 @@ function Invoke-WPFUIElements {
             $stackPanelContainer.Children.Add($label) | Out-Null
             $sync[$category] = $label
 
-            # Sort entries by type (checkboxes first, then buttons, then comboboxes, notes last) and then alphabetically by Content
+            # Ordena as entradas por tipo (caixas de seleção primeiro, depois botões, depois caixas de combinação e notas por último) e então alfabeticamente por Content
             $entries = $organizedData[$panelKey][$category] | Sort-Object @{Expression = {
                 switch ($_.Type) {
                     'Button' { 1 }
@@ -171,9 +171,9 @@ function Invoke-WPFUIElements {
             }}, Content
             foreach ($entryInfo in $entries) {
 
-                # Constructing a panel's worth of controls in one go holds the interface for
-                # hundreds of milliseconds. Draining the queue on a deadline rather than every
-                # nth entry keeps the wait bounded whatever the entries cost to build.
+                # Construir todos os controles de um painel de uma só vez prende a interface por
+                # centenas de milissegundos. Esvaziar a fila por prazo, em vez de a cada n entradas,
+                # mantém a espera limitada independentemente do custo de cada entrada.
                 if ($Yield -and $yieldClock.ElapsedMilliseconds -ge 25 -and (Test-WinUtilUIAlive)) {
                     $yieldClock.Restart()
                     $frame = New-Object Windows.Threading.DispatcherFrame
@@ -188,7 +188,7 @@ function Invoke-WPFUIElements {
                     [Windows.Threading.Dispatcher]::PushFrame($frame)
                 }
 
-                # Create the UI elements based on the entry type
+                # Cria os elementos de interface com base no tipo de entrada
                 switch ($entryInfo.Type) {
                     "Toggle" {
                         $dockPanel = New-Object Windows.Controls.DockPanel
@@ -217,7 +217,7 @@ function Invoke-WPFUIElements {
                         $sync[$entryInfo.Name].Add_Checked({
                             [System.Object]$Sender = $args[0]
                             Invoke-WPFSelectedCheckboxesUpdate -type "Add" -checkboxName $Sender.name
-                            # Skip applying tweaks while an import is restoring toggle states
+                            # Ignora a aplicação de ajustes enquanto uma importação restaura os estados dos interruptores
                             if (-not $sync.ImportInProgress) {
                                 Invoke-WinUtilTweaks $Sender.name
                             }
@@ -226,7 +226,7 @@ function Invoke-WPFUIElements {
                         $sync[$entryInfo.Name].Add_Unchecked({
                             [System.Object]$Sender = $args[0]
                             Invoke-WPFSelectedCheckboxesUpdate -type "Remove" -checkboxName $Sender.name
-                            # Skip undoing tweaks while an import is restoring toggle states
+                            # Ignora a reversão de ajustes enquanto uma importação restaura os estados dos interruptores
                             if (-not $sync.ImportInProgress) {
                                 Invoke-WinUtiltweaks $Sender.name -undo $true
                             }
@@ -337,7 +337,7 @@ function Invoke-WPFUIElements {
                                 $unknownStateItem = New-Object Windows.Controls.ComboBoxItem
                                 $unknownStateItem.Content = "Personalizado / Desconhecido - escolha um estado"
                                 $unknownStateItem.IsEnabled = $false
-                                $unknownStateItem.ToolTip = "$($_.Exception.Message) Select one of the supported states to replace these values."
+                                $unknownStateItem.ToolTip = "$($_.Exception.Message) Selecione um dos estados compatíveis para substituir estes valores."
                                 $comboBox.Items.Add($unknownStateItem) | Out-Null
                                 $comboBox.SelectedItem = $unknownStateItem
                                 $comboBox.ToolTip = $unknownStateItem.ToolTip
@@ -346,14 +346,14 @@ function Invoke-WPFUIElements {
                             $comboBox.SelectedIndex = 0
                         }
 
-                        # Set initial text
+                        # Define o texto inicial
                         if ($comboBox.Items.Count -gt 0) {
                             $comboBox.Text = $comboBox.SelectedItem.Content
                         }
 
                         $sync[$entryInfo.Name] = $comboBox
 
-                        # Add SelectionChanged event handler to update the text property
+                        # Adiciona o manipulador do evento SelectionChanged para atualizar a propriedade de texto
                         $comboBox.Add_SelectionChanged({
                             $selectedItem = $this.SelectedItem
                             if ($selectedItem) {
@@ -371,7 +371,7 @@ function Invoke-WPFUIElements {
                                     } catch {
                                         $applyError = $_.Exception.Message
                                         if ([string]::IsNullOrWhiteSpace($applyError)) {
-                                            $applyError = "Unable to apply registry state '$($selectedItem.Content)'."
+                                            $applyError = "Não foi possível aplicar o estado do registro '$($selectedItem.Content)'."
                                         }
                                         $previousState = if ($this.Tag.State) { $this.Tag.State } else { "Custom / Unknown - select a state" }
                                         $this.SelectedItem = @($this.Items) | Where-Object Content -EQ $previousState | Select-Object -First 1
@@ -438,23 +438,23 @@ function Invoke-WPFUIElements {
                     }
 
                     "RadioButton" {
-                        # Check if a container for this GroupName already exists
+                        # Verifica se já existe um contêiner para este GroupName
                         if (-not $radioButtonGroups.ContainsKey($entryInfo.GroupName)) {
-                            # Create a StackPanel for this group
+                            # Cria um StackPanel para este grupo
                             $groupStackPanel = New-Object Windows.Controls.StackPanel
                             $groupStackPanel.Orientation = "Vertical"
                             [System.Windows.Automation.AutomationProperties]::SetName($groupStackPanel, $entryInfo.GroupName)
                             $radioButtonGroups[$entryInfo.GroupName] = $groupStackPanel
 
-                            # Add the group container to the ItemsControl
+                            # Adiciona o contêiner do grupo ao ItemsControl
                             $stackPanelContainer.Children.Add($groupStackPanel) | Out-Null
                         }
                         else {
-                            # Retrieve the existing group container
+                            # Recupera o contêiner do grupo existente
                             $groupStackPanel = $radioButtonGroups[$entryInfo.GroupName]
                         }
 
-                        # Create the RadioButton
+                        # Cria o RadioButton
                         $radioButton = New-Object Windows.Controls.RadioButton
                         $radioButton.Name = $entryInfo.Name
                         $radioButton.GroupName = $entryInfo.GroupName
@@ -470,7 +470,7 @@ function Invoke-WPFUIElements {
                             $radioButton.IsChecked = $true
                         }
 
-                        # Add the RadioButton to the group container
+                        # Adiciona o RadioButton ao contêiner do grupo
                         $groupStackPanel.Children.Add($radioButton) | Out-Null
                         $sync[$entryInfo.Name] = $radioButton
                     }
@@ -570,8 +570,9 @@ function Invoke-WPFUIElements {
         }
     }
 
-    # A search event can run inside one of the yielded dispatcher frames above. Controls added
-    # after that event start visible, so reapply the live filter once this tab is complete.
+    # Um evento de busca pode ocorrer dentro de um dos frames do dispatcher cedidos acima. Os
+    # controles adicionados depois desse evento começam visíveis, então reaplique o filtro ativo
+    # assim que esta aba estiver completa.
     $filterPanel = switch ($sync.currentTab) {
         "Tweaks" { "tweakspanel" }
         "AppX" { "appxpanel" }

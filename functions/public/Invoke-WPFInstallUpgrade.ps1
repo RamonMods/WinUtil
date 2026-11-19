@@ -2,25 +2,25 @@ function Invoke-WPFInstallUpgrade {
     <#
 
     .SYNOPSIS
-        Upgrades every package that has an update available
+        Atualiza todos os pacotes que têm uma atualização disponível
 
     .DESCRIPTION
-        Runs on the worker like any other package work, so the progress bar, the taskbar item
-        and the log report it the same way an install does.
+        Executa no worker como qualquer outro trabalho de pacote, portanto a barra de progresso, o item da barra de tarefas
+        e o log o reportam da mesma forma que uma instalação.
 
     #>
 
     param([string]$ManagerPreference = $sync.preferences.packagemanager)
 
-    # Queued work receives the preference selected when the user requested the upgrade.
+    # O trabalho enfileirado recebe a preferência selecionada quando o usuário solicitou a atualização.
     if ($ManagerPreference -eq "Choco") {
-        Step-WinUtilJob -Status "Preparing Chocolatey" -State "Indeterminate"
+        Step-WinUtilJob -Status "Preparando o Chocolatey" -State "Indeterminate"
         Install-WinUtilChoco
 
-        Write-WinUtilLog -Component "Install" -Message "Upgrading all Chocolatey packages."
-        Step-WinUtilJob -Status "Upgrading all Chocolatey packages" -State "Indeterminate"
+        Write-WinUtilLog -Component "Install" -Message "Atualizando todos os pacotes do Chocolatey."
+        Step-WinUtilJob -Status "Atualizando todos os pacotes do Chocolatey" -State "Indeterminate"
 
-        # "all" is choco's own name for every installed package, so this stays one call
+        # "all" é o nome usado pelo próprio choco para todos os pacotes instalados, portanto isso continua sendo uma única chamada
         $result = Measure-WinUtilStep -Scope "Install" -Name "choco upgrade all" -ScriptBlock {
             Install-WinUtilProgramChoco -Action Upgrade -Programs @("all")
         }
@@ -28,14 +28,14 @@ function Invoke-WPFInstallUpgrade {
         return
     }
 
-    Step-WinUtilJob -Status "Preparing WinGet" -State "Indeterminate"
+    Step-WinUtilJob -Status "Preparando o WinGet" -State "Indeterminate"
     Install-WinUtilWinget
 
-    Write-WinUtilLog -Component "Install" -Message "Upgrading all WinGet packages."
-    Step-WinUtilJob -Status "Upgrading all WinGet packages" -State "Indeterminate"
+    Write-WinUtilLog -Component "Install" -Message "Atualizando todos os pacotes do WinGet."
+    Step-WinUtilJob -Status "Atualizando todos os pacotes do WinGet" -State "Indeterminate"
 
-    # Let WinGet resolve every package against its recorded source. Parsing its localized,
-    # width-truncated table loses identifiers and source information.
+    # Deixe o WinGet resolver cada pacote em relação à sua origem registrada. Analisar a tabela localizada
+    # e truncada por largura faz perder identificadores e informações de origem.
     $result = Measure-WinUtilStep -Scope "Install" -Name "winget upgrade --all" -ScriptBlock {
         Install-WinUtilProgramWinget -Action Upgrade -Programs @("all")
     }

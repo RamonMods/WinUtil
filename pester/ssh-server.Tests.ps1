@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - OpenSSH Server Setup
+# Testes - Configuração do servidor OpenSSH
 #===========================================================================
 
 BeforeAll {
@@ -64,9 +64,9 @@ BeforeAll {
     }
 
     function script:Get-AuthorizedKeyFileContent {
-        # The key file ends up readable only by Administrators and SYSTEM, so an
-        # unelevated run has to grant itself read access back through its
-        # ownership of the file before it can check the contents.
+        # O arquivo de chaves acaba legível apenas por Administrators e SYSTEM, então uma
+        # execução sem elevação precisa conceder a si mesma acesso de leitura por meio da
+        # propriedade do arquivo antes de poder verificar o conteúdo.
         $currentUserSid = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
         icacls $script:authorizedKeysPath /grant "*${currentUserSid}:(R)" | Out-Null
 
@@ -102,7 +102,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Remove-Item -Path $script:testRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    It "leaves the administrators block in a default sshd_config alone" {
+    It "não altera o bloco de administradores em um sshd_config padrão" {
         $original = New-SshdConfig -AdministratorsBlock $script:defaultAdministratorsBlock
 
         Invoke-WinUtilSSHServer
@@ -111,7 +111,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Should -Invoke -CommandName Restart-Service -Times 0 -Exactly
     }
 
-    It "silently creates the firewall rule when it does not exist" {
+    It "cria a regra de firewall silenciosamente quando ela não existe" {
         New-SshdConfig -AdministratorsBlock $script:defaultAdministratorsBlock | Out-Null
         $script:firewallRuleMissing = $true
         Mock New-NetFirewallRule { }
@@ -122,7 +122,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Should -Invoke New-NetFirewallRule -Times 1 -Exactly
     }
 
-    It "enables an existing disabled firewall rule instead of recreating it" {
+    It "habilita uma regra de firewall desabilitada existente em vez de recriá-la" {
         New-SshdConfig -AdministratorsBlock $script:defaultAdministratorsBlock | Out-Null
         Mock Get-NetFirewallRule { [pscustomobject]@{ Enabled = 2 } }
         Mock Set-NetFirewallRule { }
@@ -136,7 +136,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Should -Invoke New-NetFirewallRule -Times 0 -Exactly
     }
 
-    It "leaves an existing enabled firewall rule unchanged" {
+    It "não altera uma regra de firewall habilitada existente" {
         New-SshdConfig -AdministratorsBlock $script:defaultAdministratorsBlock | Out-Null
         Mock Get-NetFirewallRule { [pscustomobject]@{ Enabled = 1 } }
         Mock Set-NetFirewallRule { }
@@ -148,7 +148,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Should -Invoke New-NetFirewallRule -Times 0 -Exactly
     }
 
-    It "leaves an sshd_config without an administrators block alone" {
+    It "não altera um sshd_config sem bloco de administradores" {
         $original = New-SshdConfig -AdministratorsBlock ""
         Set-ProfileKeyFile -Keys @("ssh-ed25519 AAAAnotanadminkey laptop")
 
@@ -159,7 +159,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Should -Invoke -CommandName Restart-Service -Times 0 -Exactly
     }
 
-    It "creates administrators_authorized_keys limited to Administrators and SYSTEM" {
+    It "cria administrators_authorized_keys limitado a Administrators e SYSTEM" {
         New-SshdConfig -AdministratorsBlock $script:defaultAdministratorsBlock | Out-Null
 
         Invoke-WinUtilSSHServer
@@ -173,7 +173,7 @@ Describe "Invoke-WinUtilSSHServer" {
         $sids | Should -Contain "S-1-5-18"
     }
 
-    It "restores the administrators block when an earlier run commented it out" {
+    It "restaura o bloco de administradores quando uma execução anterior o comentou" {
         New-SshdConfig -AdministratorsBlock $script:overriddenAdministratorsBlock | Out-Null
 
         Invoke-WinUtilSSHServer
@@ -184,7 +184,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Should -Invoke -CommandName Restart-Service -Times 1 -Exactly
     }
 
-    It "moves profile keys into administrators_authorized_keys while restoring the block" {
+    It "move as chaves do perfil para administrators_authorized_keys enquanto restaura o bloco" {
         New-SshdConfig -AdministratorsBlock $script:overriddenAdministratorsBlock | Out-Null
         Set-ProfileKeyFile -Keys @("# my laptop", "", "ssh-ed25519 AAAAkeyone laptop", "ssh-ed25519 AAAAkeytwo desktop")
 
@@ -196,7 +196,7 @@ Describe "Invoke-WinUtilSSHServer" {
         $keys | Should -Not -Contain "# my laptop"
     }
 
-    It "does not copy profile keys when sshd_config is already at its default" {
+    It "não copia as chaves do perfil quando sshd_config já está no padrão" {
         New-SshdConfig -AdministratorsBlock $script:defaultAdministratorsBlock | Out-Null
         Set-ProfileKeyFile -Keys @("ssh-ed25519 AAAAnotanadminkey laptop")
 
@@ -205,7 +205,7 @@ Describe "Invoke-WinUtilSSHServer" {
         Get-AuthorizedKeyFileContent | Should -Not -Contain "ssh-ed25519 AAAAnotanadminkey laptop"
     }
 
-    It "keeps keys that are already in administrators_authorized_keys" {
+    It "mantém as chaves que já estão em administrators_authorized_keys" {
         New-SshdConfig -AdministratorsBlock $script:overriddenAdministratorsBlock | Out-Null
         Set-Content -Path $script:authorizedKeysPath -Value "ssh-ed25519 AAAAexisting server"
         Set-ProfileKeyFile -Keys @("ssh-ed25519 AAAAexisting server", "ssh-ed25519 AAAAnew laptop")

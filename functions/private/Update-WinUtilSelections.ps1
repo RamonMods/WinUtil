@@ -31,7 +31,7 @@ function Update-WinUtilSelections {
                 $cbkey
                 continue
             }
-            throw "Unsupported selection key '$cbkey'."
+            throw "Chave de seleção não suportada: '$cbkey'."
         }
 
         $isKnownSelection = switch ($listName) {
@@ -57,10 +57,10 @@ function Update-WinUtilSelections {
                 $cbkey
                 continue
             }
-            throw "Unknown selection key '$cbkey'."
+            throw "Chave de seleção desconhecida: '$cbkey'."
         }
 
-        # Replacement imports must also behave like checkbox selections, not repeated actions.
+        # Importa��es de substitui��o tamb�m devem se comportar como sele��es de caixa de sele��o, n�o como a��es repetidas.
         if ($nextSelections[$listName] -notcontains $cbkey) {
             $nextSelections[$listName].Add($cbkey)
         }
@@ -80,8 +80,8 @@ function Update-WinUtilSelections {
 
     foreach ($listName in $nextSelections.Keys) {
         foreach ($cbkey in $nextSelections[$listName]) {
-            # Appending, so the same entry can already be there: a preset and a config that both
-            # name it would otherwise select it twice
+            # Ao acrescentar, a mesma entrada pode j� estar presente: uma predefini��o e uma configura��o que a
+            # nomeiam acabariam selecionando-a duas vezes
             if ($sync.$listName -notcontains $cbkey) {
                 $sync.$listName.Add($cbkey)
             }

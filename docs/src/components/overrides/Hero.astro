@@ -1,15 +1,15 @@
 ---
-// Custom hero override: eyebrow, heading, tagline, actions, badges, screenshot.
+// Substituição personalizada do hero: sobretítulo, título, slogan, ações, selos e captura de tela.
 import { Image } from 'astro:assets';
 import { Icon } from '@astrojs/starlight/components';
 import HeroDotGrid from '../landing/HeroDotGrid.jsx';
 import HeroEyebrow from '../landing/HeroEyebrow.jsx';
 import GlareHover from '../react-bits/GlareHover.jsx';
 
-// Matches Starlight's internal PAGE_TITLE_ID (used by the skip-to-content link).
+// Corresponde ao PAGE_TITLE_ID interno do Starlight (usado pelo link para pular ao conteúdo).
 const PAGE_TITLE_ID = '_top';
 
-// Resolve hero content: Starlight's built-in hero fields plus our custom schema extensions.
+// Resolve o conteúdo do hero: os campos nativos do hero do Starlight mais as extensões do nosso esquema.
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline, image, actions = [] } = data.hero || {};
 const { heroEyebrow, heroCaption, heroBadges = [] } = data;
@@ -19,12 +19,12 @@ if (image && 'file' in image) heroImage = image.file;
 ---
 
 <section class:list={['wu-hero', !heroImage && 'wu-hero--solo']}>
-	{/* Full-bleed background: dot grid (motion on) or grid lines (motion off), plus the glow. */}
+	{/* Fundo em largura total: grade de pontos (animações ativas) ou linhas de grade (animações desativadas), mais o brilho. */}
 	<div class="wu-hero-dots" aria-hidden="true"><HeroDotGrid client:idle /></div>
 	<div class="wu-hero-grid" aria-hidden="true"></div>
 	<div class="wu-hero-glow" aria-hidden="true"></div>
 	<div class="wu-hero-inner">
-		{/* Copy column: eyebrow, heading, tagline, actions, caption. */}
+		{/* Coluna de texto: sobretítulo, título, slogan, ações e legenda. */}
 		<div class="wu-hero-copy">
 			{
 				heroEyebrow && (
@@ -56,11 +56,11 @@ if (image && 'file' in image) heroImage = image.file;
 			}
 			{heroCaption && <p class="wu-hero-caption">{heroCaption}</p>}
 		</div>
-		{/* Screenshot framed as a fake browser/app window. */}
+		{/* Captura de tela enquadrada como uma janela falsa de navegador/aplicativo. */}
 		{
 			heroImage && (
 				<div class="wu-hero-media">
-					{/* Glare sweeps across the window on hover. */}
+					{/* O brilho varre a janela ao passar o mouse. */}
 					<GlareHover
 						client:visible
 						width="100%"
@@ -91,7 +91,7 @@ if (image && 'file' in image) heroImage = image.file;
 			)
 		}
 	</div>
-	{/* Badge row (shields.io / dcbadge images) below the two-column layout. */}
+	{/* Linha de selos (imagens shields.io) abaixo do layout de duas colunas. */}
 	{
 		heroBadges.length > 0 && (
 			<div class="wu-hero-bottom">
@@ -113,7 +113,7 @@ if (image && 'file' in image) heroImage = image.file;
 
 <style>
 	@layer starlight.core {
-		/* Outer hero shell; pulled up to close Starlight's fixed 1.5rem ContentPanel padding. */
+		/* Casca externa do hero; puxada para cima para eliminar o preenchimento fixo de 1,5rem do ContentPanel do Starlight. */
 		.wu-hero {
 			position: relative;
 			border-bottom: 1px solid var(--sl-color-hairline-light);
@@ -123,7 +123,7 @@ if (image && 'file' in image) heroImage = image.file;
 			padding-top: 1.5rem;
 		}
 
-		/* Full-bleed grid/glow background, forced behind all hero content via negative z-index. */
+		/* Fundo de grade/brilho em largura total, forçado atrás de todo o conteúdo do hero por meio de z-index negativo. */
 		.wu-hero-dots,
 		.wu-hero-grid,
 		.wu-hero-glow {
@@ -156,7 +156,7 @@ if (image && 'file' in image) heroImage = image.file;
 			);
 		}
 
-		/* Two-column layout: copy left, screenshot right (stacked on mobile). */
+		/* Layout de duas colunas: texto à esquerda, captura à direita (empilhados no celular). */
 		.wu-hero-inner {
 			position: relative;
 			z-index: 1;
@@ -165,12 +165,12 @@ if (image && 'file' in image) heroImage = image.file;
 			padding-block: 3rem 2rem;
 		}
 
-		/* Hero copy: eyebrow, heading, tagline, actions, caption. */
+		/* Texto do hero: sobretítulo, título, slogan, ações e legenda. */
 		.wu-hero-copy {
 			text-align: center;
 		}
 
-		/* Eyebrow as a pill badge with a pulsing status dot. */
+		/* Sobretítulo como selo pastilha com um ponto de status pulsante. */
 		.wu-eyebrow {
 			display: inline-flex;
 			align-items: center;
@@ -251,14 +251,14 @@ if (image && 'file' in image) heroImage = image.file;
 			color: var(--sl-color-gray-3);
 		}
 
-		/* Screenshot framed in a fake browser window (traffic-light dots + title bar). */
+		/* Captura enquadrada em uma janela falsa de navegador (pontos semáforo + barra de título). */
 		.wu-hero-media {
 			position: relative;
 			display: flex;
 			justify-content: center;
 		}
 
-		/* Soft accent glow pooled under the screenshot. */
+		/* Brilho suave de destaque acumulado sob a captura de tela. */
 		.wu-hero-media::before {
 			content: '';
 			position: absolute;
@@ -278,13 +278,13 @@ if (image && 'file' in image) heroImage = image.file;
 			background: var(--sl-color-gray-6);
 		}
 
-		/* The shadow sits on GlareHover's root, since it clips everything inside it to its rounded box. */
+		/* A sombra fica na raiz do GlareHover, pois ele recorta tudo dentro de si em sua caixa arredondada. */
 		.wu-hero-media :global(.glare-hover) {
 			max-width: 56rem;
 			box-shadow: 0 25px 50px -12px hsl(0 0% 0% / 0.5);
 		}
 
-		/* Window chrome: title bar + traffic-light buttons. */
+		/* Moldura da janela: barra de título + botões semáforo. */
 		.wu-window-bar {
 			display: flex;
 			align-items: center;
@@ -344,7 +344,7 @@ if (image && 'file' in image) heroImage = image.file;
 			height: auto;
 		}
 
-		/* Badge row below the two-column layout, centered full-width. */
+		/* Linha de selos abaixo do layout de duas colunas, centralizada em toda a largura. */
 		.wu-hero-bottom {
 			position: relative;
 			z-index: 1;
@@ -356,7 +356,7 @@ if (image && 'file' in image) heroImage = image.file;
 			margin: 0;
 		}
 
-		/* Desktop breakpoint: side-by-side columns, left-aligned copy. */
+		/* Ponto de quebra desktop: colunas lado a lado, texto alinhado à esquerda. */
 		@media (min-width: 50rem) {
 			.wu-hero-inner {
 				grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -378,7 +378,7 @@ if (image && 'file' in image) heroImage = image.file;
 			}
 		}
 
-		/* No image (the 404 page): one centered column that fills the screen. */
+		/* Sem imagem (a página 404): uma coluna centralizada que preenche a tela. */
 		.wu-hero--solo .wu-hero-inner {
 			grid-template-columns: minmax(0, 1fr);
 			align-content: center;

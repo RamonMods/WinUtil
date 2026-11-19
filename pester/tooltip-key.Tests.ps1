@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Entry ToolTip Helper
+# Testes - Auxiliar de dica de ferramenta de entrada
 #===========================================================================
 
 BeforeAll {
@@ -24,8 +24,8 @@ BeforeAll {
         appxHashtable          = $appxHashtable
     }
 
-    # Map each control type the renderer handles to whether its branch adds the preset key.
-    # Read from the source AST so re-adding the helper to an unsupported branch fails the test.
+    # Mapeia cada tipo de controle tratado pelo renderizador para indicar se sua ramificação adiciona a chave da predefinição.
+    # Lê a AST do código-fonte para que readicionar o auxiliar a uma ramificação não suportada faça o teste falhar.
     $script:rendererClauses = @{}
     $rendererPath = Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1"
     $rendererAst = [System.Management.Automation.Language.Parser]::ParseFile($rendererPath, [ref]$null, [ref]$null)
@@ -42,7 +42,7 @@ BeforeAll {
     $appRendererPath = Join-Path $script:repoRoot "functions\private\Initialize-InstallAppEntries.ps1"
     $script:appRenderer = Get-Content $appRendererPath -Raw
 
-    # Every entry the renderer draws, with the branch that draws it
+    # Cada entrada desenhada pelo renderizador, com a ramificação que a desenha
     $script:renderedEntries = foreach ($configName in "appnavigation", "tweaks", "feature", "appx") {
         $config = Get-Content (Join-Path $script:repoRoot "config\$configName.json") -Raw | ConvertFrom-Json
         foreach ($property in $config.PSObject.Properties) {
@@ -60,41 +60,41 @@ BeforeAll {
 }
 
 Describe "Get-WinUtilEntryToolTip" {
-    It "appends the preset key after the description" {
+    It "anexa a chave da predefinição após a descrição" {
         Get-WinUtilEntryToolTip -Description "Fast private browser" -Key "WPFInstallBrave" |
             Should -Be "Fast private browser`n`nPreset key: WPFInstallBrave"
     }
 
-    It "returns only the key line when description is null" {
+    It "retorna apenas a linha da chave quando a descrição é nula" {
         Get-WinUtilEntryToolTip -Description $null -Key "WPFTweaksTele" |
             Should -Be "Preset key: WPFTweaksTele"
     }
 
-    It "returns only the key line when description is whitespace" {
+    It "retorna apenas a linha da chave quando a descrição contém apenas espaços" {
         Get-WinUtilEntryToolTip -Description "   " -Key "WPFTweaksTele" |
             Should -Be "Preset key: WPFTweaksTele"
     }
 
-    It "returns a plain string, not a UI object" {
+    It "retorna uma string simples, não um objeto de interface" {
         (Get-WinUtilEntryToolTip -Description "x" -Key "WPFTweaksTele").GetType().Name |
             Should -Be "String"
     }
 }
 
 Describe "Preset key tooltips" {
-    It "leaves unsupported controls unlabelled" {
-        # Comboboxes and radio buttons are not representable in the flat preset format.
-        # Toggle keys can be imported, but preset execution does not apply their state.
+    It "deixa controles não suportados sem rótulo" {
+        # Caixas de combinação e botões de opção não podem ser representados no formato simples de predefinição.
+        # Chaves de interruptor podem ser importadas, mas a execução da predefinição não aplica seu estado.
         $script:rendererClauses["Toggle"] | Should -BeFalse
         $script:rendererClauses["Combobox"] | Should -BeFalse
         $script:rendererClauses["RadioButton"] | Should -BeFalse
     }
 
-    It "labels entries created by the application renderer" {
+    It "rotula entradas criadas pelo renderizador de aplicativos" {
         $script:appRenderer | Should -Match '\$tooltip\s*=\s*\[Security\.SecurityElement\]::Escape\(\(Get-WinUtilEntryToolTip\s+-Description\s+\$app\.description\s+-Key\s+\$appKey\)\)'
     }
 
-    It "labels every entry with a key the preset importer accepts" {
+    It "rotula cada entrada com uma chave aceita pelo importador de predefinições" {
         $labelled = @($script:renderedEntries | Where-Object { $script:rendererClauses[$_.Clause] })
         $labelled.Count | Should -BeGreaterThan 0
 
@@ -109,10 +109,10 @@ Describe "Preset key tooltips" {
             }
 
             { Update-WinUtilSelections -flatJson @($entry.Key) } |
-                Should -Not -Throw -Because "$($entry.Config).json key '$($entry.Key)' is shown as a preset key"
+                Should -Not -Throw -Because "$($entry.Config).json key '$($entry.Key)' é exibida como uma chave de predefinição"
 
             $imported = @($sync.Values | ForEach-Object { $_ })
-            $imported | Should -Contain $entry.Key -Because "importing '$($entry.Key)' must restore that selection"
+            $imported | Should -Contain $entry.Key -Because "importar '$($entry.Key)' deve restaurar essa seleção"
         }
     }
 }

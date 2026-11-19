@@ -1,9 +1,9 @@
 ---
-// Page title override, with a breadcrumb of the sidebar groups that contain the page.
+// Substituição do título da página, com trilha de navegação dos grupos da barra lateral que contêm a página.
 import type { SidebarEntry } from '@astrojs/starlight/route-data';
 import '../../styles/docs-ui.css';
 
-// Starlight's page title id; the skip link and the table of contents link to it.
+// Id do título da página no Starlight; o link para pular ao conteúdo e o índice apontam para ele.
 const PAGE_TITLE_ID = '_top';
 
 const { entry, sidebar } = Astro.locals.starlightRoute;

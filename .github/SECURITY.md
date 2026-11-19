@@ -1,7 +1,7 @@
-# Security Policy
+# Política de Segurança
 
-If you find a security issue, please post it in the Issues tab. If you think it should be private, you can email me at contact@RamonMods.com.
+Se você encontrar um problema de segurança, publique-o na aba Issues. Se achar que deve ser privado, você pode me enviar um e-mail para contact@RamonMods.com.
 
-For immediate response check out our Discord server:
+Para uma resposta imediata, confira nosso servidor do Discord:
 
 [![](https://github.com/RamonMods/WinUtil)](https://github.com/RamonMods/WinUtil)

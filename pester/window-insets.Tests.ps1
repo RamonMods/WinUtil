@@ -3,8 +3,8 @@ BeforeAll {
     . (Join-Path $PSScriptRoot '../functions/private/Update-WinUtilWindowInsets.ps1')
 }
 
-Describe 'Maximized window insets' {
-    It 'uses the actual frame plus padded border at <Dpi> DPI' -TestCases @(
+Describe 'Margens da janela maximizada' {
+    It 'usa a moldura real mais borda com preenchimento em <Dpi> DPI' -TestCases @(
         @{ Dpi = 96; Pixels = 8 }, @{ Dpi = 120; Pixels = 9 },
         @{ Dpi = 144; Pixels = 11 }, @{ Dpi = 192; Pixels = 13 },
         @{ Dpi = 288; Pixels = 18 }
@@ -21,21 +21,21 @@ Describe 'Maximized window insets' {
         $margin.Bottom | Should -Be ($Pixels * $scale)
     }
 
-    It 'handles a monitor at negative coordinates and a left taskbar' {
+    It 'lida com um monitor em coordenadas negativas e uma barra de tarefas à esquerda' {
         $work = [pscustomobject]@{ Left=-1872; Top=-1080; Right=0; Bottom=0 }
         $bounds = [pscustomobject]@{ Left=-1880; Top=-1088; Right=8; Bottom=8 }
         $margin = Get-WinUtilWindowInsets -Bounds $bounds -WorkArea $work -FromDevice ([Windows.Media.Matrix]::Identity)
         $margin | Should -Be ([Windows.Thickness]::new(8))
     }
 
-    It 'handles asymmetric overhang without turning unused space into negative margins' {
+    It 'lida com saliência assimétrica sem transformar espaço não usado em margens negativas' {
         $work = [pscustomobject]@{ Left=40; Top=0; Right=1920; Bottom=1040 }
         $bounds = [pscustomobject]@{ Left=32; Top=-12; Right=1924; Bottom=1030 }
         $margin = Get-WinUtilWindowInsets -Bounds $bounds -WorkArea $work -FromDevice ([Windows.Media.Matrix]::Identity)
         $margin | Should -Be ([Windows.Thickness]::new(8,12,4,0))
     }
 
-    It 'clears the inset when the window is restored' {
+    It 'limpa a margem quando a janela é restaurada' {
         $script:sync = @{ Form = [pscustomobject]@{ WindowState='Normal' }; WPFMainGrid = [pscustomobject]@{ Margin = [Windows.Thickness]::new(8) } }
         try {
             Update-WinUtilWindowInsets

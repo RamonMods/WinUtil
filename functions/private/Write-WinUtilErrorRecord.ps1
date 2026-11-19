@@ -1,21 +1,21 @@
 function Write-WinUtilErrorRecord {
     <#
         .SYNOPSIS
-            Logs a failure with enough context to act on it
+            Registra uma falha com contexto suficiente para agir sobre ela
 
         .DESCRIPTION
-            A bare "You cannot call a method on a null-valued expression." says nothing about
-            where it came from. This records the message together with the exception type, the
-            command and line that raised it, and the script stack, under a component name.
+            Um simples "You cannot call a method on a null-valued expression." não diz nada sobre
+            sua origem. Isto registra a mensagem junto com o tipo de exceção, o comando e a linha
+            que a gerou, e a pilha de script, sob um nome de componente.
 
         .PARAMETER ErrorRecord
-            The error to report, normally $_ from a catch block.
+            O erro a relatar, normalmente $_ de um bloco catch.
 
         .PARAMETER Component
-            Which part of WinUtil was running, for example Install or UI.
+            Qual parte do WinUtil estava em execução, por exemplo Instalar ou UI.
 
         .PARAMETER Context
-            What was being attempted, for example the button name or the package.
+            O que estava sendo tentado, por exemplo o nome do botão ou o pacote.
     #>
     param(
         [Parameter(Mandatory)]
@@ -25,8 +25,8 @@ function Write-WinUtilErrorRecord {
 
         [string]$Context,
 
-        # The underlying failure was already logged and counted; retain this call's context and
-        # stack as diagnostic detail without adding a second headline error.
+        # A falha subjacente já foi registrada e contabilizada; mantém o contexto e a pilha desta
+        # chamada como detalhe de diagnóstico sem adicionar um segundo erro principal.
         [switch]$DetailOnly
     )
 
@@ -37,12 +37,12 @@ function Write-WinUtilErrorRecord {
     if ($invocation) {
         $where = "$($invocation.ScriptName):$($invocation.ScriptLineNumber)"
         if ([string]::IsNullOrWhiteSpace($invocation.ScriptName)) {
-            $where = "line $($invocation.ScriptLineNumber)"
+            $where = "linha $($invocation.ScriptLineNumber)"
         }
-        Write-WinUtilLog -Level "ERROR" -Detail -Component $Component -Message "  at $where in $($invocation.MyCommand): $($invocation.Line.Trim())"
+        Write-WinUtilLog -Level "ERROR" -Detail -Component $Component -Message "  em $where em $($invocation.MyCommand): $($invocation.Line.Trim())"
     }
 
-    Write-WinUtilLog -Level "ERROR" -Detail -Component $Component -Message "  type $($ErrorRecord.Exception.GetType().FullName), category $($ErrorRecord.CategoryInfo.Category)"
+    Write-WinUtilLog -Level "ERROR" -Detail -Component $Component -Message "  tipo $($ErrorRecord.Exception.GetType().FullName), categoria $($ErrorRecord.CategoryInfo.Category)"
 
     if ($ErrorRecord.ScriptStackTrace) {
         foreach ($frame in ($ErrorRecord.ScriptStackTrace -split "`r?`n")) {

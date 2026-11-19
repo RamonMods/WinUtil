@@ -2,13 +2,13 @@ function Invoke-WinUtilScript {
     <#
 
     .SYNOPSIS
-        Invokes the provided scriptblock. Intended for things that can't be handled with the other functions.
+        Invoca o bloco de script fornecido. Destinado a coisas que não podem ser tratadas pelas outras funções.
 
     .PARAMETER Name
-        The name of the scriptblock being invoked
+        O nome do bloco de script que está sendo invocado
 
     .PARAMETER scriptblock
-        The scriptblock to be invoked
+        O bloco de script a ser invocado
 
     .EXAMPLE
         $Scriptblock = [scriptblock]::Create({"Write-output 'Hello World'"})
@@ -21,31 +21,31 @@ function Invoke-WinUtilScript {
     )
 
     try {
-        Write-Host "Running Script for $Name"
-        Write-WinUtilLog -Component "Script" -Message "Running script for $Name"
+        Write-Host "Executando script para $Name"
+        Write-WinUtilLog -Component "Script" -Message "Executando script para $Name"
         Invoke-Command $scriptblock -ErrorAction Stop
-        Write-WinUtilLog -Component "Script" -Message "Completed script for $Name"
+        Write-WinUtilLog -Component "Script" -Message "Script concluído para $Name"
     } catch [System.Management.Automation.CommandNotFoundException] {
-        Write-Warning "The specified command was not found."
+        Write-Warning "O comando especificado não foi encontrado."
         Write-Warning $PSItem.Exception.message
-        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Command not found while running script for $Name`: $($PSItem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Comando não encontrado ao executar o script para $Name`: $($PSItem.Exception.Message)"
     } catch [System.Management.Automation.RuntimeException] {
-        Write-Warning "A runtime exception occurred."
+        Write-Warning "Ocorreu uma exceção de tempo de execução."
         Write-Warning $PSItem.Exception.message
-        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Runtime exception while running script for $Name`: $($PSItem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Exceção de tempo de execução ao executar o script para $Name`: $($PSItem.Exception.Message)"
     } catch [System.Security.SecurityException] {
-        Write-Warning "A security exception occurred."
+        Write-Warning "Ocorreu uma exceção de segurança."
         Write-Warning $PSItem.Exception.message
-        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Security exception while running script for $Name`: $($PSItem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Exceção de segurança ao executar o script para $Name`: $($PSItem.Exception.Message)"
     } catch [System.UnauthorizedAccessException] {
-        Write-Warning "Access denied. You do not have permission to perform this operation."
+        Write-Warning "Acesso negado. Você não tem permissão para executar esta operação."
         Write-Warning $PSItem.Exception.message
-        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Access denied while running script for $Name`: $($PSItem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Acesso negado ao executar o script para $Name`: $($PSItem.Exception.Message)"
     } catch {
-        # Generic catch block to handle any other type of exception
-        Write-Warning "Unable to run script for $Name due to unhandled exception."
+        # Bloco catch genérico para tratar qualquer outro tipo de exceção
+        Write-Warning "Não foi possível executar o script para $Name devido a uma exceção não tratada."
         Write-Warning $psitem.Exception.StackTrace
-        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Unhandled exception while running script for $Name`: $($psitem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Script" -Message "Exceção não tratada ao executar o script para $Name`: $($psitem.Exception.Message)"
     }
 
 }

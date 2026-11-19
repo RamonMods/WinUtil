@@ -9,11 +9,11 @@ export const collections = {
 		schema: docsSchema({
 			extend: () =>
 				z.object({
-					// Small uppercase kicker line above the hero heading, e.g. "Open Source Windows Setup Utility".
+					// Pequena linha em maiúsculas acima do título do hero, ex.: "Utilitário de configuração do Windows de código aberto".
 					heroEyebrow: z.string().optional(),
-					// Muted one-liner below the hero actions, e.g. "Self-hosted. Script-powered. No installer.".
+					// Linha discreta abaixo das ações do hero, ex.: "Auto-hospedado. Baseado em script. Sem instalador.".
 					heroCaption: z.string().optional(),
-					// Badge images (shields.io, dcbadge, etc.) shown in a row at the bottom of the hero.
+					// Imagens de selos (shields.io etc.) exibidas em uma linha na parte inferior do hero.
 					heroBadges: z
 						.array(
 							z.object({

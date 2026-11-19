@@ -3,34 +3,34 @@ function Invoke-WPFButton {
     <#
 
     .SYNOPSIS
-        Routes a button press, deciding whether it is interface work or a job
+        Roteia o pressionamento de um botão, decidindo se é trabalho de interface ou um job
 
     .DESCRIPTION
-        This is the one place that classifies a button. Anything that changes the system runs
-        through Start-WinUtilJob, which means it gets the busy flag, the progress bar, the
-        taskbar item, the console banner and the log lines without each workflow arranging that
-        for itself. Anything that only changes what the interface is showing runs here and now,
-        because pushing it onto a worker would just make it slower.
+        Este é o único lugar que classifica um botão. Tudo o que altera o sistema passa pelo
+        Start-WinUtilJob, o que significa que recebe o sinalizador de ocupado, a barra de progresso,
+        o item da barra de tarefas, o banner do console e as linhas de log sem que cada fluxo de
+        trabalho precise organizar isso por conta própria. Tudo o que apenas altera o que a
+        interface mostra é executado aqui e agora, porque enviar isso a um worker só o tornaria mais lento.
 
     .PARAMETER Button
-        The name of the button that was clicked
+        O nome do botão que foi clicado
 
     #>
 
     Param ([string]$Button)
 
-    # Clear the progress left behind by the previous job, but never while one is running
+    # Limpa o progresso deixado pelo job anterior, mas nunca enquanto um estiver em execução
     if (-not $sync.ActiveJob) {
         Step-WinUtilJob -Hide
     }
 
-    # Switch-driven buttons that change the system. Anything in feature.json counts too. The
-    # WPFPanel* entries are the exception only when they hand off to a Windows applet, which is
-    # what a missing function means; the two that carry one change the system themselves and
-    # would otherwise run their waits on the interface thread with nothing reporting them.
+    # Botões controlados por switch que alteram o sistema. Tudo o que está no feature.json também conta. As
+    # entradas WPFPanel* são a exceção apenas quando transferem para um applet do Windows, o que é
+    # o que significa uma função ausente; as duas que possuem uma alteram o sistema elas mesmas e
+    # caso contrário executariam suas esperas na thread de interface sem nada para reportá-las.
     #
-    # This is a whitelist on purpose: window chrome and popup toggles also reach here, because
-    # every Button in $sync gets wired to this function, and they must not become jobs.
+    # Esta é uma lista de permissões de propósito: os elementos da janela e os alternadores de popup também chegam aqui, porque
+    # todo Button em $sync é conectado a esta função, e eles não devem se tornar jobs.
     $workButtons = @(
         "WPFInstallUpgrade", "WPFAddUltPerf", "WPFRemoveUltPerf",
         "WPFUpdatesdefault", "WPFUpdatesdisable", "WPFUpdatessecurity",
@@ -38,8 +38,8 @@ function Invoke-WPFButton {
     )
 
     $featureEntry = $sync.configs.feature.$Button
-    # Feature installation owns its selection validation and snapshots the selection before it
-    # starts a job. Wrapping it here would turn its "nothing selected" return into job success.
+    # A instalação de recursos cuida da própria validação da seleção e a captura antes de
+    # iniciar um job. Englobá-la aqui transformaria seu retorno de "nada selecionado" em sucesso do job.
     $isConfigWork = $featureEntry -and $Button -ne "WPFFeatureInstall" -and
         ($Button -notlike "WPFPanel*" -or $featureEntry.function)
 
@@ -67,24 +67,24 @@ function Invoke-WPFButton {
         return
     }
 
-    # A handler that throws on the interface thread would otherwise reach the user as a bare
-    # message with no indication of which control produced it
+    # Um manipulador que lança uma exceção na thread de interface chegaria ao usuário como uma mensagem
+    # simples, sem indicar qual controle a produziu
     try {
         Invoke-WPFButtonAction -Button $Button
     } catch {
-        Write-WinUtilErrorRecord -ErrorRecord $_ -Component "UI" -Context "Button '$Button'"
+        Write-WinUtilErrorRecord -ErrorRecord $_ -Component "UI" -Context "Botão '$Button'"
     }
 }
 
 function Get-WinUtilButtonLabel {
     <#
     .SYNOPSIS
-        Returns the name a button's job should be reported under.
+        Retorna o nome sob o qual o job de um botão deve ser reportado.
 
     .DESCRIPTION
-        Whatever the button says is what the progress bar, the banner and the log say, so the
-        wording never drifts from the interface and there is no second list to maintain. Falls
-        back to the button name when there is nothing to read.
+        O que o botão diz é o que a barra de progresso, o banner e o log dizem, para que a
+        redação nunca se afaste da interface e não haja uma segunda lista para manter. Usa
+        o nome do botão como fallback quando não há nada para ler.
     #>
     param([string]$Button)
 
@@ -113,14 +113,14 @@ function Invoke-WPFButtonAction {
     <#
 
     .SYNOPSIS
-        Invokes the function associated with the clicked button
+        Invoca a função associada ao botão clicado
 
     .DESCRIPTION
-        The work itself. Called by Invoke-WPFButton, either directly or from inside a job, so it
-        must not concern itself with progress, busy state or banners.
+        O trabalho em si. Chamado por Invoke-WPFButton, diretamente ou de dentro de um job, portanto
+        não deve se preocupar com progresso, estado de ocupado ou banners.
 
     .PARAMETER Button
-        The name of the button that was clicked
+        O nome do botão que foi clicado
 
     #>
 
@@ -130,11 +130,11 @@ function Invoke-WPFButtonAction {
         [string]$ManagerPreference = $sync.preferences.packagemanager
     )
 
-    # Check if button is defined in feature config with function or InvokeScript
+    # Verifica se o botão está definido na configuração de recursos com function ou InvokeScript
     if ($sync.configs.feature.$Button) {
         $buttonConfig = $sync.configs.feature.$Button
 
-        # If button has a function defined, call it
+        # Se o botão tiver uma function definida, chama-a
         if ($buttonConfig.function) {
             $functionName = $buttonConfig.function
             if (Get-Command $functionName -ErrorAction SilentlyContinue) {
@@ -143,7 +143,7 @@ function Invoke-WPFButtonAction {
             }
         }
 
-        # If button has InvokeScript defined, execute the scripts
+        # Se o botão tiver InvokeScript definido, executa os scripts
         if ($buttonConfig.InvokeScript -and $buttonConfig.InvokeScript.Count -gt 0) {
             foreach ($script in $buttonConfig.InvokeScript) {
                 if (-not [string]::IsNullOrWhiteSpace($script)) {
@@ -154,7 +154,7 @@ function Invoke-WPFButtonAction {
         }
     }
 
-    # Fallback to hard-coded switch for buttons not in feature.json
+    # Usa como fallback o switch codificado para botões que não estão no feature.json
     Switch -Wildcard ($Button) {
         "WPFTab?BT" {Invoke-WPFTab $Button}
         "WPFInstall" {Invoke-WPFInstall}
@@ -199,8 +199,8 @@ function Invoke-WPFButtonAction {
                 }
             }
         }
-        # Closing may be declined, or leave a job running that outlives the window, so the
-        # goodbye belongs at the point the process actually ends rather than here
+        # O fechamento pode ser recusado, ou deixar um job em execução que sobrevive à janela, então a
+        # despedida fica no ponto em que o processo realmente termina, e não aqui
         "WPFCloseButton" {$sync.Form.Close()}
         "WPFMinimizeButton" {[Windows.SystemCommands]::MinimizeWindow($sync.Form)}
         "WPFMaximizeButton" {

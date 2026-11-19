@@ -1,7 +1,7 @@
-# Run search behavior against real WPF controls in a fresh Windows PowerShell process.
-# Other Pester files install lightweight UI types that cannot coexist with WPF.
-Describe "Search filtering with real WPF controls" {
-    It "preserves search and category behavior in Windows PowerShell 5.1" -Skip:($env:OS -ne "Windows_NT") {
+# Executa o comportamento de busca com controles WPF reais em um novo processo do Windows PowerShell.
+# Outros arquivos do Pester instalam tipos de interface leves que não podem coexistir com o WPF.
+Describe "Filtragem de busca com controles WPF reais" {
+    It "preserva o comportamento de busca e categoria no Windows PowerShell 5.1" -Skip:($env:OS -ne "Windows_NT") {
         $env:WINUTIL_WPF_TEST_ROOT = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
         $env:WINUTIL_WPF_PESTER_PATH = Join-Path (Get-Module Pester).ModuleBase "Pester.psd1"
         try {

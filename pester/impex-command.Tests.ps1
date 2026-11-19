@@ -3,7 +3,7 @@ BeforeAll {
     . (Join-Path $repoRoot "functions\public\Invoke-WPFImpex.ps1")
 }
 
-Describe "Exported configuration clipboard command" {
+Describe "Comando de área de transferência para configuração exportada" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             selectedApps = @("WPFInstallGit")
@@ -14,7 +14,7 @@ Describe "Exported configuration clipboard command" {
         })
         $script:copiedCommand = $null
         Mock Set-Clipboard { $script:copiedCommand = $Value }
-        # Execute only a harmless replacement that echoes the received path.
+        # Executa apenas uma substituição inofensiva que ecoa o caminho recebido.
         Mock Invoke-RestMethod { 'param([string]$Config) $Config' }
     }
 
@@ -22,7 +22,7 @@ Describe "Exported configuration clipboard command" {
         Remove-Variable -Name sync, copiedCommand -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "preserves the configuration path for <FileName> when the copied command runs" -ForEach @(
+    It "preserva o caminho da configuração para <FileName> quando o comando copiado é executado" -ForEach @(
         @{ FileName = 'my settings.json' }
         @{ FileName = "O'Brien.json" }
         @{ FileName = ('O{0}Brien.json' -f [char]0x2019) }

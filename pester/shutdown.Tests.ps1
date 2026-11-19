@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Closing while something is running
+# Testes - Fechamento enquanto algo está em execução
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -18,18 +18,18 @@ BeforeAll {
     function Complete-WinUtilConsoleProgress { }
 }
 
-Describe "Tracking what is running" {
+Describe "Acompanhamento do que está em execução" {
     BeforeEach {
         $global:sync = [hashtable]::Synchronized(@{})
     }
 
-    It "reports nothing to stop before anything has run" {
-        # @($null) is a one element array holding null, so a missing collection once read as one
-        # running item and the shutdown logged work that did not exist
+    It "não relata nada para parar antes de qualquer execução" {
+        # @($null) é um array de um elemento contendo nulo, então uma coleção ausente era lida como um
+        # item em execução e o fechamento registrava trabalho que não existia
         Stop-WinUtilActiveWork | Should -BeTrue
     }
 
-    It "creates the collection on first use" {
+    It "cria a coleção no primeiro uso" {
         $shell = [powershell]::Create()
         try {
             Register-WinUtilActiveShell -PowerShell $shell
@@ -39,12 +39,12 @@ Describe "Tracking what is running" {
         }
     }
 
-    It "drops instances that have finished instead of holding them for the session" {
+    It "descarta instâncias que terminaram em vez de mantê-las durante a sessão" {
         $first = [powershell]::Create()
         $second = [powershell]::Create()
         try {
             Register-WinUtilActiveShell -PowerShell $first
-            # the first is NotStarted, so registering another should sweep it away
+            # a primeira está como NotStarted, então registrar outra deve removê-la
             Register-WinUtilActiveShell -PowerShell $second
 
             @($sync.ActiveShells).Count | Should -Be 1
@@ -54,7 +54,7 @@ Describe "Tracking what is running" {
         }
     }
 
-    It "survives an instance that was disposed underneath it" {
+    It "sobrevive a uma instância que foi descartada enquanto era usada" {
         $shell = [powershell]::Create()
         Register-WinUtilActiveShell -PowerShell $shell
         $shell.Dispose()
@@ -62,7 +62,7 @@ Describe "Tracking what is running" {
         { Stop-WinUtilActiveWork -TimeoutSeconds 1 } | Should -Not -Throw
     }
 
-    It "treats a stopping invocation as active until it reaches a terminal state" {
+    It "trata uma invocação em parada como ativa até atingir um estado terminal" {
         $shell = [pscustomobject]@{
             InvocationStateInfo = [pscustomobject]@{
                 State = [System.Management.Automation.PSInvocationState]::Stopping
@@ -72,7 +72,7 @@ Describe "Tracking what is running" {
         Test-WinUtilShellRunning $shell | Should -BeTrue
     }
 
-    It "stops work that is genuinely running" {
+    It "para um trabalho que está realmente em execução" {
         $pool = [runspacefactory]::CreateRunspacePool(1, 2)
         $pool.Open()
         $shell = [powershell]::Create()
@@ -95,9 +95,9 @@ Describe "Tracking what is running" {
         }
     }
 
-    It "gives up rather than holding the window open for ever" {
-        # a worker inside a command that never returns cannot be stopped, and must not stop the
-        # window closing either
+    It "desiste em vez de manter a janela aberta indefinidamente" {
+        # um worker dentro de um comando que nunca retorna não pode ser parado e não deve impedir o
+        # fechamento da janela
         $global:sync.ActiveShells = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
         $stubborn = [pscustomobject]@{
             InvocationStateInfo = [pscustomobject]@{ State = [System.Management.Automation.PSInvocationState]::Running }
@@ -114,7 +114,7 @@ Describe "Tracking what is running" {
     }
 }
 
-Describe "The close question" {
+Describe "A pergunta de fechamento" {
     BeforeEach {
         $global:sync = [hashtable]::Synchronized(@{})
         $sync.ActiveJob = "Install"
@@ -123,18 +123,18 @@ Describe "The close question" {
         Mock Step-WinUtilJob { }
     }
 
-    It "hands the job to the console and closes the window when asked to let it finish" {
+    It "entrega o job ao console e fecha a janela quando solicitado a deixá-lo terminar" {
         Mock Show-WinUtilMessage { "Yes" }
         Mock Write-Host { }
 
         Invoke-WinUtilCloseRequest -RunningJob "Install"
 
-        # the window goes now; the job carries on without it
+        # a janela fecha agora; o job continua sem ela
         $sync.FinishInConsole | Should -BeTrue
         $sync.ForceClose | Should -BeTrue
     }
 
-    It "keeps the window open when the close is cancelled" {
+    It "mantém a janela aberta quando o fechamento é cancelado" {
         Mock Show-WinUtilMessage { "Cancel" }
 
         Invoke-WinUtilCloseRequest -RunningJob "Install"
@@ -143,7 +143,7 @@ Describe "The close question" {
         $sync.ForceClose | Should -Not -BeTrue
     }
 
-    It "closes before the main thread stops the worker pool" {
+    It "fecha antes de a thread principal parar o pool de workers" {
         Mock Show-WinUtilMessage { "No" }
         Mock Request-WinUtilWindowClose { }
 
@@ -155,14 +155,14 @@ Describe "The close question" {
             Should -Not -Match 'Request-WinUtilWindowClose\s+-Before'
     }
 
-    It "never shuts down the worker pool from the window closing handler" {
+    It "nunca encerra o pool de workers no manipulador de fechamento da janela" {
         (Get-Content (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw) |
             Should -Not -Match 'Close-WinUtilRunspacePool'
     }
 
 
 
-    It "offers all three choices" {
+    It "oferece as três opções" {
         Mock Show-WinUtilMessage { "Cancel" }
 
         Invoke-WinUtilCloseRequest -RunningJob "Install"
@@ -172,8 +172,8 @@ Describe "The close question" {
         }
     }
 
-    It "states the wait limit that the console hand-off enforces" {
-        # the prompt quotes the real default before requesting a stop
+    It "informa o limite de espera imposto pela transferência para o console" {
+        # o aviso cita o padrão real antes de solicitar a parada
         $tokens = $null
         $errors = $null
         $ast = [System.Management.Automation.Language.Parser]::ParseFile(
@@ -193,22 +193,22 @@ Describe "The close question" {
     }
 }
 
-Describe "Waiting for work that outlived the window" {
+Describe "Espera por trabalho que sobreviveu à janela" {
     BeforeEach {
         $global:sync = [hashtable]::Synchronized(@{})
         Mock Write-WinUtilLog { }
         Mock Write-Host { }
     }
 
-    It "returns at once when nothing was left running" {
+    It "retorna imediatamente quando nada ficou em execução" {
         $sync.FinishInConsole = $true
         $sync.ActiveJob = $null
 
         { Wait-WinUtilRemainingWork } | Should -Not -Throw
     }
 
-    It "does not wait when the window was closed normally" {
-        # a job cannot be active without FinishInConsole, but the guard must hold either way
+    It "não espera quando a janela foi fechada normalmente" {
+        # um job não pode estar ativo sem FinishInConsole, mas a proteção deve valer de qualquer forma
         $sync.FinishInConsole = $false
         $sync.ActiveJob = "Install"
 
@@ -217,11 +217,11 @@ Describe "Waiting for work that outlived the window" {
         $clock.Elapsed.TotalSeconds | Should -BeLessThan 2
     }
 
-    It "waits until the job clears the busy flag" {
+    It "espera até que o job limpe a sinalização de ocupado" {
         $sync.FinishInConsole = $true
         $sync.ActiveJob = "Install"
 
-        # something else clears it, the way a worker's finally does
+        # outra coisa a limpa, como faz o finally de um worker
         $timer = New-Object System.Timers.Timer
         $timer.Interval = 700
         $timer.AutoReset = $false
@@ -238,7 +238,7 @@ Describe "Waiting for work that outlived the window" {
         Get-EventSubscriber | Where-Object { $_.SourceObject -is [System.Timers.Timer] } | Unregister-Event
     }
 
-    It "gives up rather than keeping the process alive for ever" {
+    It "desiste em vez de manter o processo vivo indefinidamente" {
         $sync.FinishInConsole = $true
         $sync.ActiveJob = "Install"
 
@@ -246,7 +246,7 @@ Describe "Waiting for work that outlived the window" {
         Wait-WinUtilRemainingWork -TimeoutMinutes 0.02
         $clock.Stop()
 
-        # it waited rather than returning at once, and gave up rather than waiting for ever
+        # esperou em vez de retornar imediatamente e desistiu em vez de esperar indefinidamente
         $clock.Elapsed.TotalSeconds | Should -BeGreaterThan 0.5
         $clock.Elapsed.TotalSeconds | Should -BeLessThan 10
         $sync.ActiveJob | Should -Be "Install"

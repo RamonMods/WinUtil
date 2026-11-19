@@ -1,12 +1,12 @@
 function Start-WinUtilNextQueuedJob {
     <#
         .SYNOPSIS
-            Starts the oldest queued job if the slot is free
+            Inicia o job enfileirado mais antigo se o slot estiver livre
 
         .DESCRIPTION
-            Runs on the interface thread, posted by Clear-WinUtilActiveJob when a job finishes
-            whether it succeeded or not. Until the job it starts claims the slot, $sync.JobHandoff
-            keeps new actions queueing behind it, and every way out of here clears the flag.
+            Roda na thread da interface, postado por Clear-WinUtilActiveJob quando um job termina
+            com sucesso ou não. Até que o job iniciado tome o slot, $sync.JobHandoff
+            mantém novas ações enfileiradas atrás dele, e toda saída daqui limpa a sinalização.
     #>
     if ($sync.ShuttingDown -or $sync.FinishInConsole) {
         Reset-WinUtilJobHandoff
@@ -32,15 +32,15 @@ function Start-WinUtilNextQueuedJob {
         return
     }
 
-    Write-WinUtilLog -Component $next.Name -Message "Starting queued $($next.Name) job."
-    # FromQueue clears the handoff in the same lock that claims the slot, or when it refuses
+    Write-WinUtilLog -Component $next.Name -Message "Iniciando o job enfileirado $($next.Name)."
+    # FromQueue limpa a entrega no mesmo bloqueio que toma o slot, ou quando recusa
     Start-WinUtilJob -Name $next.Name -Description $next.Description -ScriptBlock ([scriptblock]::Create($next.ScriptBlock)) -Parameters $next.Parameters -DisableAppList:$next.DisableAppList -FromQueue
 }
 
 function Reset-WinUtilJobHandoff {
     <#
         .SYNOPSIS
-            Lets new actions claim the slot again after a handoff that will not complete
+            Permite que novas ações tomem o slot novamente após uma entrega que não se completará
     #>
     [System.Threading.Monitor]::Enter($sync.SyncRoot)
     try {
@@ -53,7 +53,7 @@ function Reset-WinUtilJobHandoff {
 function Get-WinUtilQueuedJobIndex {
     <#
         .SYNOPSIS
-            Finds a queued job by Id, or -1. The caller holds the SyncRoot lock.
+            Encontra um job enfileirado pelo Id, ou -1. O chamador detém o bloqueio SyncRoot.
     #>
     param([string]$Id)
 
@@ -68,13 +68,13 @@ function Get-WinUtilQueuedJobIndex {
 function Move-WinUtilQueuedJob {
     <#
         .SYNOPSIS
-            Moves a queued job one place earlier or later, doing nothing at either end
+            Move um job enfileirado uma posição antes ou depois, não fazendo nada em nenhuma extremidade
 
         .PARAMETER Id
-            The Id of the queued job.
+            O Id do job enfileirado.
 
         .PARAMETER Direction
-            Up runs it sooner, Down later.
+            Up executa mais cedo, Down mais tarde.
     #>
     param(
         [Parameter(Mandatory)]
@@ -100,7 +100,7 @@ function Move-WinUtilQueuedJob {
     }
 
     if ($moved) {
-        Write-WinUtilLog -Component $moved.Name -Message "Moved queued $($moved.Name) job $($Direction.ToLower())."
+        Write-WinUtilLog -Component $moved.Name -Message "Movido o job enfileirado $($moved.Name) $($Direction.ToLower())."
         Update-WinUtilJobQueueUI
     }
 }
@@ -108,10 +108,10 @@ function Move-WinUtilQueuedJob {
 function Remove-WinUtilQueuedJob {
     <#
         .SYNOPSIS
-            Cancels a queued job before it starts
+            Cancela um job enfileirado antes de ele iniciar
 
         .PARAMETER Id
-            The Id of the queued job. A job that has already started is not in the queue.
+            O Id do job enfileirado. Um job que já iniciou não está na fila.
     #>
     param(
         [Parameter(Mandatory)]
@@ -131,7 +131,7 @@ function Remove-WinUtilQueuedJob {
     }
 
     if ($removed) {
-        Write-WinUtilLog -Component $removed.Name -Message "Cancelled queued $($removed.Name) job."
+        Write-WinUtilLog -Component $removed.Name -Message "Cancelado o job enfileirado $($removed.Name)."
         Update-WinUtilJobQueueUI
     }
 }
@@ -139,10 +139,10 @@ function Remove-WinUtilQueuedJob {
 function Clear-WinUtilJobQueue {
     <#
         .SYNOPSIS
-            Drops every queued job and returns how many were dropped
+            Descarta todos os jobs enfileirados e retorna quantos foram descartados
 
         .DESCRIPTION
-            For the window closing: nothing queued may start once it is gone.
+            Para o fechamento da janela: nada enfileirado pode iniciar depois que ela se foi.
     #>
     $dropped = 0
     [System.Threading.Monitor]::Enter($sync.SyncRoot)
@@ -154,7 +154,7 @@ function Clear-WinUtilJobQueue {
     }
 
     if ($dropped -gt 0) {
-        Write-WinUtilLog -Component "UI" -Message "Discarded $dropped queued job(s) because the window is closing."
+        Write-WinUtilLog -Component "UI" -Message "Descartados $dropped job(s) enfileirado(s) porque a janela está fechando."
     }
     return $dropped
 }
@@ -162,16 +162,16 @@ function Clear-WinUtilJobQueue {
 function Update-WinUtilJobQueueUI {
     <#
         .SYNOPSIS
-            Shows the queue button while anything runs or waits, and rebuilds the open dropdown
+            Mostra o botão da fila enquanto algo roda ou espera, e reconstrói a lista suspensa aberta
 
         .DESCRIPTION
-            Interface thread only. Other threads post it through Invoke-WPFUIThread.
+            Somente na thread da interface. Outras threads a postam por meio de Invoke-WPFUIThread.
     #>
     if ($null -eq $sync.JobQueueButton) {
         return
     }
 
-    # A copy, so the rows are built without holding the lock the workers need
+    # Uma cópia, para que as linhas sejam construídas sem manter o bloqueio que os workers precisam
     [System.Threading.Monitor]::Enter($sync.SyncRoot)
     try {
         $queued = $sync.JobQueue.ToArray()
@@ -191,7 +191,7 @@ function Update-WinUtilJobQueueUI {
         return
     }
 
-    $sync.JobQueueRunning.Text = if ($running) { "Running: $running" } else { "Nothing running" }
+    $sync.JobQueueRunning.Text = if ($running) { "Em execução: $running" } else { "Nada em execução" }
     $sync.JobQueueItems.Children.Clear()
 
     for ($index = 0; $index -lt $queued.Count; $index++) {
@@ -201,7 +201,7 @@ function Update-WinUtilJobQueueUI {
             $row.ColumnDefinitions.Add((New-Object System.Windows.Controls.ColumnDefinition -Property @{Width = "30"}))
         }
 
-        # Trimmed with a tooltip because the dropdown has a fixed width
+        # Cortado com uma dica porque a lista suspensa tem largura fixa
         $label = New-Object Windows.Controls.TextBlock
         $label.Text = $queued[$index].Name
         $label.ToolTip = $queued[$index].Name
@@ -214,9 +214,9 @@ function Update-WinUtilJobQueueUI {
 
         $column = 1
         foreach ($action in @(
-            @{ Glyph = 0xE70E; Tip = "Run sooner"; Enabled = $index -gt 0; Click = { Move-WinUtilQueuedJob -Id $this.Tag -Direction Up } },
-            @{ Glyph = 0xE70D; Tip = "Run later"; Enabled = $index -lt ($queued.Count - 1); Click = { Move-WinUtilQueuedJob -Id $this.Tag -Direction Down } },
-            @{ Glyph = 0xE711; Tip = "Cancel"; Enabled = $true; Click = { Remove-WinUtilQueuedJob -Id $this.Tag } }
+            @{ Glyph = 0xE70E; Tip = "Executar antes"; Enabled = $index -gt 0; Click = { Move-WinUtilQueuedJob -Id $this.Tag -Direction Up } },
+            @{ Glyph = 0xE70D; Tip = "Executar depois"; Enabled = $index -lt ($queued.Count - 1); Click = { Move-WinUtilQueuedJob -Id $this.Tag -Direction Down } },
+            @{ Glyph = 0xE711; Tip = "Cancelar"; Enabled = $true; Click = { Remove-WinUtilQueuedJob -Id $this.Tag } }
         )) {
             $button = New-Object Windows.Controls.Button
             $button.FontFamily = "Segoe MDL2 Assets"

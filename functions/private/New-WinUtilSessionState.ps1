@@ -1,17 +1,17 @@
 function New-WinUtilSessionState {
     <#
         .SYNOPSIS
-            Builds the InitialSessionState every WinUtil runspace is created from
+            Cria o InitialSessionState a partir do qual todo runspace do WinUtil é criado
 
         .DESCRIPTION
-            The interface runspace and the worker pool start from the same state: the shared
-            $sync hashtable, the compiled script's globals, and every WinUtil function. That is
-            what lets the interface build a tab and a job body call any helper without injecting
-            definitions by hand. PowerShell's own functions are skipped, the default session
-            state already carries them.
+            O runspace da interface e o pool de workers partem do mesmo estado: a hashtable
+            compartilhada $sync, as globais do script compilado e todas as funções do WinUtil. É isso
+            que permite à interface montar uma aba e ao corpo de um job chamar qualquer auxiliar sem injetar
+            definições manualmente. As funções próprias do PowerShell são ignoradas, pois o estado de sessão
+            padrão já as contém.
 
-            Cached: an InitialSessionState is a template any number of runspaces are created
-            from, and building it is not free.
+            Em cache: um InitialSessionState é um modelo a partir do qual qualquer número de runspaces é criado,
+            e construí-lo não é gratuito.
     #>
 
     if ($sync.SessionState) {

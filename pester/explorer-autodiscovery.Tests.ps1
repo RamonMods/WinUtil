@@ -1,5 +1,5 @@
-# Execute the configured scripts through the real tweak orchestrator. Every registry
-# cmdlet is mocked so these tests never touch the machine's Explorer view database.
+# Executa os scripts configurados pelo orquestrador de ajustes real. Cada cmdlet de registro
+# é mockado para que estes testes nunca toquem o banco de dados de exibição do Explorer da máquina.
 BeforeAll {
     $repoRoot = Split-Path $PSScriptRoot -Parent
     . (Join-Path $repoRoot 'functions/private/Invoke-WinUtilTweaks.ps1')
@@ -10,7 +10,7 @@ BeforeAll {
     function Invoke-WinUtilScript { param($Name, [scriptblock]$ScriptBlock) }
 }
 
-Describe 'Explorer automatic folder discovery apply and undo' {
+Describe 'Aplicação e desfazer da descoberta automática de pastas do Explorer' {
     BeforeEach {
         $script:sync = @{ configs = @{ tweaks = $script:explorerTweaks } }
         $script:existingKeys = @()
@@ -27,7 +27,7 @@ Describe 'Explorer automatic folder discovery apply and undo' {
         Remove-Variable sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It 'flushes both view database keys when they exist' {
+    It 'apaga ambas as chaves do banco de dados de exibição quando existem' {
         $script:existingKeys = $script:bagKeys
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableExplorerAutoDiscovery'
         foreach ($key in $script:bagKeys) {
@@ -35,13 +35,13 @@ Describe 'Explorer automatic folder discovery apply and undo' {
         }
     }
 
-    It 'skips the removal when Explorer has not created the keys yet' {
+    It 'ignora a remoção quando o Explorer ainda não criou as chaves' {
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableExplorerAutoDiscovery'
         Should -Invoke Remove-Item -Times 0 -Exactly
     }
 
-    # Applying the tweak recreates Bags\AllFolders, so a second apply finds Bags without BagMRU.
-    It 'removes Bags and skips BagMRU when only Bags exists' {
+    # Aplicar o ajuste recria Bags\AllFolders, então uma segunda aplicação encontra Bags sem BagMRU.
+    It 'remove Bags e ignora BagMRU quando apenas Bags existe' {
         $bags, $bagMRU = $script:bagKeys
         $script:existingKeys = @($bags)
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableExplorerAutoDiscovery'
@@ -49,13 +49,13 @@ Describe 'Explorer automatic folder discovery apply and undo' {
         Should -Invoke Remove-Item -Times 0 -Exactly -ParameterFilter { $Path -eq $bagMRU }
     }
 
-    It 'still creates AllFolders and sets the generic view when the keys are missing' {
+    It 'ainda cria AllFolders e define a exibição genérica quando as chaves estão ausentes' {
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableExplorerAutoDiscovery'
         Should -Invoke New-Item -Times 1 -Exactly -ParameterFilter { $Path -eq "$script:shellRoot\Bags\AllFolders\Shell" }
         Should -Invoke New-ItemProperty -Times 1 -Exactly -ParameterFilter { $Name -eq 'FolderType' -and $Value -eq 'NotSpecified' }
     }
 
-    It 'undo flushes both keys when they exist and skips them when they are missing' {
+    It 'o desfazer apaga ambas as chaves quando existem e as ignora quando estão ausentes' {
         $script:existingKeys = $script:bagKeys
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableExplorerAutoDiscovery' -undo $true
         Should -Invoke Remove-Item -Times 2 -Exactly

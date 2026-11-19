@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Package Selection and Package Managers
+# Testes - Seleção de pacotes e gerenciadores de pacotes
 #===========================================================================
 
 BeforeAll {
@@ -14,7 +14,7 @@ BeforeAll {
     function Write-WinUtilJobBanner {
         param([string]$Message, [string]$Level)
     }
-    # The CLI path is what these tests cover; the module path is verified against real winget
+    # Estes testes cobrem o caminho da CLI; o caminho do módulo é verificado com o winget real
     function Step-WinUtilJob { param([string]$Status, [int]$Percent, [string]$State, [string]$Overlay, [switch]$Hide) }
     function Write-WinUtilLog { }
 }
@@ -24,7 +24,7 @@ Describe "Get-WinUtilSelectedPackages" {
         Mock Invoke-WPFUIThread { }
     }
 
-    It "uses winget IDs when winget is preferred" {
+    It "usa IDs do winget quando o winget é preferido" {
         $packages = @(
             [pscustomobject]@{ winget = "Git.Git"; choco = "git" }
             [pscustomobject]@{ winget = "VideoLAN.VLC"; choco = "vlc" }
@@ -36,7 +36,7 @@ Describe "Get-WinUtilSelectedPackages" {
         @($result["Choco"]).Count | Should -Be 0
     }
 
-    It "uses choco IDs and falls back to winget for na or missing choco IDs" {
+    It "usa IDs do choco e recorre ao winget para IDs choco na ou ausentes" {
         $packages = @(
             [pscustomobject]@{ winget = "Git.Git"; choco = "git" }
             [pscustomobject]@{ winget = "VideoLAN.VLC"; choco = "na" }
@@ -49,7 +49,7 @@ Describe "Get-WinUtilSelectedPackages" {
         (@($result["Winget"]) -join "|") | Should -Be "VideoLAN.VLC|Mozilla.Firefox"
     }
 
-    It "splits multi-ID values on ';' so every ID is installed" {
+    It "divide valores com vários IDs por ';' para que cada ID seja instalado" {
         $packages = @(
             [pscustomobject]@{ winget = "GitHub.GitHubDesktop"; choco = "git;github-desktop" }
         )
@@ -59,7 +59,7 @@ Describe "Get-WinUtilSelectedPackages" {
         (@($result["Choco"]) -join "|") | Should -Be "git|github-desktop"
     }
 
-    It "does not uninstall an app dependency unless it was separately selected" {
+    It "não desinstala uma dependência de aplicativo a menos que ela tenha sido selecionada separadamente" {
         $desktop = [pscustomobject]@{ winget = "GitHub.GitHubDesktop"; choco = "git;github-desktop" }
         $git = [pscustomobject]@{ winget = "Git.Git"; choco = "git" }
 
@@ -70,7 +70,7 @@ Describe "Get-WinUtilSelectedPackages" {
         @($both.Choco) | Should -Be @('github-desktop', 'git')
     }
 
-    It "skips blank, na, and missing package IDs" {
+    It "ignora IDs de pacote em branco, na e ausentes" {
         $packages = @(
             [pscustomobject]@{ winget = ""; choco = "" }
             [pscustomobject]@{ winget = "na"; choco = "na" }
@@ -84,7 +84,7 @@ Describe "Get-WinUtilSelectedPackages" {
         @($result["Choco"]).Count | Should -Be 0
     }
 
-    It "deduplicates package IDs" {
+    It "remove IDs de pacote duplicados" {
         $packages = @(
             [pscustomobject]@{ winget = "Git.Git"; choco = "git" }
             [pscustomobject]@{ winget = "Git.Git"; choco = "git" }
@@ -97,16 +97,16 @@ Describe "Get-WinUtilSelectedPackages" {
         @($result["Winget"]).Count | Should -Be 0
     }
 
-    It "returns exactly one object so the caller can index the split" {
-        # A stray value on the output stream would make this an array, and every package list
-        # would then read back empty.
+    It "retorna exatamente um objeto para que o chamador possa indexar a divisão" {
+        # Um valor estranho no fluxo de saída tornaria isso uma matriz, e toda lista de pacotes
+        # seria lida de volta vazia.
         $result = @(Get-WinUtilSelectedPackages -PackageList @([pscustomobject]@{ winget = "Git.Git" }) -Preference "Winget")
 
         $result.Count | Should -Be 1
         (@($result[0]["Winget"]) -join "|") | Should -Be "Git.Git"
     }
 
-    It "returns empty package lists for an empty selection" {
+    It "retorna listas de pacotes vazias para uma seleção vazia" {
         $result = Get-WinUtilSelectedPackages -PackageList @() -Preference "Winget"
 
         @($result["Winget"]).Count | Should -Be 0
@@ -120,7 +120,7 @@ Describe "Test-WinUtilPackageManager" {
         Mock Write-Host { }
     }
 
-    It "reports winget installed when the command exists" {
+    It "informa winget instalado quando o comando existe" {
         Mock Get-Command {
             [pscustomobject]@{ Name = "winget" }
         } -ParameterFilter { $Name -eq "winget" -and $ErrorAction -eq "SilentlyContinue" }
@@ -134,7 +134,7 @@ Describe "Test-WinUtilPackageManager" {
         Should -Invoke -CommandName Write-Host -Times 0 -Exactly
     }
 
-    It "reports choco not installed when the command is missing" {
+    It "informa choco não instalado quando o comando está ausente" {
         Mock Get-Command {
             $null
         } -ParameterFilter { $Name -eq "choco" -and $ErrorAction -eq "SilentlyContinue" }
@@ -147,7 +147,7 @@ Describe "Test-WinUtilPackageManager" {
         Should -Invoke -CommandName Write-WinUtilJobBanner -Times 0 -Exactly
     }
 
-    It "requires both requested managers to be installed" -TestCases @(
+    It "exige que ambos os gerenciadores solicitados estejam instalados" -TestCases @(
         @{ WingetPresent = $true; ChocoPresent = $true; Expected = "installed" }
         @{ WingetPresent = $false; ChocoPresent = $true; Expected = "not-installed" }
         @{ WingetPresent = $true; ChocoPresent = $false; Expected = "not-installed" }
@@ -160,7 +160,7 @@ Describe "Test-WinUtilPackageManager" {
         Should -Invoke -CommandName Write-Host -Times 0 -Exactly
     }
 
-    It "reports not installed when no manager is requested" {
+    It "informa não instalado quando nenhum gerenciador é solicitado" {
         Test-WinUtilPackageManager | Should -Be "not-installed"
     }
 }
@@ -172,7 +172,7 @@ Describe "Install-WinUtilProgramWinget" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
     }
 
-    It "starts winget with install arguments" {
+    It "inicia o winget com argumentos de instalação" {
         Install-WinUtilProgramWinget -Action Install -Programs @("Git.Git")
 
         Should -Invoke -CommandName Start-Process -Times 1 -Exactly -ParameterFilter {
@@ -184,7 +184,7 @@ Describe "Install-WinUtilProgramWinget" {
         }
     }
 
-    It "starts winget with uninstall arguments and msstore source when requested" {
+    It "inicia o winget com argumentos de desinstalação e fonte msstore quando solicitado" {
         Install-WinUtilProgramWinget -Action Uninstall -Programs @("msstore:9NBLGGH4NNS1")
 
         Should -Invoke -CommandName Start-Process -Times 1 -Exactly -ParameterFilter {
@@ -193,7 +193,7 @@ Describe "Install-WinUtilProgramWinget" {
         }
     }
 
-    It "upgrades every package through its configured source without parsing the output table" {
+    It "atualiza cada pacote pela fonte configurada sem analisar a tabela de saída" {
         Install-WinUtilProgramWinget -Action Upgrade -Programs @("all")
 
         Should -Invoke -CommandName Start-Process -Times 1 -Exactly -ParameterFilter {
@@ -202,7 +202,7 @@ Describe "Install-WinUtilProgramWinget" {
         }
     }
 
-    It "skips whitespace and na package IDs" {
+    It "ignora IDs de pacote em branco e na" {
         Install-WinUtilProgramWinget -Action Install -Programs @(" ", "na")
 
         Should -Invoke -CommandName Start-Process -Times 0 -Exactly
@@ -211,7 +211,7 @@ Describe "Install-WinUtilProgramWinget" {
 
 Describe "Install-WinUtilProgramChoco" {
     BeforeAll {
-        # choco is a native command, so it needs a function to stand in for it
+        # choco é um comando nativo, então precisa de uma função para substituí-lo
         function choco { $global:LASTEXITCODE = 0 }
     }
 
@@ -221,7 +221,7 @@ Describe "Install-WinUtilProgramChoco" {
         Mock choco { $global:LASTEXITCODE = 0 }
     }
 
-    It "calls choco once per package so a failure names the one that failed" {
+    It "chama o choco uma vez por pacote para que uma falha identifique qual pacote falhou" {
         $results = @(Install-WinUtilProgramChoco -Action Install -Programs @("git", "vlc"))
 
         $results.Count | Should -Be 2
@@ -230,7 +230,7 @@ Describe "Install-WinUtilProgramChoco" {
         Should -Invoke -CommandName choco -Times 2 -Exactly
     }
 
-    It "passes the install verb and suppresses choco's own progress redraw" {
+    It "passa o verbo de instalação e suprime o redesenho de progresso próprio do choco" {
         Install-WinUtilProgramChoco -Action Install -Programs @("git")
 
         Should -Invoke -CommandName choco -Times 1 -Exactly -ParameterFilter {
@@ -239,7 +239,7 @@ Describe "Install-WinUtilProgramChoco" {
         }
     }
 
-    It "passes the uninstall verb" {
+    It "passa o verbo de desinstalação" {
         Install-WinUtilProgramChoco -Action Uninstall -Programs @("git")
 
         Should -Invoke -CommandName choco -Times 1 -Exactly -ParameterFilter {
@@ -247,8 +247,8 @@ Describe "Install-WinUtilProgramChoco" {
         }
     }
 
-    It "upgrades rather than installing when asked to upgrade" {
-        # choco install all -y would look for a package called "all"
+    It "atualiza em vez de instalar quando solicitado a atualizar" {
+        # choco install all -y procuraria um pacote chamado "all"
         Install-WinUtilProgramChoco -Action Upgrade -Programs @("all")
 
         Should -Invoke -CommandName choco -Times 1 -Exactly -ParameterFilter {
@@ -256,7 +256,7 @@ Describe "Install-WinUtilProgramChoco" {
         }
     }
 
-    It "moves the progress bar through the list" {
+    It "move a barra de progresso pela lista" {
         Install-WinUtilProgramChoco -Action Install -Programs @("git", "vlc") -ProgressBase 0 -ProgressSpan 100
 
         Should -Invoke -CommandName Step-WinUtilJob -ParameterFilter { $Status -like "*git (1/2)*" }

@@ -1,4 +1,4 @@
-/* Self-hosted fonts: Geist for UI text, JetBrains Mono for code. Avoids external requests at runtime. */
+/* Fontes auto-hospedadas: Geist para textos da interface, JetBrains Mono para código. Evita requisições externas em tempo de execução. */
 @import '@fontsource/geist-sans/400.css';
 @import '@fontsource/geist-sans/500.css';
 @import '@fontsource/geist-sans/600.css';

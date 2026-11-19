@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Work button routing
+# Testes - Roteamento dos botões de ação
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -21,7 +21,7 @@ BeforeAll {
     function Invoke-WPFFeatureInstall { }
 }
 
-Describe "Work button preflight" {
+Describe "Pré-verificação dos botões de ação" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             ActiveJob = $null
@@ -57,14 +57,14 @@ Describe "Work button preflight" {
         Remove-Variable -Name capturedJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "lets feature installation validate its selection before starting a job" {
+    It "permite que a instalação de recursos valide sua seleção antes de iniciar um job" {
         Invoke-WPFButton -Button "WPFFeatureInstall"
 
         Should -Invoke Invoke-WPFFeatureInstall -Times 1 -Exactly
         Should -Invoke Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "does not start the update-disable job when confirmation is declined" {
+    It "não inicia o job de desabilitação de atualizações quando a confirmação é recusada" {
         Mock Confirm-WPFUpdatesdisable { $false }
 
         Invoke-WPFButton -Button "WPFUpdatesdisable"
@@ -73,7 +73,7 @@ Describe "Work button preflight" {
         Should -Invoke Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "passes completed confirmation into the update-disable job" {
+    It "repassa a confirmação concluída ao job de desabilitação de atualizações" {
         Invoke-WPFButton -Button "WPFUpdatesdisable"
 
         Should -Invoke Start-WinUtilJob -Times 1 -Exactly -ParameterFilter {

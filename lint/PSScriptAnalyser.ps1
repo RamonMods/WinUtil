@@ -1,11 +1,11 @@
 @{
-    # Only diagnostic records of the specified severity will be generated.
-    # Uncomment the following line if you only want Errors and Warnings but
-    # not Information diagnostic records.
+    # Somente registros de diagnóstico da severidade especificada serão gerados.
+    # Descomente a linha a seguir se quiser apenas erros e avisos, mas não
+    # registros de diagnóstico informativos.
     # Severity = @('Error','Warning')
 
-    # Analyze **only** the following rules. Use IncludeRules when you want
-    # to invoke only a small subset of the default rules.
+    # Analisa **apenas** as regras a seguir. Use IncludeRules quando quiser
+    # invocar somente um pequeno subconjunto das regras padrão.
 <#
     IncludeRules = @('PSAvoidDefaultValueSwitchParameter',
                      'PSMisleadingBacktick',
@@ -16,10 +16,10 @@
                      'PSUseApprovedVerbs',
                      'PSUseDeclaredVarsMoreThanAssignments')
 #>
-    # Do not analyze the following rules. Use ExcludeRules when you have
-    # commented out the IncludeRules settings above and want to include all
-    # the default rules except for those you exclude below.
-    # Note: if a rule is in both IncludeRules and ExcludeRules, the rule
-    # will be excluded.
+    # Não analisa as regras a seguir. Use ExcludeRules quando tiver
+    # comentado a configuração IncludeRules acima e quiser incluir todas
+    # as regras padrão, exceto as que você excluir abaixo.
+    # Observação: se uma regra estiver em IncludeRules e ExcludeRules, a regra
+    # será excluída.
     ExcludeRules = @('PSAvoidUsingWriteHost')
 }

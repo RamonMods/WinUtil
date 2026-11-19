@@ -1,64 +1,64 @@
 ---
-title: "Dev Docs Generator"
-description: "How the devdocs-generator.ps1 script works"
+title: "Gerador de Docs de Desenvolvimento"
+description: "Como funciona o script devdocs-generator.ps1"
 ---
 
-# Dev Docs Generator
+# Gerador de Docs de Desenvolvimento
 
-The `devdocs-generator.ps1` script automatically generates Astro/Starlight markdown (`.mdx`) files for the development documentation. It pulls content directly from the JSON config files and PowerShell function files so the docs never go out of sync.
+O script `devdocs-generator.ps1` gera automaticamente arquivos markdown (`.mdx`) do Astro/Starlight para a documentação de desenvolvimento. Ele obtém o conteúdo diretamente dos arquivos de configuração JSON e dos arquivos de função do PowerShell, para que a documentação nunca fique desatualizada.
 
-## When Does it Run?
+## Quando ele é executado?
 
-- Automatically runs as part of the `pre-release.yaml` GitHub Actions workflow (manually triggered via `workflow_dispatch`), which regenerates the `.mdx` files and updates the `"link"` properties in the JSON config files
-- `pre-release.yaml` then opens a `docs-update` pull request with those changes; `auto-merge-docs.yaml` auto-approves and merges it into `main`
-- That merge pushes changes under `docs/**`, which triggers `docs.yaml` — but `docs.yaml` only builds and deploys the Astro site, it does not run the generator itself
-- Can also be run manually/locally from `tools/` (`./devdocs-generator.ps1`)
+- É executado automaticamente como parte do fluxo de trabalho (workflow) `pre-release.yaml` do GitHub Actions (acionado manualmente via `workflow_dispatch`), que regenera os arquivos `.mdx` e atualiza as propriedades `"link"` nos arquivos de configuração JSON
+- Em seguida, `pre-release.yaml` abre um pull request `docs-update` com essas alterações; `auto-merge-docs.yaml` aprova e mescla automaticamente o pull request na branch `main`
+- Essa mescla envia as alterações em `docs/**`, o que aciona `docs.yaml` — mas `docs.yaml` apenas compila e publica o site Astro, sem executar o gerador em si
+- Também pode ser executado manualmente/localmente a partir de `tools/` (`./devdocs-generator.ps1`)
 
-## What Does It Do?
+## O que ele faz?
 
-### 1. Loads the Data
+### 1. Carrega os dados
 
-- Reads `config/tweaks.json` and `config/feature.json`
-- Reads all `.ps1` function files from `functions/public/` and `functions/private/`
-- Parses `Invoke-WPFButton.ps1` to build a mapping of button names to their function names
+- Lê `config/tweaks.json` e `config/feature.json`
+- Lê todos os arquivos de função `.ps1` de `functions/public/` e `functions/private/`
+- Analisa `Invoke-WPFButton.ps1` para montar um mapa de nomes de botão para nomes de função
 
-### 2. Updates Links in JSON
+### 2. Atualiza os links no JSON
 
-- Adds or updates a `"link"` property on every entry in both JSON config files
-- Each link points to that entry's documentation page on the Astro/Starlight site
-- The updated links are automatically committed back to the JSON config files as part of the pre-release workflow
+- Adiciona ou atualiza uma propriedade `"link"` em cada entrada dos dois arquivos de configuração JSON
+- Cada link aponta para a página de documentação dessa entrada no site Astro/Starlight
+- Os links atualizados são automaticamente comitados de volta nos arquivos de configuração JSON como parte do fluxo de pré-lançamento (pre-release)
 
-### 3. Cleans Up Old Docs
+### 3. Limpa a documentação antiga
 
-- Deletes all `.mdx` files from `docs/src/content/docs/code-reference/tweaks/` and `docs/src/content/docs/code-reference/features/`
-- This prevents duplicate or orphaned files from previous runs
-- No category `index.mdx` landing pages exist yet; if one is added later, the matching exclusion in the script is left commented out ready to re-enable
+- Exclui todos os arquivos `.mdx` de `docs/src/content/docs/code-reference/tweaks/` e `docs/src/content/docs/code-reference/features/`
+- Isso evita arquivos duplicados ou órfãos de execuções anteriores
+- Ainda não existem páginas de entrada `index.mdx` por categoria; se uma for adicionada depois, a exclusão correspondente no script fica comentada, pronta para ser reativada
 
-### 4. Generates Tweak Documentation
+### 4. Gera a documentação dos ajustes
 
-For each entry in `tweaks.json` that belongs to a documented category:
+Para cada entrada em `tweaks.json` que pertence a uma categoria documentada:
 
-- **Button type** entries get the mapped PowerShell function file embedded
-- **All other types** get the raw JSON snippet embedded with correct line numbers from the source file
-- Entries with **registry changes** get a Registry Changes section added
+- As entradas do tipo **Button** recebem o arquivo de função do PowerShell mapeado incorporado
+- **Todos os outros tipos** recebem o trecho JSON bruto incorporado com os números de linha corretos do arquivo de origem
+- As entradas com **alterações no registro** recebem uma seção de Alterações no Registro
 
-### 5. Generates Feature Documentation
+### 5. Gera a documentação dos recursos
 
-For each entry in `feature.json` that belongs to a documented category:
+Para cada entrada em `feature.json` que pertence a uma categoria documentada:
 
-- **Fixes and Legacy Windows Panels** get the mapped PowerShell function file embedded
-- **Features** get the raw JSON snippet embedded with correct line numbers
+- **Fixes e Legacy Windows Panels** recebem o arquivo de função do PowerShell mapeado incorporado
+- **Features** recebem o trecho JSON bruto incorporado com os números de linha corretos
 
-### 6. Output Format
+### 6. Formato de saída
 
-- Every `.mdx` file gets Starlight frontmatter with `title` and `description` (description comes from the entry's `Description` field when present). Values are serialized as JSON quoted strings, which are valid YAML scalars and preserve Windows paths, quotation marks, and line breaks.
-- A `:::note` aside points back at the source file (JSON config or PowerShell function) it was generated from
-- Code blocks use Starlight/Expressive Code syntax with a `title` attribute naming the source file
-- Files are organized into category subdirectories matching the JSON `category` field
+- Cada arquivo `.mdx` recebe um frontmatter do Starlight com `title` e `description` (a descrição vem do campo `Description` da entrada, quando presente). Os valores são serializados como strings JSON entre aspas, que são escalares YAML válidos e preservam caminhos do Windows, aspas e quebras de linha.
+- Um bloco `:::note` aponta de volta para o arquivo de origem (configuração JSON ou função do PowerShell) a partir do qual foi gerado
+- Os blocos de código usam a sintaxe do Starlight/Expressive Code com um atributo `title` que nomeia o arquivo de origem
+- Os arquivos são organizados em subdiretórios de categoria correspondentes ao campo `category` do JSON
 
-## Documented Categories
+## Categorias documentadas
 
-The script generates docs for entries in these categories:
+O script gera documentação para entradas nestas categorias:
 
 - Essential Tweaks
 - z--Advanced-Tweaks---CAUTION
@@ -68,7 +68,7 @@ The script generates docs for entries in these categories:
 - Fixes
 - Legacy Windows Panels
 
-## File Structure
+## Estrutura de arquivos
 
 ```
 docs/src/content/docs/code-reference/
@@ -83,26 +83,26 @@ docs/src/content/docs/code-reference/
     Legacy-Windows-Panels/
 ```
 
-The Starlight sidebar picks these up automatically via `autogenerate` entries in `docs/astro.config.mjs` for the `code-reference/tweaks` and `code-reference/features` directories, so no sidebar edits are needed when new entries are added.
+A barra lateral do Starlight detecta esses arquivos automaticamente por meio das entradas `autogenerate` em `docs/astro.config.mjs` para os diretórios `code-reference/tweaks` e `code-reference/features`, portanto não é necessário editar a barra lateral quando novas entradas são adicionadas.
 
-## How File Names Are Derived
+## Como os nomes de arquivo são derivados
 
-The script strips common prefixes from the JSON key names using the pattern `WPF(WinUtil|Toggle|Features?|Tweaks?|Panel|Fix(es)?)?`. For example:
+O script remove prefixos comuns dos nomes das chaves JSON usando o padrão `WPF(WinUtil|Toggle|Features?|Tweaks?|Panel|Fix(es)?)?`. Por exemplo:
 
-| JSON Key            | Generated File |
+| Chave JSON          | Arquivo gerado |
 | ------------------- | -------------- |
 | `WPFTweaksHiber`    | `Hiber.mdx`     |
 | `WPFTweaksDeBloat`  | `DeBloat.mdx`   |
 | `WPFFeatureshyperv` | `hyperv.mdx`    |
 | `WPFPanelDISM`      | `DISM.mdx`      |
 
-## Key Points
+## Pontos principais
 
-- The JSON config files are the single source of truth
-- Manual edits to generated `.mdx` files will be overwritten on the next run
-- The script only touches `docs/src/content/docs/code-reference/tweaks/` and `.../features/` — `architecture.mdx` and any other hand-written page under `code-reference/` are untouched
-  — if a category `index.mdx` landing page is added inside `tweaks/` or `features/`, uncomment the exclusion in the cleanup step first, or it will be deleted on the next run
-- Category directories are created automatically if they don't exist
-- The `"link"` property added to JSON entries is excluded from the displayed code blocks
-- The `pre-release` workflow generates both the `.mdx` files and the `"link"` properties, and commits them back to the repo via the `docs-update` PR
-- The `docs` workflow never runs the generator — it only builds and deploys the already-committed Astro site
+- Os arquivos de configuração JSON são a única fonte da verdade
+- Edições manuais nos arquivos `.mdx` gerados serão sobrescritas na próxima execução
+- O script só mexe em `docs/src/content/docs/code-reference/tweaks/` e `.../features/` — `architecture.mdx` e qualquer outra página escrita à mão em `code-reference/` não são alteradas
+  — se uma página de entrada `index.mdx` de categoria for adicionada dentro de `tweaks/` ou `features/`, descomente a exclusão na etapa de limpeza primeiro, ou ela será excluída na próxima execução
+- Os diretórios de categoria são criados automaticamente caso não existam
+- A propriedade `"link"` adicionada às entradas JSON é excluída dos blocos de código exibidos
+- O fluxo `pre-release` gera tanto os arquivos `.mdx` quanto as propriedades `"link"` e os comita de volta no repositório por meio do PR `docs-update`
+- O fluxo `docs` nunca executa o gerador — ele apenas compila e publica o site Astro já comitado

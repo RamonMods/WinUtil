@@ -1130,7 +1130,7 @@
                     Background="{DynamicResource ButtonWin11ISOBackgroundColor}" Foreground="{DynamicResource ButtonWin11ISOForegroundColor}" FontWeight="Bold" Name="WPFTab5BT">
                     <ToggleButton.Content>
                         <TextBlock FontSize="{DynamicResource TabButtonFontSize}" Background="Transparent" Foreground="{DynamicResource ButtonWin11ISOForegroundColor}">
-                            <Underline>C</Underline>riador do Win11
+                            <Underline>C</Underline>riar Win11
                         </TextBlock>
                     </ToggleButton.Content>
                 </ToggleButton>

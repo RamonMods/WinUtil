@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Progress bar reflects how a run ended
+# Testes - A barra de progresso reflete como a execução terminou
 #===========================================================================
 
 BeforeAll {
@@ -23,7 +23,7 @@ BeforeAll {
 
     function script:New-ProgressFixture {
         $bar = New-Object System.Windows.Controls.ProgressBar
-        # the brushes the job layer points the fill at, resolvable from the control itself
+        # os pincéis que a camada de trabalhos aponta para o preenchimento, resolvíveis pelo próprio controle
         $bar.Resources.Add("ProgressBarForegroundColor", [System.Windows.Media.Brushes]::LimeGreen)
         $bar.Resources.Add("ProgressBarErrorColor", [System.Windows.Media.Brushes]::Red)
         $bar.Resources.Add("ProgressBarWarningColor", [System.Windows.Media.Brushes]::Orange)
@@ -38,8 +38,8 @@ BeforeAll {
     }
 }
 
-Describe "Step-WinUtilJob progress colour" {
-    It "fills green while a run is going normally" {
+Describe "Cor de progresso de Step-WinUtilJob" {
+    It "preenche de verde enquanto a execução ocorre normalmente" {
         $bar = New-ProgressFixture
 
         Step-WinUtilJob -Status "working" -Percent 40 -State "Normal"
@@ -47,7 +47,7 @@ Describe "Step-WinUtilJob progress colour" {
         $bar.Foreground | Should -Be ([System.Windows.Media.Brushes]::LimeGreen)
     }
 
-    It "turns the bar red when a run failed" {
+    It "fica vermelha quando a execução falha" {
         $bar = New-ProgressFixture
 
         Step-WinUtilJob -Status "Tweaks failed" -Percent 100 -State "Error"
@@ -55,17 +55,17 @@ Describe "Step-WinUtilJob progress colour" {
         $bar.Foreground | Should -Be ([System.Windows.Media.Brushes]::Red)
     }
 
-    It "warns rather than reporting success when a run finished with errors" {
+    It "avisa em vez de informar sucesso quando a execução termina com erros" {
         $bar = New-ProgressFixture
 
-        # this is the case that read as a clean finish: full bar, normal colour
+        # este é o caso que parecia uma conclusão limpa: barra cheia, cor normal
         Step-WinUtilJob -Status "Tweaks finished with 2 error(s)" -Percent 100 -State "Paused"
 
         $bar.Foreground | Should -Be ([System.Windows.Media.Brushes]::Orange)
         $bar.Foreground | Should -Not -Be ([System.Windows.Media.Brushes]::LimeGreen)
     }
 
-    It "goes back to the normal colour when the next run starts" {
+    It "volta à cor normal quando a próxima execução começa" {
         $bar = New-ProgressFixture
 
         Step-WinUtilJob -Status "Tweaks failed" -Percent 100 -State "Error"
@@ -74,7 +74,7 @@ Describe "Step-WinUtilJob progress colour" {
         $bar.Foreground | Should -Be ([System.Windows.Media.Brushes]::LimeGreen)
     }
 
-    It "mirrors the status into each visible working label" {
+    It "espelha o status em cada rótulo de trabalho visível" {
         $null = New-ProgressFixture
         $global:sync["WPFInstallWorkingPanel"] = New-Object System.Windows.Controls.Grid
         $global:sync["WPFInstallWorkingLabel"] = New-Object System.Windows.Controls.TextBlock
@@ -89,7 +89,7 @@ Describe "Step-WinUtilJob progress colour" {
         $global:sync["WPFTweaksWorkingLabel"].Text | Should -Be "Installing vlc (2/7)"
     }
 
-    It "leaves hidden working labels alone" {
+    It "não altera rótulos de trabalho ocultos" {
         $null = New-ProgressFixture
         $global:sync["WPFInstallWorkingPanel"] = New-Object System.Windows.Controls.Grid
         $global:sync["WPFInstallWorkingLabel"] = New-Object System.Windows.Controls.TextBlock
@@ -106,7 +106,7 @@ Describe "Step-WinUtilJob progress colour" {
         $global:sync["WPFTweaksWorkingLabel"].Text | Should -Be "Applying tweaks..."
     }
 
-    It "swaps the app list for the working view and back" {
+    It "troca a lista de aplicativos pela visualização de trabalho e volta" {
         $null = New-ProgressFixture
         $global:sync["WPFInstallWorkingPanel"] = New-Object System.Windows.Controls.Grid
         $global:sync["WPFInstallContentGrid"] = New-Object System.Windows.Controls.Grid
@@ -128,7 +128,7 @@ Describe "Step-WinUtilJob progress colour" {
         $global:sync["WPFSearchChips"].Visibility | Should -Be ([System.Windows.Visibility]::Visible)
     }
 
-    It "swaps the tweaks list and action bar for the working view and back" {
+    It "troca a lista de ajustes e a barra de ações pela visualização de trabalho e volta" {
         $null = New-ProgressFixture
         $global:sync["WPFTweaksWorkingPanel"] = New-Object System.Windows.Controls.Grid
         $global:sync["WPFTweaksContentScroll"] = New-Object System.Windows.Controls.ScrollViewer

@@ -1,7 +1,7 @@
 function Test-WinUtilShellRunning {
     <#
         .SYNOPSIS
-            Whether one instance is still running, treating a disposed one as finished
+            Se uma instância ainda está em execução, tratando uma descartada como concluída
     #>
     param($PowerShell)
 
@@ -18,20 +18,20 @@ function Test-WinUtilShellRunning {
 function Register-WinUtilActiveShell {
     <#
         .SYNOPSIS
-            Records a PowerShell instance that is running on the worker pool
+            Registra uma instância do PowerShell que está rodando no pool de workers
 
         .DESCRIPTION
-            An instance still queued when the pool closes starts on a closing runspace, throws on
-            a thread pool thread where nothing catches, and takes the process down with it.
-            Tracking what is in flight is what lets those be stopped first.
+            Uma instância ainda enfileirada quando o pool fecha inicia em um runspace em fechamento, lança uma
+            exceção em uma thread do pool onde nada a captura, e derruba o processo junto.
+            Acompanhar o que está em andamento permite interromper essas primeiro.
     #>
     param(
         [Parameter(Mandatory)]
         $PowerShell
     )
 
-    # Synchronized protects one operation, not a test followed by an assignment, so the
-    # collection is created under the shared lock
+    # Synchronized protege uma operação, não um teste seguido de uma atribuição, então a
+    # coleção é criada sob o bloqueio compartilhado
     [System.Threading.Monitor]::Enter($sync.SyncRoot)
     try {
         if ($null -eq $sync.ActiveShells) {
@@ -41,14 +41,14 @@ function Register-WinUtilActiveShell {
         [System.Threading.Monitor]::Exit($sync.SyncRoot)
     }
 
-    # Nothing disposes these on the way out, so finished ones are dropped here instead of
-    # accumulating for the life of the session
+    # Nada descarta estas na saída, então as concluídas são removidas aqui, em vez de
+    # se acumularem durante toda a sessão
     foreach ($finished in (Get-WinUtilActiveShell)) {
         if (-not (Test-WinUtilShellRunning $finished)) {
             try {
                 $sync.ActiveShells.Remove($finished)
             } catch {
-                Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Could not remove a completed worker from the active set: $_"
+                Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Não foi possível remover um worker concluído do conjunto ativo: $_"
             }
         }
     }
@@ -59,11 +59,11 @@ function Register-WinUtilActiveShell {
 function Get-WinUtilActiveShell {
     <#
         .SYNOPSIS
-            A snapshot of the tracked instances, copied under the collection's own lock
+            Um instantâneo das instâncias acompanhadas, copiado sob o bloqueio da própria coleção
 
         .DESCRIPTION
-            Enumerating a synchronized ArrayList is not itself synchronized; a concurrent Add or
-            Remove throws mid-loop. SyncRoot is the documented fix.
+            Enumerar um ArrayList sincronizado não é, por si só, sincronizado; um Add ou Remove
+            concorrente lança no meio do laço. SyncRoot é a correção documentada.
     #>
 
     if ($null -eq $sync.ActiveShells) {
@@ -81,21 +81,21 @@ function Get-WinUtilActiveShell {
 function Stop-WinUtilActiveWork {
     <#
         .SYNOPSIS
-            Asks everything running on the worker pool to stop, and waits for it
+            Pede a tudo que roda no pool de workers para parar, e espera
 
         .DESCRIPTION
-            Stop is a request, not a kill: a command already inside an installer runs until it
-            returns. The wait is bounded so a worker that never returns cannot hold the window
-            open.
+            Parar é um pedido, não uma morte: um comando já dentro de um instalador roda até
+            retornar. A espera é limitada para que um worker que nunca retorna não possa manter a janela
+            aberta.
 
         .PARAMETER TimeoutSeconds
-            How long to wait before giving up on it.
+            Quanto tempo esperar antes de desistir.
     #>
     param(
         [int]$TimeoutSeconds = 15,
 
-        # Issue the stop and return. The caller polls Test-WinUtilActiveWorkRunning instead of
-        # blocking here, which matters on the interface thread where a wait freezes the window.
+        # Emite a parada e retorna. O chamador consulta Test-WinUtilActiveWorkRunning em vez de
+        # bloquear aqui, o que importa na thread da interface, onde uma espera congela a janela.
         [switch]$NoWait
     )
 
@@ -104,14 +104,14 @@ function Stop-WinUtilActiveWork {
         return $true
     }
 
-    Write-WinUtilLog -Component "UI" -Message "Stopping $($shells.Count) running item(s) before closing."
+    Write-WinUtilLog -Component "UI" -Message "Parando $($shells.Count) item(ns) em execução antes de fechar."
 
     foreach ($shell in $shells) {
         if (Test-WinUtilShellRunning $shell) {
             try {
                 $null = $shell.BeginStop($null, $null)
             } catch {
-                Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Could not request that a worker stop: $_"
+                Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Não foi possível pedir a parada de um worker: $_"
             }
         }
     }
@@ -125,21 +125,21 @@ function Stop-WinUtilActiveWork {
         $stillRunning = @(Get-WinUtilActiveShell | Where-Object { Test-WinUtilShellRunning $_ }).Count
 
         if ($stillRunning -eq 0) {
-            Write-WinUtilLog -Component "UI" -Message "Everything stopped after $($clock.ElapsedMilliseconds) ms."
+            Write-WinUtilLog -Component "UI" -Message "Tudo parou após $($clock.ElapsedMilliseconds) ms."
             return $true
         }
 
         Start-Sleep -Milliseconds 100
     }
 
-    Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Gave up waiting for work to stop after $TimeoutSeconds seconds, closing anyway."
+    Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Desistiu de esperar a parada do trabalho após $TimeoutSeconds segundos, fechando mesmo assim."
     return $false
 }
 
 function Test-WinUtilActiveWorkRunning {
     <#
         .SYNOPSIS
-            Whether any tracked instance is still running
+            Se alguma instância acompanhada ainda está em execução
     #>
 
     foreach ($shell in (Get-WinUtilActiveShell)) {

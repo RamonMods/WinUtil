@@ -3,8 +3,8 @@ function Invoke-WinUtilInstallAppRenderBatch {
         [Parameter(Mandatory = $true)]
         $CategoryBatch,
 
-        # How many entries to build in this pass. Entries are built in one parse each, so a pass
-        # costs a few milliseconds per ten entries; the rest goes back on the queue.
+        # Quantas entradas construir nesta passagem. Cada entrada é construída em uma análise, então uma passagem
+        # custa alguns milissegundos por dez entradas; o restante volta para a fila.
         [int]$ChunkSize = 40
     )
 
@@ -12,7 +12,7 @@ function Invoke-WinUtilInstallAppRenderBatch {
     $count = [Math]::Min($keys.Count, $ChunkSize)
     $chunk = @($keys[0..($count - 1)])
 
-    # This runs on the dispatcher, so keep the slice free of logging and other disk I/O.
+    # Isto roda no dispatcher, então mantenha a fatia livre de registro em log e outras operações de disco.
     $checkBoxes = @(Initialize-InstallAppEntries -TargetElement $CategoryBatch.TargetElement -AppKeys $chunk)
     for ($i = 0; $i -lt $chunk.Count; $i++) {
         $sync.($chunk[$i]) = $checkBoxes[$i]
@@ -26,8 +26,8 @@ function Invoke-WinUtilInstallAppRenderBatch {
         })
     }
 
-    # Entries render in batches, so a filter that is already active has to be applied to each new
-    # batch. Categories count as an active filter just like search text does.
+    # As entradas são renderizadas em lotes, então um filtro já ativo precisa ser aplicado a cada novo
+    # lote. Categorias contam como filtro ativo, assim como o texto de busca.
     if ($sync.currentTab -eq "Install" -and $sync.SearchBar) {
         $selectedCategories = if ($sync.SelectedAppCategories) { $sync.SelectedAppCategories.ToArray() } else { @() }
 
@@ -49,8 +49,8 @@ function Start-WinUtilInstallAppRendering {
 
     $sync.InstallAppEntriesRendered = $false
 
-    # Before the window is shown nothing is waiting on the interface thread, so the whole list is
-    # built in one pass and the window opens complete instead of filling in
+    # Antes de a janela ser exibida, nada espera pela thread da interface, então a lista inteira é
+    # construída em uma passagem e a janela abre completa em vez de preencher aos poucos
     if ($sync.BuildingBeforeShow) {
         while ($sync.InstallAppRenderQueue.Count -gt 0) {
             Invoke-WinUtilInstallAppRenderBatch -CategoryBatch $sync.InstallAppRenderQueue.Dequeue() -ChunkSize ([int]::MaxValue)
@@ -64,10 +64,10 @@ function Start-WinUtilInstallAppRendering {
         -Step { param($CategoryBatch) Invoke-WinUtilInstallAppRenderBatch -CategoryBatch $CategoryBatch } `
         -OnComplete { Complete-WinUtilInstallAppRendering } `
         -DeferWhile {
-            # Tabs that have never been built come first. This list is already on screen and
-            # filling in, while another tab is empty until it is built, so a click on one costs
-            # the whole build. The list finishing a little later is not felt; a tab that takes
-            # half a second to open is.
+            # Abas que nunca foram construídas vêm primeiro. Esta lista já está na tela e sendo
+            # preenchida, enquanto outra aba fica vazia até ser construída, então um clique nela custa
+            # a construção inteira. A lista terminar um pouco depois não é notado; uma aba que leva
+            # meio segundo para abrir, sim.
             $sync.TabWarmupQueue -and $sync.TabWarmupQueue.Count -gt 0
         }
 }

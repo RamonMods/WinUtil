@@ -34,7 +34,7 @@ async function labelChanges(title, labels, files = [{ filename: 'functions/examp
   return calls;
 }
 
-test('retitling removes obsolete mapped labels before adding the current label', async () => {
+test('renomear remove rótulos mapeados obsoletos antes de adicionar o rótulo atual', async () => {
   assert.deepEqual(await labelChanges('Fix(ui): corrected', ['new feature', 'documentation', 'custom']), [
     ['remove', 'new feature'],
     ['remove', 'documentation'],
@@ -42,15 +42,15 @@ test('retitling removes obsolete mapped labels before adding the current label',
   ]);
 });
 
-test('an unrecognized title removes mapped labels but preserves unrelated labels', async () => {
+test('um título não reconhecido remove rótulos mapeados, mas preserva rótulos não relacionados', async () => {
   assert.deepEqual(await labelChanges('Updated description', ['bug', 'custom']), [['remove', 'bug']]);
 });
 
-test('an already matching type label is retained', async () => {
+test('um rótulo de tipo já correspondente é mantido', async () => {
   assert.deepEqual(await labelChanges('docs: update', ['documentation', 'custom']), []);
 });
 
-test('skip-changelog reconciliation uses current labels and current files', async () => {
+test('a reconciliação de skip-changelog usa os rótulos e arquivos atuais', async () => {
   const code = [{ filename: 'functions/example.ps1' }];
   const docs = [{ filename: 'docs/example.mdx' }];
   assert.deepEqual(await labelChanges('Update', ['skip-changelog'], code), [['remove', 'skip-changelog']]);
@@ -59,7 +59,7 @@ test('skip-changelog reconciliation uses current labels and current files', asyn
   assert.deepEqual(await labelChanges('Update', ['skip-changelog'], docs), []);
 });
 
-test('the embedded unattended XML is classified as a code change', async () => {
+test('o XML unattended incorporado é classificado como mudança de código', async () => {
   const files = [{ filename: 'tools/autounattend.xml' }];
   assert.deepEqual(await labelChanges('Update', [], files), []);
   assert.deepEqual(await labelChanges('Update', ['skip-changelog'], files), [['remove', 'skip-changelog']]);

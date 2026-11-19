@@ -1,11 +1,11 @@
 #===========================================================================
-# Tests - BitLocker Disable Tweak InvokeScript
+# Testes - InvokeScript do ajuste de desabilitação do BitLocker
 #===========================================================================
-# Covers WPFTweaksDisableBitLocker (config/tweaks.json): the apply script must
-# query Get-BitLockerVolume and skip Disable-BitLocker when VolumeStatus is
-# FullyDecrypted. ProtectionStatus Off alone is not sufficient: an encrypted
-# volume with suspended protection must still be disabled. Query and disable
-# failures must propagate instead of being swallowed.
+# Cobre WPFTweaksDisableBitLocker (config/tweaks.json): o script de aplicação deve
+# consultar Get-BitLockerVolume e ignorar Disable-BitLocker quando VolumeStatus for
+# FullyDecrypted. ProtectionStatus Off sozinho não basta: um volume criptografado
+# com proteção suspensa ainda deve ser desabilitado. Falhas de consulta e de
+# desabilitação devem se propagar, em vez de serem engolidas.
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -34,7 +34,7 @@ Describe "WPFTweaksDisableBitLocker InvokeScript" {
         Mock Write-Host { }
     }
 
-    It "skips Disable-BitLocker and reports already-off when FullyDecrypted" {
+    It "ignora Disable-BitLocker e reporta já desabilitado quando FullyDecrypted" {
         Mock Get-BitLockerVolume {
             [pscustomobject]@{
                 MountPoint           = $Env:SystemDrive
@@ -55,7 +55,7 @@ Describe "WPFTweaksDisableBitLocker InvokeScript" {
         }
     }
 
-    It "still disables an encrypted volume with ProtectionStatus Off" {
+    It "ainda desabilita um volume criptografado com ProtectionStatus Off" {
         Mock Get-BitLockerVolume {
             [pscustomobject]@{
                 MountPoint           = $Env:SystemDrive
@@ -72,7 +72,7 @@ Describe "WPFTweaksDisableBitLocker InvokeScript" {
         }
     }
 
-    It "disables an encrypted volume with ProtectionStatus On" {
+    It "desabilita um volume criptografado com ProtectionStatus On" {
         Mock Get-BitLockerVolume {
             [pscustomobject]@{
                 MountPoint           = $Env:SystemDrive
@@ -89,7 +89,7 @@ Describe "WPFTweaksDisableBitLocker InvokeScript" {
         }
     }
 
-    It "propagates Get-BitLockerVolume failures without calling Disable-BitLocker" {
+    It "propaga falhas de Get-BitLockerVolume sem chamar Disable-BitLocker" {
         Mock Get-BitLockerVolume { throw "simulated BitLocker query failure" }
 
         { & $script:invokeBlock } | Should -Throw -ExpectedMessage "*simulated BitLocker query failure*"
@@ -97,7 +97,7 @@ Describe "WPFTweaksDisableBitLocker InvokeScript" {
         Should -Invoke -CommandName Disable-BitLocker -Times 0 -Exactly
     }
 
-    It "propagates Disable-BitLocker failures" {
+    It "propaga falhas de Disable-BitLocker" {
         Mock Get-BitLockerVolume {
             [pscustomobject]@{
                 MountPoint           = $Env:SystemDrive
@@ -111,13 +111,13 @@ Describe "WPFTweaksDisableBitLocker InvokeScript" {
         { & $script:invokeBlock } | Should -Throw -ExpectedMessage "*simulated BitLocker disable failure*"
     }
 
-    It "makes a non-terminating disable error stop the script" {
+    It "faz com que um erro não terminante de desabilitação interrompa o script" {
         Mock Get-BitLockerVolume { [pscustomobject]@{ VolumeStatus = 'FullyEncrypted' } }
         Mock Disable-BitLocker { Write-Error 'simulated non-terminating disable failure' }
         { & $script:invokeBlock } | Should -Throw '*simulated non-terminating disable failure*'
         Should -Invoke Disable-BitLocker -Times 1 -Exactly -ParameterFilter { $ErrorAction -eq 'Stop' }
     }
-    It "preserves the Enable-BitLocker undo script" {
+    It "preserva o script de desfazer Enable-BitLocker" {
         $script:undoText | Should -Match 'Enable-BitLocker -MountPoint \$Env:SystemDrive'
     }
 }

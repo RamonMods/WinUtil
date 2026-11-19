@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Runspace Behavior
+# Testes - Comportamento do runspace
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -49,7 +49,7 @@ BeforeAll {
     }
 }
 
-Describe "Invoke-WPFRunspace behavior" {
+Describe "Comportamento de Invoke-WPFRunspace" {
     BeforeEach {
         New-WinUtilRunspaceTestContext -InitialSync @{ Marker = "shared" }
     }
@@ -58,7 +58,7 @@ Describe "Invoke-WPFRunspace behavior" {
         Clear-WinUtilRunspaceTestContext
     }
 
-    It "returns a single async handle with no argument list" {
+    It "retorna um único handle assíncrono sem lista de argumentos" {
         $script:sync.Result = $null
 
         $handle = Invoke-WPFRunspace -ScriptBlock {
@@ -70,7 +70,7 @@ Describe "Invoke-WPFRunspace behavior" {
         $script:sync.Result | Should -Be "no-args|shared"
     }
 
-    It "refuses work when shutdown wins the lifecycle lock before a pool exists" {
+    It "recusa trabalho quando o desligamento ganha o bloqueio do ciclo de vida antes de existir um pool" {
         $script:sync.runspace.Close()
         $script:sync.runspace.Dispose()
         $script:sync.Remove("runspace")
@@ -120,7 +120,7 @@ Describe "Invoke-WPFRunspace behavior" {
         }
     }
 
-    It "registers started work before shutdown can close the pool" {
+    It "registra o trabalho iniciado antes que o desligamento possa fechar o pool" {
         $handle = Invoke-WPFRunspace -ScriptBlock {
             Start-Sleep -Seconds 5
         }
@@ -134,7 +134,7 @@ Describe "Invoke-WPFRunspace behavior" {
         $script:sync.ContainsKey("runspace") | Should -BeFalse
     }
 
-    It "preserves ownership and lets started work finish when cleanup registration fails" {
+    It "preserva a propriedade e permite que o trabalho iniciado termine quando o registro de limpeza falha" {
         $workStarted = [System.Threading.ManualResetEventSlim]::new($false)
         $script:sync.WorkStarted = $workStarted
         $script:sync.WorkFinished = $false
@@ -167,7 +167,7 @@ Describe "Invoke-WPFRunspace behavior" {
         }
     }
 
-    It "passes one named parameter" {
+    It "passa um parâmetro nomeado" {
         $script:sync.Result = $null
 
         $handle = Invoke-WPFRunspace -ParameterList @(,("Name", "value")) -ScriptBlock {
@@ -181,7 +181,7 @@ Describe "Invoke-WPFRunspace behavior" {
         $script:sync.Result | Should -Be "Name=value"
     }
 
-    It "passes multiple named parameters" {
+    It "passa vários parâmetros nomeados" {
         $script:sync.Result = $null
 
         $handle = Invoke-WPFRunspace -ParameterList @(
@@ -201,7 +201,7 @@ Describe "Invoke-WPFRunspace behavior" {
         $script:sync.Result | Should -Be "alpha|beta|shared"
     }
 
-    It "keeps the shared runspace pool usable after scriptblock failures" {
+    It "mantém o pool compartilhado de runspaces utilizável após falhas de scriptblock" {
         $handle = Invoke-WPFRunspace -ScriptBlock {
             Start-Sleep -Milliseconds 100
             throw "runspace failure"
@@ -218,7 +218,7 @@ Describe "Invoke-WPFRunspace behavior" {
         $script:sync.Result | Should -Be "after-failure"
     }
 
-    It "runs multiple queued invocations without shared PowerShell state" {
+    It "executa várias invocações enfileiradas sem estado compartilhado do PowerShell" {
         $script:sync.FirstResult = $null
         $script:sync.SecondResult = $null
 
@@ -242,12 +242,12 @@ Describe "Invoke-WPFRunspace behavior" {
 
 
 
-    It "exposes a strongly typed cleanup callback" {
+    It "expõe um callback de limpeza fortemente tipado" {
         ([WinUtilRunspaceCleanupV3]::Callback -is [System.Threading.WaitOrTimerCallback]) | Should -BeTrue
     }
 }
 
-Describe "Public runspace callers" {
+Describe "Chamadores públicos do runspace" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             ProcessRunning = $false
@@ -267,7 +267,7 @@ Describe "Public runspace callers" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "queues selected feature installation as a job without executing the body" {
+    It "enfileira a instalação de recursos selecionados como um trabalho sem executar o corpo" {
         $script:sync.selectedFeatures.Add("WPFFeaturesSandbox")
 
         Invoke-WPFFeatureInstall
@@ -279,7 +279,7 @@ Describe "Public runspace callers" {
         }
     }
 
-    It "queues selected tweak undo as a job without executing the body" {
+    It "enfileira a reversão dos ajustes selecionados como um trabalho sem executar o corpo" {
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         $script:sync.selectedTweaks.Add("WPFTweaksServices")
 
@@ -293,7 +293,7 @@ Describe "Public runspace callers" {
         }
     }
 
-    It "queues AppX removal as a job with the selection and app metadata" {
+    It "enfileira a remoção de AppX como um trabalho com a seleção e os metadados do aplicativo" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         $script:sync.configs.appxHashtable["WPFAppxExample"] = [pscustomobject]@{
             Content = "Example"
@@ -310,7 +310,7 @@ Describe "Public runspace callers" {
         }
     }
 
-    It "keeps every long workflow entrypoint on the job layer" {
+    It "mantém todos os pontos de entrada de fluxos longos na camada de trabalhos" {
         $publicRoot = Join-Path $script:repoRoot "functions\public"
         $privateRoot = Join-Path $script:repoRoot "functions\private"
         $entrypoints = @(
@@ -330,7 +330,7 @@ Describe "Public runspace callers" {
         foreach ($entrypoint in $entrypoints) {
             $source = Get-Content -Path $entrypoint -Raw
             $source | Should -Match 'Start-WinUtilJob -Name'
-            # Job bodies never build their own runspace or busy state
+            # Corpos de trabalho nunca criam seu próprio runspace ou estado de ocupação
             $source | Should -Not -Match 'RunspaceFactory\]::CreateRunspace'
             $source | Should -Not -Match 'Invoke-WPFRunspace'
             $source | Should -Not -Match '\$sync\.ProcessRunning'

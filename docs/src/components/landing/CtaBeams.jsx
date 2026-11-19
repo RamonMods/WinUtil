@@ -1,4 +1,4 @@
-// Light beams behind the final call to action.
+// Feixes de luz atrás da chamada final para a ação.
 import Beams from '../react-bits/Beams.jsx';
 import useStarlightTheme from '../../hooks/useStarlightTheme.js';
 import useAccentColor from '../../hooks/useAccentColor.js';

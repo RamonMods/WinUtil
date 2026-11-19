@@ -1,5 +1,5 @@
-// Hero eyebrow text with a periodic shine. ShinyText can't resolve CSS variables, so colors are picked per theme.
-// The server-rendered color comes from CSS instead, so it already matches the theme before hydration.
+// Texto do sobretítulo do hero com brilho periódico. O ShinyText não resolve variáveis CSS, então as cores são escolhidas por tema.
+// A cor renderizada no servidor vem do CSS, então já corresponde ao tema antes da hidratação.
 const FIRST_PAINT = { backgroundImage: 'linear-gradient(var(--wu-eyebrow-text), var(--wu-eyebrow-text))' };
 import ShinyText from '../react-bits/ShinyText.jsx';
 import useStarlightTheme from '../../hooks/useStarlightTheme.js';

@@ -24,7 +24,7 @@ function Remove-WinUtilEnvironmentReportExportFile {
 function Write-WinUtilEnvironmentReportExport {
     <#
     .SYNOPSIS
-        Publishes an environment report and its optional log companion as one export.
+        Publica um relatório de ambiente e seu arquivo de log opcional como uma única exportação.
     #>
     param(
         [Parameter(Mandatory)]
@@ -54,8 +54,8 @@ function Write-WinUtilEnvironmentReportExport {
     $retainLogsBackup = $false
 
     try {
-        # Prepare both outputs before replacing either destination. If collection or a temporary
-        # write fails, the previous export remains untouched.
+        # Prepara ambas as saídas antes de substituir qualquer destino. Se a coleta ou uma
+        # gravação temporária falhar, a exportação anterior permanece intacta.
         [System.IO.File]::WriteAllText($jsonTempPath, $Json, $encoding)
         if ($IncludeLogs) {
             [System.IO.File]::WriteAllText($logsTempPath, $Logs, $encoding)
@@ -77,8 +77,8 @@ function Write-WinUtilEnvironmentReportExport {
             $publishError = $_
             $rollbackErrors = [System.Collections.Generic.List[string]]::new()
 
-            # A two-file replacement is not atomic on Windows. Restore both destinations if the
-            # second publish fails so an old companion cannot appear to belong to new JSON.
+            # A substituição de dois arquivos não é atômica no Windows. Restaura ambos os
+            # destinos se a segunda publicação falhar, para um arquivo antigo não parecer pertencer ao novo JSON.
             try {
                 if ($hadJson) {
                     Copy-WinUtilEnvironmentReportExportFile -SourcePath $jsonBackupPath -DestinationPath $JsonPath -Overwrite
@@ -88,7 +88,7 @@ function Write-WinUtilEnvironmentReportExport {
             } catch {
                 $retainJsonBackup = $hadJson
                 $recoveryNote = if ($hadJson) { " Recovery copy retained at $jsonBackupPath." } else { "" }
-                $rollbackErrors.Add("JSON restore failed: $($_.Exception.Message).$recoveryNote")
+                $rollbackErrors.Add("Falha ao restaurar o JSON: $($_.Exception.Message).$recoveryNote")
             }
 
             if ($IncludeLogs) {
@@ -101,12 +101,12 @@ function Write-WinUtilEnvironmentReportExport {
                 } catch {
                     $retainLogsBackup = $hadLogs
                     $recoveryNote = if ($hadLogs) { " Recovery copy retained at $logsBackupPath." } else { "" }
-                    $rollbackErrors.Add("logs restore failed: $($_.Exception.Message).$recoveryNote")
+                    $rollbackErrors.Add("Falha ao restaurar os logs: $($_.Exception.Message).$recoveryNote")
                 }
             }
 
             if ($rollbackErrors.Count -gt 0) {
-                $message = "Environment export publish failed: $($publishError.Exception.Message) Rollback also failed: $($rollbackErrors -join ' ')"
+                $message = "Falha ao publicar a exportação de ambiente: $($publishError.Exception.Message) A reversão também falhou: $($rollbackErrors -join ' ')"
                 throw [System.IO.IOException]::new($message, $publishError.Exception)
             }
 
@@ -124,7 +124,7 @@ function Write-WinUtilEnvironmentReportExport {
                 try {
                     Remove-WinUtilEnvironmentReportExportFile -Path $cleanupTarget.Path
                 } catch {
-                    Write-Warning "Could not remove temporary environment-export file $($cleanupTarget.Path): $($_.Exception.Message)"
+                    Write-Warning "Não foi possível remover o arquivo temporário de exportação de ambiente $($cleanupTarget.Path): $($_.Exception.Message)"
                 }
             }
         }

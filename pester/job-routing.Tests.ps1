@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Everything that changes the system goes through the job layer
+# Testes - Tudo que altera o sistema passa pela camada de trabalhos
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -7,10 +7,10 @@ BeforeAll {
     $script:configRoot = Join-Path $script:repoRoot "config"
 }
 
-Describe "Work routing" {
-    It "never hands work to a console window of its own" {
-        # A separate console takes the work outside the job layer, so it gets no progress bar,
-        # no taskbar state and no log lines, and the window outlives WinUtil
+Describe "Roteamento de trabalho" {
+    It "nunca entrega trabalho a uma janela de console própria" {
+        # Um console separado tira o trabalho da camada de trabalhos, então ele não tem barra de progresso,
+        # nem estado na barra de tarefas, nem linhas de log, e a janela sobrevive ao WinUtil
         $offenders = @()
         foreach ($file in (Get-ChildItem -Path $script:functionRoot -Filter *.ps1 -Recurse)) {
             $text = Get-Content -Path $file.FullName -Raw
@@ -30,7 +30,7 @@ Describe "Work routing" {
 
 
 
-    It "probes for optional commands without throwing when they are absent" {
+    It "verifica comandos opcionais sem gerar erro quando estão ausentes" {
         $offenders = @()
         foreach ($file in (Get-ChildItem -Path $script:functionRoot -Filter *.ps1 -Recurse)) {
             $text = Get-Content -Path $file.FullName -Raw
@@ -48,9 +48,9 @@ Describe "Work routing" {
 
 
 
-    It "never leaves the runspace handle in the pipeline" {
-        # Invoke-WPFRunspace returns an IAsyncResult. An unassigned call prints it to the
-        # console, or folds it into whatever the calling workflow returns.
+    It "nunca deixa o handle do runspace no pipeline" {
+        # Invoke-WPFRunspace retorna um IAsyncResult. Uma chamada sem atribuição o imprime no
+        # console, ou o incorpora ao que o fluxo de chamada retornar.
         $offenders = @()
         foreach ($file in (Get-ChildItem -Path $script:functionRoot -Filter *.ps1 -Recurse)) {
             if ($file.Name -eq "Invoke-WPFRunspace.ps1") { continue }

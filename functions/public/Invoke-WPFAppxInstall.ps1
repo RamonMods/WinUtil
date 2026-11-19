@@ -1,10 +1,10 @@
 function Invoke-WPFAppxInstall {
     if ($null -eq $sync.selectedAppx -or $sync.selectedAppx.Count -eq 0) {
-        Show-WinUtilMessage -Message "No AppX Package selected" -Title "Error" -Button "OK" -Icon "Error"
+        Show-WinUtilMessage -Message "Nenhum pacote AppX selecionado" -Title "Erro" -Button "OK" -Icon "Error"
         return
     }
 
-    Start-WinUtilJob -Name "AppX install" -Description "Installing AppX packages" -QueueIfBusy -Parameters @{
+    Start-WinUtilJob -Name "AppX install" -Description "Instalando pacotes AppX" -QueueIfBusy -Parameters @{
         Selected = @($sync.selectedAppx)
         Apps = $sync.configs.appxHashtable
     } -ScriptBlock {
@@ -12,14 +12,14 @@ function Invoke-WPFAppxInstall {
 
         $totalPackages = @($Selected).Count
         $results = @()
-        Write-WinUtilLog -Component "AppX" -Message "Starting AppX install for $totalPackages selected package(s)."
+        Write-WinUtilLog -Component "AppX" -Message "Iniciando a instalação do AppX para $totalPackages pacote(s) selecionado(s)."
 
         for ($index = 0; $index -lt $totalPackages; $index++) {
             $app = $Apps[$Selected[$index]]
             $position = $index + 1
 
-            Step-WinUtilJob -Status "Installing $($app.Content) ($position/$totalPackages)" -Percent ([int](($index / $totalPackages) * 100))
-            Write-Host "Installing $($app.Content)"
+            Step-WinUtilJob -Status "Instalando $($app.Content) ($position/$totalPackages)" -Percent ([int](($index / $totalPackages) * 100))
+            Write-Host "Instalando $($app.Content)"
             $appResults = @(Install-WinUtilAPPX -Name $app.PackageId -StoreId $app.StoreId)
             $results += $appResults
             $status = if (@($appResults | Where-Object Outcome -EQ "Failed").Count -gt 0) {

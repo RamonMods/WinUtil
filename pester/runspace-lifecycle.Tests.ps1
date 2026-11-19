@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Runspace lifecycle
+# Testes - Ciclo de vida do runspace
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -22,7 +22,7 @@ Describe "Initialize-WinUtilRunspacePool" {
         Remove-Variable -Name PARAM_OFFLINE -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "creates and reuses one open runspace pool" {
+    It "cria e reutiliza um único pool de runspaces aberto" {
         $firstPool = Initialize-WinUtilRunspacePool
         $secondPool = Initialize-WinUtilRunspacePool
 
@@ -30,14 +30,14 @@ Describe "Initialize-WinUtilRunspacePool" {
         [object]::ReferenceEquals($firstPool, $secondPool) | Should -BeTrue
     }
 
-    It "uses one lifecycle lock for the session" {
+    It "usa um único bloqueio de ciclo de vida para a sessão" {
         $firstLock = Get-WinUtilRunspacePoolLock
         $secondLock = Get-WinUtilRunspacePoolLock
 
         [object]::ReferenceEquals($firstLock, $secondLock) | Should -BeTrue
     }
 
-    It "closes and removes the active runspace pool" {
+    It "fecha e remove o pool de runspaces ativo" {
         $pool = Initialize-WinUtilRunspacePool
 
         Close-WinUtilRunspacePool
@@ -46,7 +46,7 @@ Describe "Initialize-WinUtilRunspacePool" {
         $script:sync.ContainsKey("runspace") | Should -BeFalse
     }
 
-    It "defers pool cleanup when a worker ignores the stop timeout" {
+    It "adia a limpeza do pool quando um worker ignora o tempo limite de parada" {
         $pool = [runspacefactory]::CreateRunspacePool(1, 1)
         $pool.Open()
         $script:sync.runspace = $pool
@@ -69,7 +69,7 @@ Describe "Initialize-WinUtilRunspacePool" {
     }
 }
 
-Describe "Runspace startup wiring" {
+Describe "Configuração de inicialização do runspace" {
 
 
 
@@ -78,7 +78,7 @@ Describe "Runspace startup wiring" {
 
 
 
-    It "carries every WinUtil function into a new runspace" {
+    It "carrega todas as funções do WinUtil em um novo runspace" {
         $sync = [Hashtable]::Synchronized(@{})
         $null = $sync
         function Test-WinUtilSessionStateMarker { "marker" }
@@ -103,7 +103,7 @@ Describe "Runspace startup wiring" {
         }
     }
 
-    It "loads WPF assemblies inside the cold-start asset runspace" {
+    It "carrega assemblies WPF dentro do runspace de ativos de inicialização a frio" {
         $source = Get-Content -Path (Join-Path $script:repoRoot "functions\private\Start-WinUtilAssetRendering.ps1") -Raw
 
         $source | Should -Match 'Add-Type -AssemblyName WindowsBase'

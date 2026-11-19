@@ -1,4 +1,4 @@
-// Solution card whose border lights up near the pointer.
+// Cartão de solução cuja borda se ilumina perto do ponteiro.
 import BorderGlow from '../react-bits/BorderGlow.jsx';
 import useStarlightTheme from '../../hooks/useStarlightTheme.js';
 

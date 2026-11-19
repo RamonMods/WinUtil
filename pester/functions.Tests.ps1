@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Functions
+# Testes - Funções
 #===========================================================================
 
 $functionRoot = Join-Path $PSScriptRoot "..\functions"
@@ -12,10 +12,10 @@ $functionCases = @(
     }
 )
 
-Describe "Function source files" {
+Describe "Arquivos de código-fonte de funções" {
     foreach ($functionCase in $functionCases) {
-        Context "Checking $($functionCase.Path)" {
-            It "has no parser errors" -TestCases $functionCase {
+        Context "Verificando $($functionCase.Path)" {
+            It "não tem erros de análise" -TestCases $functionCase {
                 param([string]$Path)
 
                 $tokens = $null
@@ -27,7 +27,7 @@ Describe "Function source files" {
                 }
             }
 
-            It "defines top-level functions with approved verb-noun names" -TestCases $functionCase {
+            It "define funções de nível superior com nomes verbo-substantivo aprovados" -TestCases $functionCase {
                 param([string]$Path)
 
                 $tokens = $null
@@ -59,7 +59,7 @@ Describe "Function source files" {
                 }
             }
 
-            It "imports without throwing" -TestCases $functionCase {
+            It "importa sem lançar exceção" -TestCases $functionCase {
                 param([string]$Path)
 
                 try {

@@ -1,5 +1,5 @@
-# Execute the configured scripts through the real tweak orchestrator. All service
-# operations are mocked so these tests never change the machine's indexer.
+# Executa os scripts configurados pelo orquestrador real de ajustes. Todas as operações de serviço
+# são simuladas para que estes testes nunca alterem o indexador da máquina.
 BeforeAll {
     $repoRoot = Split-Path $PSScriptRoot -Parent
     . (Join-Path $repoRoot 'functions/private/Invoke-WinUtilTweaks.ps1')
@@ -9,7 +9,7 @@ BeforeAll {
     function Invoke-WinUtilScript { param($Name, [scriptblock]$ScriptBlock) }
 }
 
-Describe 'Windows Search indexing apply and undo' {
+Describe 'Aplicação e reversão da indexação da Pesquisa do Windows' {
     BeforeEach {
         $script:sync = @{ configs = @{ tweaks = $script:searchTweaks } }
         $script:searchService = [pscustomobject]@{ StartType = 'Automatic'; Status = 'Running' }
@@ -26,7 +26,7 @@ Describe 'Windows Search indexing apply and undo' {
         Remove-Variable sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It 'disables and stops an automatic indexer, then restores and starts it' {
+    It 'desabilita e para um indexador automático e depois o restaura e inicia' {
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableSearchIndexing'
         $script:searchService.StartType | Should -Be 'Disabled'
         $script:searchService.Status | Should -Be 'Stopped'
@@ -38,7 +38,7 @@ Describe 'Windows Search indexing apply and undo' {
         Should -Invoke Start-Service -Times 1 -Exactly -ParameterFilter { $Name -eq 'WSearch' -and $ErrorAction -eq 'Stop' }
     }
 
-    It 'preserves a Manual service and its <Status> state on apply and undo' -TestCases @(
+    It 'preserva um serviço Manual e seu estado <Status> na aplicação e reversão' -TestCases @(
         @{ Status = 'Running' }, @{ Status = 'Stopped' }
     ) {
         param($Status)
@@ -54,14 +54,14 @@ Describe 'Windows Search indexing apply and undo' {
         Should -Invoke Write-Warning -Times 2 -Exactly -ParameterFilter { $Message -match 'WSearch.*Manual' }
     }
 
-    It 'does not stop the indexer when setting Disabled fails' {
+    It 'não para o indexador quando a definição de Disabled falha' {
         Mock Set-WinUtilService { }
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableSearchIndexing'
         Should -Invoke Stop-Service -Times 0 -Exactly
         $script:searchService.Status | Should -Be 'Running'
     }
 
-    It 'does not start the indexer when restoring Automatic fails' {
+    It 'não inicia o indexador quando a restauração de Automatic falha' {
         $script:searchService.StartType = 'Disabled'
         $script:searchService.Status = 'Stopped'
         Mock Set-WinUtilService { }
@@ -69,7 +69,7 @@ Describe 'Windows Search indexing apply and undo' {
         Should -Invoke Start-Service -Times 0 -Exactly
     }
 
-    It 'does not repeat stop or start operations after reaching the desired state' {
+    It 'não repete operações de parada ou inicialização após atingir o estado desejado' {
         $script:searchService.StartType = 'Disabled'
         $script:searchService.Status = 'Stopped'
         Invoke-WinUtilTweaks -CheckBox 'WPFTweaksDisableSearchIndexing'
@@ -80,7 +80,7 @@ Describe 'Windows Search indexing apply and undo' {
         Should -Invoke Start-Service -Times 0 -Exactly
     }
 
-    It 'skips absent WSearch in both configured scripts' {
+    It 'ignora o WSearch ausente nos dois scripts configurados' {
         Mock Get-Service { $null }
         & ([scriptblock]::Create($script:searchTweaks.WPFTweaksDisableSearchIndexing.InvokeScript -join "`n"))
         & ([scriptblock]::Create($script:searchTweaks.WPFTweaksDisableSearchIndexing.UndoScript -join "`n"))
@@ -88,7 +88,7 @@ Describe 'Windows Search indexing apply and undo' {
         Should -Invoke Start-Service -Times 0 -Exactly
     }
 
-    It 'propagates stop and start failures from the configured scripts' {
+    It 'propaga falhas de parada e inicialização dos scripts configurados' {
         $script:searchService.StartType = 'Disabled'
         Mock Stop-Service { throw 'Indexer stop failed' }
         { & ([scriptblock]::Create($script:searchTweaks.WPFTweaksDisableSearchIndexing.InvokeScript -join "`n")) } | Should -Throw '*Indexer stop failed*'

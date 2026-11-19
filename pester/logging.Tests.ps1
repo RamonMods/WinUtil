@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - WinUtil Logging
+# Testes - Registro de log do WinUtil
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -27,7 +27,7 @@ Describe "Write-WinUtilLog" {
         Remove-Item -Path $script:testRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    It "writes to the active timestamped session log under logs" {
+    It "grava no log de sessão ativo com carimbo de data/hora em logs" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             winutildir = $script:testRoot
@@ -41,8 +41,8 @@ Describe "Write-WinUtilLog" {
         Get-Content -Path $logPath -Raw | Should -Match "\[INFO\] \[Test\] same session log"
     }
 
-    It "records entries from a runspace that shares the console host" {
-        # Like the UI thread, which a transcript on the main thread never recorded
+    It "registra entradas de um runspace que compartilha o host do console" {
+        # Como a thread da interface, que uma transcrição na thread principal nunca registrava
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             logPath = $logPath
@@ -74,7 +74,7 @@ Describe "Write-WinUtilLog" {
         @($content | Where-Object { $_ -match "\[Test\] from the main thread$" }).Count | Should -Be 1
     }
 
-    It "keeps the session log readable while it is open" {
+    It "mantém o log da sessão legível enquanto está aberto" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             logPath = $logPath
@@ -87,7 +87,7 @@ Describe "Write-WinUtilLog" {
         Get-Content -LiteralPath $logPath -Raw | Should -Match "second entry"
     }
 
-    It "releases the file when closed and appends to it if a later entry arrives" {
+    It "libera o arquivo quando fechado e acrescenta entradas posteriores" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             logPath = $logPath
@@ -106,8 +106,8 @@ Describe "Write-WinUtilLog" {
         $content | Should -Match "after close"
     }
 
-    It "marks the session log as UTF-8 once, even after reopening it" {
-        # Without a BOM, Windows PowerShell's Get-Content reads the log as ANSI and mangles non-ASCII text
+    It "marca o log da sessão como UTF-8 uma única vez, mesmo após reabri-lo" {
+        # Sem BOM, o Get-Content do Windows PowerShell lê o log como ANSI e corrompe texto não ASCII
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             logPath = $logPath
@@ -123,13 +123,13 @@ Describe "Write-WinUtilLog" {
         ([regex]::Matches($hex, "EFBBBF")).Count | Should -Be 1
     }
 
-    It "shows the entry on the console without emitting a Write-Host record" {
+    It "mostra a entrada no console sem emitir um registro Write-Host" {
         $script:sync = [hashtable]::Synchronized(@{
             logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         })
         Mock Write-WinUtilHost { }
 
-        # A Write-Host record here would get logged twice inside a job
+        # Um registro Write-Host aqui seria registrado duas vezes dentro de um trabalho
         $records = @(& { Write-WinUtilLog -Component "Test" -Message "console entry" } 6>&1)
 
         $records.Count | Should -Be 0
@@ -138,7 +138,7 @@ Describe "Write-WinUtilLog" {
         }
     }
 
-    It "writes only the file when the entry is already on the console" {
+    It "grava apenas no arquivo quando a entrada já está no console" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             logPath = $logPath
@@ -151,7 +151,7 @@ Describe "Write-WinUtilLog" {
         Get-Content -Path $logPath -Raw | Should -Match "\[INFO\] \[Test\] collected output"
     }
 
-    It "writes entries produced concurrently by several threads" {
+    It "grava entradas produzidas simultaneamente por várias threads" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             winutildir = $script:testRoot
@@ -190,7 +190,7 @@ Describe "Write-WinUtilLog" {
         }
     }
 
-    It "creates one fallback log under logs when only winutildir is available" {
+    It "cria um log de reserva em logs quando apenas winutildir está disponível" {
         $script:sync = [hashtable]::Synchronized(@{
             winutildir = $script:testRoot
         })
@@ -207,7 +207,7 @@ Describe "Write-WinUtilLog" {
         $content | Should -Match "second fallback entry"
     }
 
-    It "still shows the entry when the log file cannot be opened" {
+    It "ainda mostra a entrada quando o arquivo de log não pode ser aberto" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             winutildir = $script:testRoot
@@ -231,7 +231,7 @@ Describe "Write-WinUtilLog" {
         Should -Invoke -CommandName Write-Warning -Times 0 -Exactly
     }
 
-    It "counts headline errors in the logging runspace whether or not it is a job worker" {
+    It "conta erros principais no runspace de log independentemente de ser um worker de trabalho" {
         $script:sync = [hashtable]::Synchronized(@{
             winutildir = $script:testRoot
             LoggedErrors = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
@@ -248,7 +248,7 @@ Describe "Write-WinUtilLog" {
         $script:sync.LoggedErrors.Count | Should -Be 2
     }
 
-    It "suppresses debug entries outside a local compile" {
+    It "suprime entradas de depuração fora de uma compilação local" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             IsLocalCompile = $false
@@ -260,7 +260,7 @@ Describe "Write-WinUtilLog" {
         Test-Path -Path $logPath | Should -BeFalse
     }
 
-    It "writes debug entries from a local compile" {
+    It "grava entradas de depuração de uma compilação local" {
         $logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
         $script:sync = [hashtable]::Synchronized(@{
             IsLocalCompile = $true
@@ -272,7 +272,7 @@ Describe "Write-WinUtilLog" {
         Get-Content -Path $logPath -Raw | Should -Match "\[DEBUG\] \[UI\] timing detail"
     }
 
-    It "does not record UI timing steps outside a local compile" {
+    It "não registra etapas de tempo da interface fora de uma compilação local" {
         $script:sync = [hashtable]::Synchronized(@{
             IsLocalCompile = $false
             StepTimings = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
@@ -286,7 +286,7 @@ Describe "Write-WinUtilLog" {
         Should -Invoke Write-WinUtilLog -Times 0 -Exactly
     }
 
-    It "records local UI timing steps as debug entries" {
+    It "registra etapas de tempo da interface local como entradas de depuração" {
         $script:sync = [hashtable]::Synchronized(@{
             IsLocalCompile = $true
             StepTimings = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
@@ -303,7 +303,7 @@ Describe "Write-WinUtilLog" {
 
 }
 
-Describe "Collected runspace output" {
+Describe "Saída coletada do runspace" {
     BeforeEach {
         $script:testRoot = Join-Path ([System.IO.Path]::GetTempPath()) "winutil-logging-$([guid]::NewGuid())"
         $script:logPath = Join-Path $script:testRoot "logs\winutil_2026-07-01_12-00-00.log"
@@ -319,7 +319,7 @@ Describe "Collected runspace output" {
         Remove-Item -Path $script:testRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    It "logs redirected Write-Host output and puts it back on the console as it was" {
+    It "registra a saída redirecionada de Write-Host e a devolve ao console como era" {
         Mock Write-WinUtilHost { }
 
         & { Write-Host "Set HKLM:\Software\Example\Value to 1" -ForegroundColor Green } 6>&1 | ForEach-Object {
@@ -332,7 +332,7 @@ Describe "Collected runspace output" {
         }
     }
 
-    It "logs redirected warnings and non-terminating errors" {
+    It "registra avisos redirecionados e erros não terminais" {
         Mock Write-WinUtilHost { }
 
         & { Write-Warning "Service Example was not found."; Write-Error "Access denied" -ErrorAction Continue } 2>&1 3>&1 | ForEach-Object {
@@ -344,7 +344,7 @@ Describe "Collected runspace output" {
         $content | Should -Match "\[ERROR\] \[Tweaks\] Non-terminating error : Access denied"
     }
 
-    It "does not show again what the host already displayed" {
+    It "não mostra novamente o que o host já exibiu" {
         Mock Write-WinUtilHost { }
 
         $collected = @(& { Write-Host "toggle applied"; Write-Warning "toggle warning" } 3>&1 6>&1)
@@ -358,7 +358,7 @@ Describe "Collected runspace output" {
         $content | Should -Match "\[WARN\] \[UI\] toggle warning"
     }
 
-    It "ignores ordinary output and blank lines" {
+    It "ignora saída comum e linhas em branco" {
         Mock Write-WinUtilHost { }
 
         & { "pipeline output"; Write-Host "" } 6>&1 | ForEach-Object {
@@ -368,7 +368,7 @@ Describe "Collected runspace output" {
         Test-Path -Path $script:logPath | Should -BeFalse
     }
 
-    It "moves each record from a runspace that shares the console host into the log once" {
+    It "move cada registro de um runspace que compartilha o host do console para o log uma única vez" {
         $runspace = [runspacefactory]::CreateRunspace($Host)
         $runspace.Open()
         $shell = [powershell]::Create()
@@ -399,8 +399,8 @@ Describe "Collected runspace output" {
         @($content | Where-Object { $_ -match "\[ERROR\] \[UI\] Non-terminating error : interface error$" }).Count | Should -Be 1
     }
 
-    It "keeps console-only helpers out of the information stream" {
-        # Anything these send through Write-Host would be logged twice inside a job
+    It "mantém auxiliares exclusivos de console fora do fluxo de informações" {
+        # Qualquer coisa que estes enviem por Write-Host seria registrada duas vezes dentro de um trabalho
         $failure = try { throw "simulated failure" } catch { $_ }
 
         $records = @(& {
@@ -415,10 +415,10 @@ Describe "Collected runspace output" {
     }
 }
 
-Describe "Session log wiring" {
-    It "does not hand the session log to a transcript" {
-        # A transcript only records the runspace that starts it, so the UI thread and jobs never
-        # made it into the file. The ISO post-install script runs on its own and is fine.
+Describe "Conexão do log da sessão" {
+    It "não entrega o log da sessão a uma transcrição" {
+        # Uma transcrição registra apenas o runspace que a inicia, então a thread da interface e os trabalhos
+        # nunca entravam no arquivo. O script de pós-instalação da ISO roda por conta própria e está OK.
         $offenders = Get-ChildItem -Path (Join-Path $script:repoRoot "scripts"), (Join-Path $script:repoRoot "functions") -Filter "*.ps1" -Recurse |
             Where-Object { $_.Name -ne "Invoke-WinUtilISOScript.ps1" } |
             Where-Object { (Get-Content -LiteralPath $_.FullName -Raw) -match "Start-Transcript" } |
@@ -427,14 +427,14 @@ Describe "Session log wiring" {
         $offenders | Should -BeNullOrEmpty
     }
 
-    It "logs the interface thread's output while the window is open" {
+    It "registra a saída da thread da interface enquanto a janela está aberta" {
         $mainScript = Get-Content -Path (Join-Path $script:repoRoot "scripts\main.ps1") -Raw
 
         $mainScript | Should -Match 'while \(-not \$uiHandle\.AsyncWaitHandle\.WaitOne\(\d+\)\) \{\s*Receive-WinUtilStreamOutput -PowerShell \$uiShell'
         $mainScript | Should -Match 'EndInvoke\(\$uiHandle\)[\s\S]*Receive-WinUtilStreamOutput -PowerShell \$uiShell'
     }
 
-    It "closes the session log on both exits" {
+    It "fecha o log da sessão nas duas saídas" {
         $mainScript = Get-Content -Path (Join-Path $script:repoRoot "scripts\main.ps1") -Raw
 
         ([regex]::Matches($mainScript, 'Close-WinUtilLog')).Count | Should -Be 2

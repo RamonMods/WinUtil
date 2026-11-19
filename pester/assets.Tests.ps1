@@ -1,13 +1,13 @@
 #===========================================================================
-# Tests - Asset rendering
+# Testes - Renderização de recursos visuais
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     . (Join-Path $script:repoRoot "functions\private\Register-WinUtilRunspaceCleanup.ps1")
 }
 
-Describe "Taskbar overlay rendering" {
-    It "loads the versioned cleanup helper beside a previous WinUtil helper type" {
+Describe "Renderização da sobreposição da barra de tarefas" {
+    It "carrega o auxiliar de limpeza versionado ao lado de um tipo auxiliar anterior do WinUtil" {
         if (-not ("WinUtilRunspaceCleanup" -as [type])) {
             Add-Type @"
 using System;
@@ -38,7 +38,7 @@ public static class WinUtilRunspaceCleanup
             Should -Not -Throw
     }
 
-    It "serializes speculative and fallback rendering through one shared lock" {
+    It "serializa a renderização especulativa e a de fallback por meio de um bloqueio compartilhado" {
         $startSource = Get-Content -Path (Join-Path $script:repoRoot "scripts\start.ps1") -Raw
         $initializerSource = Get-Content -Path (Join-Path $script:repoRoot "functions\private\Initialize-WinUtilTaskbarOverlayAssets.ps1") -Raw
 
@@ -48,7 +48,7 @@ public static class WinUtilRunspaceCleanup
         $initializerSource | Should -Match '\[System\.Threading\.Monitor\]::Exit\(\$assetRenderLock\)'
     }
 
-    It "closes a dedicated runspace after its invocation completes" {
+    It "fecha um runspace dedicado após a conclusão de sua invocação" {
         $runspace = [runspacefactory]::CreateRunspace()
         $runspace.Open()
         $shell = [powershell]::Create()

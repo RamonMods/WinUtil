@@ -1,24 +1,24 @@
 tag-prefix: ''
 categories:
-  - title: 'Features'
+  - title: 'Recursos'
     labels:
       - 'feature'
       - 'enhancement'
       - 'new feature'
-  - title: 'Bug Fixes'
+  - title: 'Correções de bugs'
     labels:
       - 'hotfix'
       - 'bugfix'
       - 'bug'
-  - title: 'UI/UX Improvements'
+  - title: 'Melhorias de UI/UX'
     labels:
       - 'ui update'
       - 'ui-ux'
-  - title: 'Slop cleaning'
+  - title: 'Limpeza de código'
     label: 'chore'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 template: |
-  ## Changes
+  ## Mudanças
 
   $CHANGES
 

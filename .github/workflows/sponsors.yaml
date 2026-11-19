@@ -1,4 +1,4 @@
-name: Generate Sponsors README
+name: Gerar README de patrocinadores
 on:
   workflow_dispatch:
   schedule:
@@ -11,32 +11,32 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.event_name == 'schedule' && github.repository == 'RamonMods/winutil') || (github.event_name != 'schedule')
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout do repositório 🛎️
         uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - name: Generate Sponsors 💖
+      - name: Gerar patrocinadores 💖
         uses: JamesIves/github-sponsors-readme-action@v1
         with:
           token: ${{ secrets.PAT }}
           file: 'README.md'
 
-      - name: Create Pull Request 🚀
+      - name: Criar pull request 🚀
         id: cpr
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.AUTO_MERGE }}
           commit-message: 'Update sponsors in README'
           title: 'chore: Update Sponsors README'
-          body: 'Automated update of sponsors section'
+          body: 'Atualização automática da seção de patrocinadores'
           branch: sponsors-update
           delete-branch: true
           labels: |
             automated
             skip-changelog
 
-      - name: Check outputs
+      - name: Verificar saídas
         run: |
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Número do pull request - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "URL do pull request - ${{ steps.cpr.outputs.pull-request-url }}"

@@ -14,10 +14,10 @@ function Invoke-WPFUpdatesdisable {
         return
     }
 
-    Write-WinUtilLog -Component "Updates" -Message "Disabling Windows Update settings."
+    Write-WinUtilLog -Component "Updates" -Message "Desativando as configurações do Windows Update."
 
-    Write-Host "Configuring registry settings..." -ForegroundColor Yellow
-    Write-WinUtilLog -Component "Updates" -Message "Configuring Windows Update registry policy values for disable mode."
+    Write-Host "Configurando as configurações do registro..." -ForegroundColor Yellow
+    Write-WinUtilLog -Component "Updates" -Message "Configurando os valores de política do registro do Windows Update para o modo desativado."
     # New-Item -Force on an existing registry key deletes the key and its subkeys first, so only
     # create missing keys and keep any other policies already stored under them.
     if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU")) {
@@ -33,18 +33,18 @@ function Invoke-WPFUpdatesdisable {
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -Type DWord -Value 0
 
     foreach ($serviceName in @("BITS", "wuauserv", "UsoSvc")) {
-        Write-Host "Stopping and disabling $serviceName service."
-        Write-WinUtilLog -Component "Updates" -Message "Stopping and disabling $serviceName service."
+        Write-Host "Interrompendo e desativando o serviço $serviceName."
+        Write-WinUtilLog -Component "Updates" -Message "Interrompendo e desativando o serviço $serviceName."
         Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
         Set-Service -Name $serviceName -StartupType Disabled
     }
 
     Remove-Item -Path "C:\Windows\SoftwareDistribution\*" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "Cleared SoftwareDistribution folder."
-    Write-WinUtilLog -Component "Updates" -Message "Cleared SoftwareDistribution folder."
+    Write-Host "Pasta SoftwareDistribution limpa."
+    Write-WinUtilLog -Component "Updates" -Message "Pasta SoftwareDistribution limpa."
 
-    Write-Host "Disabling update related scheduled tasks..." -ForegroundColor Yellow
-    Write-WinUtilLog -Component "Updates" -Message "Disabling update related scheduled tasks."
+    Write-Host "Desativando tarefas agendadas relacionadas a atualizações..." -ForegroundColor Yellow
+    Write-WinUtilLog -Component "Updates" -Message "Desativando tarefas agendadas relacionadas a atualizações."
 
     $Tasks =
         '\Microsoft\Windows\InstallService\*',
@@ -59,8 +59,8 @@ function Invoke-WPFUpdatesdisable {
     }
 
 
-    Write-Host "Note: You must restart your system in order for all changes to take effect." -ForegroundColor Yellow
-    Write-WinUtilLog -Component "Updates" -Message "Windows Update disable workflow completed. Restart required."
+    Write-Host "Observação: você deve reiniciar o sistema para que todas as alterações tenham efeito." -ForegroundColor Yellow
+    Write-WinUtilLog -Component "Updates" -Message "Fluxo de desativação do Windows Update concluído. É necessário reiniciar."
 }
 
 function Confirm-WPFUpdatesdisable {
@@ -71,7 +71,7 @@ function Confirm-WPFUpdatesdisable {
         -Icon "Warning"
 
     if ($confirmation -ne "Yes") {
-        Write-WinUtilLog -Component "Updates" -Message "Windows Update disable workflow cancelled."
+        Write-WinUtilLog -Component "Updates" -Message "Fluxo de desativação do Windows Update cancelado."
         return $false
     }
     return $true

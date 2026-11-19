@@ -1,16 +1,16 @@
 function Invoke-WinutilThemeChange {
     <#
     .SYNOPSIS
-        Toggles between light and dark themes for a Windows utility application.
+        Alterna entre os temas claro e escuro de um aplicativo utilitário do Windows.
 
     .DESCRIPTION
-        This function toggles the theme of the user interface between 'Light' and 'Dark' modes,
-        modifying various UI elements such as colors, margins, corner radii, font families, etc.
-        If the '-init' switch is used, it initializes the theme based on the system's current dark mode setting.
+        Esta função alterna o tema da interface do usuário entre os modos 'Light' e 'Dark',
+        modificando diversos elementos da interface, como cores, margens, raios de canto, fontes, etc.
+        Se a opção '-init' for usada, inicializa o tema com base na configuração atual de modo escuro do sistema.
 
     .EXAMPLE
         Invoke-WinutilThemeChange
-        # Toggles the theme between 'Light' and 'Dark'.
+        # Alterna o tema entre 'Light' e 'Dark'.
 
 
     #>
@@ -21,15 +21,15 @@ function Invoke-WinutilThemeChange {
     function Set-WinutilTheme {
         <#
         .SYNOPSIS
-            Applies the specified theme to the application's user interface.
+            Aplica o tema especificado à interface do usuário do aplicativo.
 
         .DESCRIPTION
-            This internal function applies the given theme by setting the relevant properties
-            like colors, font families, corner radii, etc., in the UI. It uses the
-            'Set-ThemeResourceProperty' helper function to modify the application's resources.
+            Esta função interna aplica o tema informado definindo as propriedades relevantes
+            como cores, fontes, raios de canto, etc., na interface. Ela usa a função
+            auxiliar 'Set-ThemeResourceProperty' para modificar os recursos do aplicativo.
 
         .PARAMETER currentTheme
-            The name of the theme to be applied. Common values are "Light", "Dark", or "shared".
+            O nome do tema a ser aplicado. Valores comuns são "Light", "Dark" ou "shared".
         #>
         param (
             [string]$currentTheme
@@ -38,29 +38,29 @@ function Invoke-WinutilThemeChange {
         function Set-ThemeResourceProperty {
             <#
             .SYNOPSIS
-                Sets a specific UI property in the application's resources.
+                Define uma propriedade específica da interface nos recursos do aplicativo.
 
             .DESCRIPTION
-                This helper function sets a property (e.g., color, margin, corner radius) in the
-                application's resources, based on the provided type and value. It includes
-                error handling to manage potential issues while setting a property.
+                Esta função auxiliar define uma propriedade (ex.: cor, margem, raio de canto) nos
+                recursos do aplicativo, com base no tipo e no valor informados. Ela inclui
+                tratamento de erros para lidar com possíveis problemas ao definir uma propriedade.
 
             .PARAMETER Name
-                The name of the resource property to modify (e.g., "MainBackgroundColor", "ButtonBackgroundMouseoverColor").
+                O nome da propriedade de recurso a ser modificada (ex.: "MainBackgroundColor", "ButtonBackgroundMouseoverColor").
 
             .PARAMETER Value
-                The value to assign to the resource property (e.g., "#FFFFFF" for a color).
+                O valor a atribuir à propriedade de recurso (ex.: "#FFFFFF" para uma cor).
 
             .PARAMETER Type
-                The type of the resource, such as "ColorBrush", "CornerRadius", "GridLength", or "FontFamily".
+                O tipo do recurso, como "ColorBrush", "CornerRadius", "GridLength" ou "FontFamily".
             #>
             param($Name, $Value, $Type)
             try {
-                # Set the resource property based on its type
+                # Define a propriedade de recurso com base no seu tipo
                 $sync.Form.Resources[$Name] = switch ($Type) {
                     "ColorBrush" { [Windows.Media.SolidColorBrush]::new($Value) }
                     "Color" {
-                        # Convert hex string to RGB values
+                        # Converte a string hexadecimal em valores RGB
                         $hexColor = $Value.TrimStart("#")
                         $r = [Convert]::ToInt32($hexColor.Substring(0,2), 16)
                         $g = [Convert]::ToInt32($hexColor.Substring(2,2), 16)
@@ -70,7 +70,7 @@ function Invoke-WinutilThemeChange {
                     "CornerRadius" { [System.Windows.CornerRadius]::new($Value) }
                     "GridLength" { [System.Windows.GridLength]::new($Value) }
                     "Thickness" {
-                        # Parse the Thickness value (supports 1, 2, or 4 inputs)
+                        # Interpreta o valor de Thickness (aceita 1, 2 ou 4 entradas)
                         $values = $Value -split ","
                         switch ($values.Count) {
                             1 { [System.Windows.Thickness]::new([double]$values[0]) }
@@ -84,39 +84,39 @@ function Invoke-WinutilThemeChange {
                 }
             }
             catch {
-                # Log a warning if there's an issue setting the property
-                Write-Warning "Failed to set property $($Name): $_"
+                # Registra um aviso se houver problema ao definir a propriedade
+                Write-Warning "Falha ao definir a propriedade $($Name): $_"
             }
         }
 
-        # Retrieve all theme properties from the theme configuration
+        # Recupera todas as propriedades do tema da configuração
         $themeProperties = $sync.configs.themes.$currentTheme.PSObject.Properties
         foreach ($themeProperty in $themeProperties) {
-            # Apply properties that deal with colors
+            # Aplica as propriedades relacionadas a cores
             if ($themeProperty.Name -like "*color*") {
                 Set-ThemeResourceProperty -Name $themeProperty.Name -Value $themeProperty.Value -Type "ColorBrush"
-                # For certain color properties, also set complementary values (e.g., BorderColor -> CBorderColor) This is required because e.g DropShadowEffect requires a <Color> and not a <SolidColorBrush> object
+                # Para certas propriedades de cor, defina também valores complementares (ex.: BorderColor -> CBorderColor). Isso é necessário porque, por exemplo, DropShadowEffect exige um objeto <Color> e não um <SolidColorBrush>
                 if ($themeProperty.Name -in @("BorderColor", "ButtonBackgroundMouseoverColor", "AppIconShadowColor", "MainGradientTopColor", "MainGradientBottomColor")) {
                     Set-ThemeResourceProperty -Name "C$($themeProperty.Name)" -Value $themeProperty.Value -Type "Color"
                 }
             }
-            # Apply corner radius properties
+            # Aplica propriedades de raio de canto
             elseif ($themeProperty.Name -like "*Radius*") {
                 Set-ThemeResourceProperty -Name $themeProperty.Name -Value $themeProperty.Value -Type "CornerRadius"
             }
-            # Apply row height properties
+            # Aplica propriedades de altura de linha
             elseif ($themeProperty.Name -like "*RowHeight*") {
                 Set-ThemeResourceProperty -Name $themeProperty.Name -Value $themeProperty.Value -Type "GridLength"
             }
-            # Apply thickness or margin properties
+            # Aplica propriedades de espessura ou margem
             elseif (($themeProperty.Name -like "*Thickness*") -or ($themeProperty.Name -like "*margin")) {
                 Set-ThemeResourceProperty -Name $themeProperty.Name -Value $themeProperty.Value -Type "Thickness"
             }
-            # Apply font family properties
+            # Aplica propriedades de fonte
             elseif ($themeProperty.Name -like "*FontFamily*") {
                 Set-ThemeResourceProperty -Name $themeProperty.Name -Value $themeProperty.Value -Type "FontFamily"
             }
-            # Apply any other properties as doubles (numerical values)
+            # Aplica quaisquer outras propriedades como doubles (valores numéricos)
             else {
                 Set-ThemeResourceProperty -Name $themeProperty.Name -Value $themeProperty.Value -Type "Double"
             }
@@ -149,12 +149,12 @@ function Invoke-WinutilThemeChange {
         }
     }
 
-    # Reapply font scaling if it was previously set (theme change resets shared resources)
+    # Reaplica a escala de fonte se ela tiver sido definida antes (a mudança de tema redefine os recursos compartilhados)
     if ($sync.ContainsKey("FontScaleFactor") -and $sync.FontScaleFactor -ne 1.0) {
         Invoke-WinUtilFontScaling -ScaleFactor $sync.FontScaleFactor
     }
 
-    # Update the theme selector button with the appropriate icon
+    # Atualiza o botão de seleção de tema com o ícone apropriado
     $ThemeButton = $sync.Form.FindName("ThemeButton")
     $ThemeButton.Content = [string]$themeButtonIcon
 }

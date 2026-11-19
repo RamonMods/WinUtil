@@ -1,4 +1,4 @@
-#====================================================================# Tests - Config Files
+#====================================================================# Testes - Arquivos de configuração
 #====================================================================
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $configRoot = Join-Path $PSScriptRoot "..\config"
@@ -111,8 +111,8 @@ function script:Get-WinUtilButtonSwitchNames {
         Sort-Object -Unique
 }
 
-# Stand-ins so the Telemetry tweak's extracted Defender handler can run in a test without
-# touching Defender or the real log file.
+# Substitutos para que o manipulador do Defender extraído do ajuste de Telemetria possa
+# rodar em um teste sem tocar no Defender nem no arquivo de log real.
 function script:Set-MpPreference {
     [CmdletBinding()]
     param([int]$SubmitSamplesConsent)
@@ -125,9 +125,9 @@ function script:Write-WinUtilLog {
 }
 }
 
-Describe "Config files" {
+Describe "Arquivos de configuração" {
     foreach ($configCase in $configCases) {
-        It "imports $($configCase.Name) with no JSON errors" -TestCases $configCase {
+        It "importa $($configCase.Name) sem erros de JSON" -TestCases $configCase {
             param([string]$Name, [string]$Path)
 
             try {
@@ -139,10 +139,10 @@ Describe "Config files" {
     }
 }
 
-Describe "Applications config" {
+Describe "Configuração de aplicativos" {
     $testCase = @{ Path = (Join-Path $configRoot "applications.json") }
 
-    It "contains at least one application" -TestCases $testCase {
+    It "contém pelo menos um aplicativo" -TestCases $testCase {
         param([string]$Path)
 
         $applications = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -153,7 +153,7 @@ Describe "Applications config" {
         }
     }
 
-    It "contains required display fields and at least one install source" -TestCases $testCase {
+    It "contém os campos de exibição obrigatórios e pelo menos uma fonte de instalação" -TestCases $testCase {
         param([string]$Path)
 
         $applications = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -187,10 +187,10 @@ Describe "Applications config" {
     }
 }
 
-Describe "Tweaks config" {
+Describe "Configuração de ajustes" {
     $testCase = @{ Path = (Join-Path $configRoot "tweaks.json") }
 
-    It "contains undo metadata for registry and service actions" -TestCases $testCase {
+    It "contém metadados de desfazer para ações de registro e serviço" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -229,7 +229,7 @@ Describe "Tweaks config" {
         }
     }
 
-    It "keeps the svchost split threshold out of the services tweak" -TestCases $testCase {
+    It "mantém o limite de divisão do svchost fora do ajuste de serviços" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -243,7 +243,7 @@ Describe "Tweaks config" {
         $undoScript | Should -Match '3670016'
     }
 
-    It "does not claim the same registry value with conflicting originals or types" -TestCases $testCase {
+    It "não reivindica o mesmo valor de registro com valores originais ou tipos conflitantes" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -278,7 +278,7 @@ Describe "Tweaks config" {
         }
     }
 
-    It "disables Windows Search indexing through the service schema with a reversible stop and start" -TestCases $testCase {
+    It "desativa a indexação do Windows Search pelo esquema de serviço com uma parada e inicialização reversíveis" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -293,9 +293,9 @@ Describe "Tweaks config" {
         $search[0].StartupType | Should -Be "Disabled"
         $search[0].OriginalType | Should -Be "Automatic"
 
-        # Set-WinUtilService only changes the startup type. The running indexer is stopped in
-        # InvokeScript and started again in UndoScript, both guarded by Get-Service so a missing
-        # service does not log an error (#5123).
+        # Set-WinUtilService apenas altera o tipo de inicialização. O indexador em execução é parado no
+        # InvokeScript e iniciado novamente no UndoScript, ambos protegidos por Get-Service para que um
+        # serviço ausente não registre um erro (#5123).
         $invoke = @($tweak.InvokeScript) -join "`n"
         $undo = @($tweak.UndoScript) -join "`n"
         $invoke | Should -Match 'Get-Service.*WSearch'
@@ -303,13 +303,13 @@ Describe "Tweaks config" {
         $undo | Should -Match 'Get-Service.*WSearch'
         $undo | Should -Match 'Start-Service.*WSearch'
 
-        # The scripts only act once the service entry has actually changed the startup type, so a
-        # service the user moved to Manual (kept by KeepServiceStartup) is neither stopped nor started.
+        # Os scripts só agem depois que a entrada do serviço realmente alterou o tipo de inicialização,
+        # então um serviço movido pelo usuário para Manual (mantido por KeepServiceStartup) não é parado nem iniciado.
         $invoke | Should -Match "StartType -eq 'Disabled'"
         $undo | Should -Match "StartType -eq 'Automatic'"
     }
 
-    It "keeps the location service disabled" -TestCases $testCase {
+    It "mantém o serviço de localização desabilitado" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -319,7 +319,7 @@ Describe "Tweaks config" {
         $locationServices[0].StartupType | Should -Be "Disabled"
     }
 
-    It "disables Windows Error Reporting through the service schema" -TestCases $testCase {
+    It "desativa o Windows Error Reporting pelo esquema de serviço" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -330,7 +330,7 @@ Describe "Tweaks config" {
         $errorReporting[0].StartupType | Should -Be "Disabled"
         $errorReporting[0].OriginalType | Should -Be "Manual"
 
-        # Telemetry and error reporting must coexist after merging their independent fixes.
+        # Telemetria e relatório de erros devem coexistir após a mesclagem de suas correções independentes.
         $diagnostics = @($telemetry.service | Where-Object Name -eq "diagtrack")
         $diagnostics | Should -HaveCount 1
         $diagnostics[0].StartupType | Should -Be "Disabled"
@@ -338,12 +338,12 @@ Describe "Tweaks config" {
         ((@($telemetry.InvokeScript) + @($telemetry.UndoScript)) -join "`n") |
             Should -Not -Match 'Set-Service\s+-Name\s+diagtrack'
 
-        # wermgr is an executable, not a service, so Set-Service on it failed on every run (#5145)
+        # wermgr é um executável, não um serviço, então Set-Service nele falhava em toda execução (#5145)
         $scripts = (@($telemetry.InvokeScript) + @($telemetry.UndoScript)) -join "`n"
         $scripts | Should -Not -Match "wermgr"
     }
 
-    It "removes the feedback period value through the registry schema" -TestCases $testCase {
+    It "remove o valor do período de feedback pelo esquema de registro" -TestCases $testCase {
         param([string]$Path)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
@@ -354,8 +354,8 @@ Describe "Tweaks config" {
         $period[0].Path | Should -Be "HKCU:\Software\Microsoft\Siuf\Rules"
         $period[0].Value | Should -Be "<RemoveEntry>"
 
-        # A bare Remove-ItemProperty in the script errored on a fresh install, where the value
-        # does not exist yet (#5145); Set-WinUtilRegistry treats an absent value as removed.
+        # Um Remove-ItemProperty direto no script dava erro em uma instalação nova, em que o valor
+        # ainda não existe (#5145); Set-WinUtilRegistry trata um valor ausente como removido.
         (@($telemetry.InvokeScript) -join "`n") | Should -Not -Match "Remove-ItemProperty"
     }
 
@@ -380,19 +380,19 @@ Describe "Tweaks config" {
         }
     )
 
-    It "identifies the <Tweak> icacls principal by SID" -TestCases $icaclsPrincipalCases {
+    It "identifica o principal do icacls de <Tweak> pelo SID" -TestCases $icaclsPrincipalCases {
         param([string]$Path, [string]$Tweak, [string]$Sid, [int]$ExpectedCount)
 
         $tweaks = Get-Content -Path $Path -Raw | ConvertFrom-Json
         $scripts = (@($tweaks.$Tweak.InvokeScript) + @($tweaks.$Tweak.UndoScript)) -join "`n"
         $sidCount = ([regex]::Matches($scripts, [regex]::Escape($Sid))).Count
 
-        $sidCount | Should -Be $ExpectedCount -Because "$Tweak must pass $Sid to icacls at every call site instead of a localized account name"
+        $sidCount | Should -Be $ExpectedCount -Because "$Tweak deve passar $Sid ao icacls em todo ponto de chamada, em vez de um nome de conta localizado"
     }
 }
 
-Describe "Config scripts changing services" {
-    It "guards every Set-Service call in a config script with a service or template existence check" {
+Describe "Scripts de configuração que alteram serviços" {
+    It "protege toda chamada a Set-Service em um script de configuração com uma verificação de existência de serviço ou modelo" {
         $unguarded = New-Object System.Collections.Generic.List[string]
 
         foreach ($configFile in (Get-ChildItem -Path $script:configRoot -Filter *.json)) {
@@ -417,8 +417,8 @@ Describe "Config scripts changing services" {
     }
 }
 
-Describe "Config scripts changing Defender preferences" {
-    It "guards every Set-MpPreference call with a try block and -ErrorAction Stop" {
+Describe "Scripts de configuração que alteram preferências do Defender" {
+    It "protege toda chamada a Set-MpPreference com um bloco try e -ErrorAction Stop" {
         $unguarded = New-Object System.Collections.Generic.List[string]
 
         foreach ($configFile in (Get-ChildItem -Path $script:configRoot -Filter *.json)) {
@@ -468,7 +468,7 @@ Describe "Config scripts changing Defender preferences" {
     }
 }
 
-Describe "Telemetry tweak Defender failures" {
+Describe "Falhas do Defender no ajuste de Telemetria" {
     BeforeAll {
         function Get-DefenderGuardBlock {
             param([string]$Action)
@@ -484,13 +484,13 @@ Describe "Telemetry tweak Defender failures" {
         }
     }
 
-    It "warns and continues when Defender is unavailable (<Action>)" -TestCases @(
+    It "avisa e continua quando o Defender não está disponível (<Action>)" -TestCases @(
         @{ Action = "InvokeScript" }
         @{ Action = "UndoScript" }
     ) {
         param($Action)
         Mock Write-WinUtilLog {}
-        # The message omits the code on purpose, so only the HResult check can match this failure.
+        # A mensagem omite o código de propósito, para que apenas a verificação do HResult corresponda a essa falha.
         Mock Set-MpPreference {
             throw [System.Management.Automation.ErrorRecord]::new(
                 [System.Runtime.InteropServices.COMException]::new("Defender provider unavailable.", [int]0x800106ba),
@@ -505,7 +505,7 @@ Describe "Telemetry tweak Defender failures" {
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter { $Level -eq 'WARN' }
     }
 
-    It "warns for a message-only provider error and continues under caller Continue (<Action>)" -TestCases @(
+    It "avisa sobre um erro de provedor apenas por mensagem e continua sob Continue do chamador (<Action>)" -TestCases @(
         @{ Action = "InvokeScript" }
         @{ Action = "UndoScript" }
     ) {
@@ -523,7 +523,7 @@ Describe "Telemetry tweak Defender failures" {
         }
     }
 
-    It "sets the requested consent when Defender is available (<Action>)" -TestCases @(
+    It "define o consentimento solicitado quando o Defender está disponível (<Action>)" -TestCases @(
         @{ Action = "InvokeScript"; Consent = 2 }
         @{ Action = "UndoScript"; Consent = 1 }
     ) {
@@ -541,7 +541,7 @@ Describe "Telemetry tweak Defender failures" {
         Should -Invoke Write-WinUtilLog -Times 0 -Exactly
     }
 
-    It "rethrows access denied with a structured unrelated HResult (<Action>)" -TestCases @(
+    It "relança acesso negado com um HResult estruturado e não relacionado (<Action>)" -TestCases @(
         @{ Action = "InvokeScript" }
         @{ Action = "UndoScript" }
     ) {
@@ -558,7 +558,7 @@ Describe "Telemetry tweak Defender failures" {
         { & (Get-DefenderGuardBlock -Action $Action) } | Should -Throw -ExpectedMessage "*Access denied*"
     }
 
-    It "rethrows a missing Defender command (<Action>)" -TestCases @(
+    It "relança a ausência de um comando do Defender (<Action>)" -TestCases @(
         @{ Action = "InvokeScript" }
         @{ Action = "UndoScript" }
     ) {
@@ -568,7 +568,7 @@ Describe "Telemetry tweak Defender failures" {
         { & (Get-DefenderGuardBlock -Action $Action) } | Should -Throw -ExpectedMessage "*Set-MpPreference is unavailable*"
     }
 
-    It "does not confuse a longer hexadecimal value with the unavailable code (<Action>)" -TestCases @(
+    It "não confunde um valor hexadecimal mais longo com o código de indisponibilidade (<Action>)" -TestCases @(
         @{ Action = "InvokeScript" }
         @{ Action = "UndoScript" }
     ) {
@@ -578,7 +578,7 @@ Describe "Telemetry tweak Defender failures" {
         { & (Get-DefenderGuardBlock -Action $Action) } | Should -Throw -ExpectedMessage "*0x800106bad*"
     }
 
-    It "rethrows Set-MpPreference failures that are not Defender being unavailable (<Action>)" -TestCases @(
+    It "relança falhas de Set-MpPreference que não são o Defender estar indisponível (<Action>)" -TestCases @(
         @{ Action = "InvokeScript" }
         @{ Action = "UndoScript" }
     ) {
@@ -589,8 +589,8 @@ Describe "Telemetry tweak Defender failures" {
     }
 }
 
-Describe "Preset config" {
-    It "references existing config entries or supported actions" {
+Describe "Configuração de predefinições" {
+    It "referencia entradas de configuração existentes ou ações compatíveis" {
         $preset = Get-WinUtilConfigObject -Name "preset"
         $applications = Get-WinUtilConfigObject -Name "applications"
         $tweaks = Get-WinUtilConfigObject -Name "tweaks"
@@ -620,8 +620,8 @@ Describe "Preset config" {
     }
 }
 
-Describe "App navigation config" {
-    It "is wired to an existing XAML target grid" {
+Describe "Configuração de navegação de aplicativos" {
+    It "está conectado a uma grade XAML de destino existente" {
         $mainScript = Get-Content -Path $script:mainScriptPath -Raw
         $tabInitializerScript = Get-Content -Path (Join-Path $script:repoRoot "functions/private/Initialize-WinUtilTabContent.ps1") -Raw
         $uiInitializerScript = Get-Content -Path (Join-Path $script:repoRoot "functions/public/Initialize-WPFUI.ps1") -Raw
@@ -641,7 +641,7 @@ Describe "App navigation config" {
         }
     }
 
-    It "contains renderable entries with valid button and radio groups" {
+    It "contém entradas renderizáveis com grupos de botões e de opções válidos" {
         $appnavigation = Get-WinUtilConfigObject -Name "appnavigation"
         $feature = Get-WinUtilConfigObject -Name "feature"
         $requiredFields = @("Content", "Category", "Type", "Order", "Description")
@@ -695,8 +695,8 @@ Describe "App navigation config" {
     }
 }
 
-Describe "UI-rendered config entries" {
-    It "contains required AppX fields" {
+Describe "Entradas de configuração renderizadas na interface" {
+    It "contém os campos obrigatórios de AppX" {
         $appx = Get-WinUtilConfigObject -Name "appx"
         $requiredFields = @("Category", "Content", "Description", "Panel", "PackageId")
         $invalidEntries = New-Object System.Collections.Generic.List[string]
@@ -717,7 +717,7 @@ Describe "UI-rendered config entries" {
         }
     }
 
-    It "contains required DNS fields with parseable IP addresses" {
+    It "contém os campos obrigatórios de DNS com endereços IP válidos para análise" {
         $dns = Get-WinUtilConfigObject -Name "dns"
         $requiredFields = @("Primary", "Secondary", "Primary6", "Secondary6")
         $invalidEntries = New-Object System.Collections.Generic.List[string]
@@ -745,7 +745,7 @@ Describe "UI-rendered config entries" {
         }
     }
 
-    It "exposes every configured DNS provider in the DNS combobox" {
+    It "expõe todo provedor DNS configurado na lista suspensa de DNS" {
         $dns = Get-WinUtilConfigObject -Name "dns"
         $tweaks = Get-WinUtilConfigObject -Name "tweaks"
         $comboItems = @($tweaks.WPFchangedns.ComboItems -split " ")
@@ -756,7 +756,7 @@ Describe "UI-rendered config entries" {
         }
     }
 
-    It "contains required feature fields and valid configured functions" {
+    It "contém os campos obrigatórios de recursos e funções configuradas válidas" {
         $feature = Get-WinUtilConfigObject -Name "feature"
         $functionNames = Get-WinUtilTopLevelFunctionNames
         $requiredFields = @("Content", "category", "panel", "link")
@@ -795,7 +795,7 @@ Describe "UI-rendered config entries" {
         }
     }
 
-    It "contains required tweak fields and valid action metadata" {
+    It "contém os campos obrigatórios de ajustes e metadados de ação válidos" {
         $tweaks = Get-WinUtilConfigObject -Name "tweaks"
         $requiredFields = @("Content", "category", "panel", "link")
         $allowedTypes = @("Button", "Combobox", "Toggle", "ToggleButton")
@@ -885,7 +885,7 @@ Describe "UI-rendered config entries" {
         }
     }
 
-    It "defines theme resources required by XAML rendering" {
+    It "define os recursos de tema exigidos pela renderização XAML" {
         $themes = Get-WinUtilConfigObject -Name "themes"
         $invalidEntries = New-Object System.Collections.Generic.List[string]
 
@@ -931,7 +931,7 @@ Describe "UI-rendered config entries" {
             "CBorderColor"
             "CButtonBackgroundMouseoverColor"
             "CAppIconShadowColor"
-            # Set from the width of the app list (Update-WinUtilAppEntryWidth), not by a theme
+            # Definido pela largura da lista de aplicativos (Update-WinUtilAppEntryWidth), não por um tema
             "AppEntryCardWidth"
             "CMainGradientTopColor"
             "CMainGradientBottomColor"
@@ -949,8 +949,8 @@ Describe "UI-rendered config entries" {
     }
 }
 
-Describe "Embedded config scripts" {
-    It "parse as PowerShell scriptblocks" {
+Describe "Scripts de configuração incorporados" {
+    It "são analisados como blocos de script do PowerShell" {
         $invalidScripts = New-Object System.Collections.Generic.List[string]
 
         foreach ($configFile in (Get-ChildItem -Path $script:configRoot -Filter *.json)) {

@@ -1,28 +1,28 @@
-title: "[App Suggestion] "
+title: "[Sugestão de aplicativo] "
 body:
   - type: input
     attributes:
-      label: "Application Link"
-      description: "Provide a link where this application can downloaded officially"
+      label: "Link do aplicativo"
+      description: "Forneça um link onde este aplicativo pode ser baixado oficialmente"
   - type: checkboxes
     attributes:
-      label: "Rules Checklist"
-      description: "You should agree with next rules"
+      label: "Lista de regras"
+      description: "Você deve concordar com as seguintes regras"
       options:
-        - label: "This application is popular enough, so is not considered as niche"
+        - label: "Este aplicativo é popular o suficiente, portanto não é considerado de nicho"
           required: true
-        - label: "This application is not considered bloatware"
+        - label: "Este aplicativo não é considerado bloatware"
           required: true
-        - label: "This application is free to access"
+        - label: "Este aplicativo é gratuito para acessar"
           required: true
-        - label: "This application should be included on majority of fresh installed systems"
+        - label: "Este aplicativo deve ser incluído na maioria dos sistemas recém-instalados"
           required: true
-        - label: "This application is present on WinGet (check winstall.app or do 'winget search your-app' in terminal)"
+        - label: "Este aplicativo está presente no WinGet (verifique winstall.app ou execute 'winget search your-app' no terminal)"
           required: true
   - type: checkboxes
     attributes:
-      label: "Check for denied applications"
+      label: "Verifique aplicativos recusados"
       options:
-        - label: "Yes, I checked PRs, issues and discussions for existing suggestions and their result"
+        - label: "Sim, verifiquei PRs, issues e discussões por sugestões existentes e seus resultados"
           required: true
       

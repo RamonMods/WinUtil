@@ -2,7 +2,7 @@ function Invoke-WPFtweaksbutton {
   <#
 
     .SYNOPSIS
-        Invokes the functions associated with each group of checkboxes
+        Invoca as funções associadas a cada grupo de caixas de seleção
 
   #>
 
@@ -13,27 +13,27 @@ function Invoke-WPFtweaksbutton {
   }
 
   if ($Tweaks.count -eq 0 -and $dnsProvider -eq "Default") {
-    Show-WinUtilMessage -Message "Please check the tweaks you wish to perform." -Title "WinUtil" -Button "OK" -Icon "Warning"
+    Show-WinUtilMessage -Message "Marque os ajustes que deseja executar." -Title "WinUtil" -Button "OK" -Icon "Warning"
     return
   }
 
-  Write-WinUtilLog -Component "Tweaks" -Message "Tweaks requested: $(@($Tweaks).Count) selected tweak(s), DNS provider: $dnsProvider"
+  Write-WinUtilLog -Component "Tweaks" -Message "Ajustes solicitados: $(@($Tweaks).Count) ajuste(s) selecionado(s), provedor de DNS: $dnsProvider"
 
-  Start-WinUtilJob -Name "Tweaks" -Description "Applying tweaks" -QueueIfBusy -Parameters @{
+  Start-WinUtilJob -Name "Tweaks" -Description "Aplicando ajustes" -QueueIfBusy -Parameters @{
     Tweaks = @($Tweaks)
     DnsProvider = $dnsProvider
   } -ScriptBlock {
     param($Tweaks, $DnsProvider)
 
-    # The restore point has to be taken before anything else changes
+    # O ponto de restauração precisa ser criado antes de qualquer outra alteração
     $restorePointTweak = "WPFTweaksRestorePoint"
     $tweaksToRun = @($Tweaks | Where-Object { $_ -ne $restorePointTweak })
     $totalSteps = [Math]::Max(@($Tweaks).Count, 1)
     $completedSteps = 0
 
     if ($Tweaks -contains $restorePointTweak) {
-      Step-WinUtilJob -Status "Creating restore point" -Percent 0
-      Write-WinUtilLog -Component "Tweaks" -Message "Creating restore point before applying selected tweaks."
+      Step-WinUtilJob -Status "Criando ponto de restauração" -Percent 0
+      Write-WinUtilLog -Component "Tweaks" -Message "Criando ponto de restauração antes de aplicar os ajustes selecionados."
       Measure-WinUtilStep -Scope "Tweaks" -Name $restorePointTweak -ScriptBlock {
         Invoke-WinUtilTweaks $restorePointTweak
       }
@@ -41,20 +41,20 @@ function Invoke-WPFtweaksbutton {
     }
 
     if ($DnsProvider -ne "Default") {
-      $dnsResult = Measure-WinUtilStep -Scope "Tweaks" -Name "Set DNS to $DnsProvider" -ScriptBlock {
+      $dnsResult = Measure-WinUtilStep -Scope "Tweaks" -Name "Definir DNS para $DnsProvider" -ScriptBlock {
         @(Set-WinUtilDNS -DNSProvider $DnsProvider)
       }
 
-      # Carrying on after the DNS change failed leaves the machine half configured, so the run
-      # ends here and the job layer reports it
+      # Continuar após a falha na alteração de DNS deixaria a máquina meio configurada, então a
+      # execução termina aqui e a camada de jobs reporta o problema
       if (@($dnsResult)[-1] -ne $true) {
-        throw "The DNS change to $DnsProvider failed, so the remaining tweaks were not applied."
+        throw "A alteração de DNS para $DnsProvider falhou, portanto os ajustes restantes não foram aplicados."
       }
     }
 
     foreach ($tweak in $tweaksToRun) {
       $tweakLabel = Get-WinUtilTweakDisplayName -Key $tweak
-      Step-WinUtilJob -Status "Applying $tweakLabel ($($completedSteps + 1)/$totalSteps)" -Percent ([int](($completedSteps / $totalSteps) * 100))
+      Step-WinUtilJob -Status "Aplicando $tweakLabel ($($completedSteps + 1)/$totalSteps)" -Percent ([int](($completedSteps / $totalSteps) * 100))
       Measure-WinUtilStep -Scope "Tweaks" -Name $tweak -ScriptBlock {
         Invoke-WinUtilTweaks $tweak
       }

@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Install and Uninstall Workflows
+# Testes - Fluxos de instalação e desinstalação
 #===========================================================================
 
 BeforeAll {
@@ -116,7 +116,7 @@ BeforeAll {
     }
 }
 
-Describe "Invoke-WPFInstall entrypoint" {
+Describe "Ponto de entrada de Invoke-WPFInstall" {
     BeforeEach {
         $script:package = New-WinUtilPackage
         New-WinUtilInstallTestContext -Packages @($script:package)
@@ -140,7 +140,7 @@ Describe "Invoke-WPFInstall entrypoint" {
         Remove-Variable -Name capturedInstallJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "queues an install job with the configured package manager preference" {
+    It "enfileira um job de instalação com a preferência de gerenciador de pacotes configurada" {
         Invoke-WPFInstall
 
         Should -Invoke -CommandName Start-WinUtilJob -Times 1 -Exactly -ParameterFilter {
@@ -154,7 +154,7 @@ Describe "Invoke-WPFInstall entrypoint" {
         Should -Invoke -CommandName Show-WinUtilMessage -Times 0 -Exactly
     }
 
-    It "logs package identities before the job is queued" {
+    It "registra as identidades dos pacotes antes de enfileirar o job" {
         Invoke-WPFInstall
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
@@ -163,7 +163,7 @@ Describe "Invoke-WPFInstall entrypoint" {
         }
     }
 
-    It "queues the explicit app popup package over the selected apps" {
+    It "enfileira o pacote explícito do popup de aplicativo antes dos aplicativos selecionados" {
         $explicitPackage = New-WinUtilPackage -Name "VLC" -Winget "VideoLAN.VLC" -Choco "vlc"
 
         Invoke-WPFInstall -PackagesToInstall $explicitPackage
@@ -175,7 +175,7 @@ Describe "Invoke-WPFInstall entrypoint" {
         Should -Invoke -CommandName Show-WinUtilMessage -Times 0 -Exactly
     }
 
-    It "prompts and exits when no packages are selected" {
+    It "pergunta e sai quando nenhum pacote está selecionado" {
         New-WinUtilInstallTestContext
 
         Invoke-WPFInstall
@@ -190,7 +190,7 @@ Describe "Invoke-WPFInstall entrypoint" {
     }
 }
 
-Describe "Invoke-WPFInstall job body" {
+Describe "Corpo do job de Invoke-WPFInstall" {
     BeforeEach {
         $script:package = New-WinUtilPackage
         New-WinUtilInstallTestContext -Packages @($script:package)
@@ -220,7 +220,7 @@ Describe "Invoke-WPFInstall job body" {
         Remove-Variable -Name capturedInstallJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "installs split winget and choco packages and reports progress" {
+    It "instala pacotes divididos entre winget e choco e relata o progresso" {
         Invoke-WPFInstall
 
         $jobParameters = $script:capturedInstallJob.Parameters
@@ -245,7 +245,7 @@ Describe "Invoke-WPFInstall job body" {
         }
     }
 
-    It "lets a failure surface so the job layer can handle it" {
+    It "permite que uma falha apareça para que a camada de jobs possa tratá-la" {
         Mock Install-WinUtilProgramWinget { throw "winget failed" }
 
         Invoke-WPFInstall
@@ -256,7 +256,7 @@ Describe "Invoke-WPFInstall job body" {
     }
 }
 
-Describe "Invoke-WPFUnInstall entrypoint" {
+Describe "Ponto de entrada de Invoke-WPFUnInstall" {
     BeforeEach {
         $script:package = New-WinUtilPackage
         New-WinUtilInstallTestContext -Packages @($script:package)
@@ -279,7 +279,7 @@ Describe "Invoke-WPFUnInstall entrypoint" {
         Remove-Variable -Name capturedUninstallJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "confirms and queues an uninstall job with the configured package manager preference" {
+    It "confirma e enfileira um job de desinstalação com a preferência de gerenciador de pacotes configurada" {
         Invoke-WPFUnInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
@@ -295,7 +295,7 @@ Describe "Invoke-WPFUnInstall entrypoint" {
         }
     }
 
-    It "logs package identities before the uninstall job is queued" {
+    It "registra as identidades dos pacotes antes de enfileirar o job de desinstalação" {
         Invoke-WPFUnInstall
 
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
@@ -304,7 +304,7 @@ Describe "Invoke-WPFUnInstall entrypoint" {
         }
     }
 
-    It "prompts and exits when no packages are selected" {
+    It "pergunta e sai quando nenhum pacote está selecionado" {
         New-WinUtilInstallTestContext
 
         Invoke-WPFUnInstall
@@ -315,7 +315,7 @@ Describe "Invoke-WPFUnInstall entrypoint" {
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "exits without queueing uninstall when confirmation is declined" {
+    It "sai sem enfileirar a desinstalação quando a confirmação é recusada" {
         Mock Show-WinUtilMessage { "No" }
 
         Invoke-WPFUnInstall
@@ -324,7 +324,7 @@ Describe "Invoke-WPFUnInstall entrypoint" {
     }
 }
 
-Describe "Invoke-WPFUnInstall job body" {
+Describe "Corpo do job de Invoke-WPFUnInstall" {
     BeforeEach {
         $script:package = New-WinUtilPackage
         New-WinUtilInstallTestContext -Packages @($script:package)
@@ -352,7 +352,7 @@ Describe "Invoke-WPFUnInstall job body" {
         Remove-Variable -Name capturedUninstallJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "uninstalls split winget and choco packages and reports progress" {
+    It "desinstala pacotes divididos entre winget e choco e relata o progresso" {
         Invoke-WPFUnInstall
 
         $jobParameters = $script:capturedUninstallJob.Parameters
@@ -374,7 +374,7 @@ Describe "Invoke-WPFUnInstall job body" {
         }
     }
 
-    It "lets a failure surface so the job layer can handle it" {
+    It "permite que uma falha apareça para que a camada de jobs possa tratá-la" {
         Mock Install-WinUtilProgramWinget { throw "winget failed" }
 
         Invoke-WPFUnInstall

@@ -1,4 +1,4 @@
-name: Close Discussion on PR Merge
+name: Fechar discussão ao mesclar PR
 
 on:
   pull_request_target: 
@@ -12,11 +12,11 @@ jobs:
       discussions: write
       contents: read
     steps:
-      - name: Check if PR was merged
+      - name: Verificar se o PR foi mesclado
         if: github.event.pull_request.merged == true
         run: echo "PR was merged"
 
-      - name: Extract Discussion Number & Close If any Were Found
+      - name: Extrair o número da discussão e fechar se houver alguma
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_BODY: ${{ github.event.pull_request.body }}

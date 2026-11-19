@@ -1,4 +1,4 @@
-// Opens the sidebar on narrow screens, with the same body attribute and inert handling as Starlight's toggle.
+// Abre a barra lateral em telas estreitas, com o mesmo atributo do body e o mesmo tratamento de inert do alternador do Starlight.
 import { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 
@@ -14,7 +14,7 @@ export default function MobileMenuToggle() {
 	useEffect(() => {
 		const onKey = (event) => {
 			if (event.key !== 'Escape') return;
-			// Closing hides a focused sidebar link, so focus goes back to this button.
+			// Ao fechar, o link focado da barra lateral fica oculto, então o foco volta para este botão.
 			const expanded = document.body.hasAttribute('data-mobile-menu-expanded');
 			if (expanded && document.getElementById('starlight__sidebar')?.contains(document.activeElement)) {
 				buttonRef.current?.focus();

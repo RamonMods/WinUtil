@@ -1,12 +1,12 @@
 <#
     .SYNOPSIS
-        Adds or replaces an app's icon in config/icons
+        Adiciona ou substitui o ícone de um aplicativo em config/icons
 
     .DESCRIPTION
-        Scales an image (PNG, ICO, JPG, GIF or BMP) to fit a 48x48 transparent canvas and saves it
-        as config/icons/<Key>.png, where Key is the app's key in config/applications.json. The file
-        is embedded in the script when it is compiled. An app without an icon file falls back to
-        its website's favicon.
+        Redimensiona uma imagem (PNG, ICO, JPG, GIF ou BMP) para caber em uma tela transparente de 48x48 e a salva
+        como config/icons/<Key>.png, em que Key é a chave do aplicativo em config/applications.json. O arquivo
+        é incorporado ao script quando ele é compilado. Um aplicativo sem arquivo de ícone usa como fallback
+        o favicon do seu site.
 
     .EXAMPLE
         .\tools\New-WinUtilIcon.ps1 -Key brave -Path C:\Downloads\brave.png
@@ -23,10 +23,10 @@ $margin = 0.04
 $configRoot = Join-Path $PSScriptRoot "..\config"
 $applications = Get-Content (Join-Path $configRoot "applications.json") -Raw | ConvertFrom-Json
 $application = $applications.PSObject.Properties[$Key]
-if (-not $application) { throw "'$Key' is not a key in config/applications.json." }
+if (-not $application) { throw "'$Key' não é uma chave em config/applications.json." }
 $Key = $application.Name
 
-# Read the file into memory, so an existing icon can be given as its own input without being locked
+# Lê o arquivo na memória, para que um ícone existente possa ser usado como própria entrada sem ficar bloqueado
 $sourceStream = [IO.MemoryStream]::new([IO.File]::ReadAllBytes((Resolve-Path $Path)))
 $source = [Drawing.Image]::FromStream($sourceStream)
 $canvas = [Drawing.Bitmap]::new($size, $size, [Drawing.Imaging.PixelFormat]::Format32bppArgb)
@@ -50,4 +50,4 @@ try {
     $source.Dispose(); $sourceStream.Dispose(); $canvas.Dispose()
 }
 
-Write-Host "Saved a $size x $size icon for '$Key' ($((Get-Item $target).Length) bytes) to config/icons/$Key.png."
+Write-Host "Salvo um ícone de $size x $size para '$Key' ($((Get-Item $target).Length) bytes) em config/icons/$Key.png."

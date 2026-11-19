@@ -12,20 +12,20 @@ function Invoke-WPFUpdatessecurity {
 
     #>
 
-    Write-Host "Disabling driver offering through Windows Update..."
-    Write-WinUtilLog -Component "Updates" -Message "Applying recommended Windows Update settings."
-    Write-WinUtilLog -Component "Updates" -Message "Disabling driver offering through Windows Update."
+    Write-Host "Desativando a oferta de drivers pelo Windows Update..."
+    Write-WinUtilLog -Component "Updates" -Message "Aplicando as configurações recomendadas do Windows Update."
+    Write-WinUtilLog -Component "Updates" -Message "Desativando a oferta de drivers pelo Windows Update."
 
     $windowsUpdatePolicyPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"
     $automaticUpdatePolicyPath = Join-Path $windowsUpdatePolicyPath "AU"
 
-    Write-Host "Restoring Windows Update availability..."
-    Write-WinUtilLog -Component "Updates" -Message "Restoring Windows Update services and scheduled tasks before applying recommended settings."
+    Write-Host "Restaurando a disponibilidade do Windows Update..."
+    Write-WinUtilLog -Component "Updates" -Message "Restaurando os serviços e as tarefas agendadas do Windows Update antes de aplicar as configurações recomendadas."
 
     Remove-ItemProperty -Path $automaticUpdatePolicyPath -Name "NoAutoUpdate" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -ErrorAction SilentlyContinue
 
-    # O Criar Win11 bloqueia o Windows Update atÃ© a limpeza de primeiro logon rodar. Limpa o que sobrou desse bloqueio,
+    # O Criar Win11 bloqueia o Windows Update até a limpeza de primeiro logon rodar. Limpa o que sobrou desse bloqueio,
     # but keep a real WSUS server.
     Remove-ItemProperty -Path $windowsUpdatePolicyPath -Name "DisableWindowsUpdateAccess" -ErrorAction SilentlyContinue
     if ((Get-ItemProperty -Path $windowsUpdatePolicyPath -Name "WUServer" -ErrorAction SilentlyContinue).WUServer -eq "http://localhost:8080") {
@@ -71,8 +71,8 @@ function Invoke-WPFUpdatessecurity {
     }
     Set-ItemProperty -Path $windowsUpdatePolicyPath -Name "ExcludeWUDriversInQualityUpdate" -Type DWord -Value 1
 
-    Write-Host "Deferring feature updates by 365 days and quality updates by 4 days..."
-    Write-WinUtilLog -Component "Updates" -Message "Deferring feature updates by 365 days and quality updates by 4 days."
+    Write-Host "Adiando atualizações de recursos em 365 dias e atualizações de qualidade em 4 dias..."
+    Write-WinUtilLog -Component "Updates" -Message "Adiando atualizações de recursos em 365 dias e atualizações de qualidade em 4 dias."
 
     Set-ItemProperty -Path $windowsUpdatePolicyPath -Name "DeferFeatureUpdates" -Type DWord -Value 1
     Set-ItemProperty -Path $windowsUpdatePolicyPath -Name "DeferFeatureUpdatesPeriodInDays" -Type DWord -Value 365
@@ -84,8 +84,8 @@ function Invoke-WPFUpdatessecurity {
         Remove-ItemProperty -Path $legacySettingsPath -Name $legacyValue -ErrorAction SilentlyContinue
     }
 
-    Write-Host "Configuring automatic updates to download and notify before installation..."
-    Write-WinUtilLog -Component "Updates" -Message "Configuring automatic updates to download and notify before installation."
+    Write-Host "Configurando atualizações automáticas para baixar e notificar antes da instalação..."
+    Write-WinUtilLog -Component "Updates" -Message "Configurando atualizações automáticas para baixar e notificar antes da instalação."
 
     if (-not (Test-Path $automaticUpdatePolicyPath)) {
         New-Item -Path $automaticUpdatePolicyPath -Force | Out-Null
@@ -98,5 +98,5 @@ function Invoke-WPFUpdatessecurity {
     Set-ItemProperty -Path $automaticUpdatePolicyPath -Name "AUOptions" -Type DWord -Value 3
     Set-ItemProperty -Path $automaticUpdatePolicyPath -Name "AUPowerManagement" -Type DWord -Value 0
 
-    Write-WinUtilLog -Component "Updates" -Message "Recommended Windows Update settings workflow completed."
+    Write-WinUtilLog -Component "Updates" -Message "Fluxo de configurações recomendadas do Windows Update concluído."
 }

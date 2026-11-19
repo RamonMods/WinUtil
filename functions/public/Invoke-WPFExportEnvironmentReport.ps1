@@ -1,19 +1,19 @@
 function Invoke-WPFExportEnvironmentReport {
     <#
     .SYNOPSIS
-        Exports an allowlisted, read-only environment report as JSON, with an optional bundle of
-        recent WinUtil logs.
+        Exporta como JSON um relatório de ambiente somente leitura e com lista de permissões, com um
+        pacote opcional dos logs recentes do WinUtil.
     #>
 
     try {
         $includeLogs = (Show-WinUtilMessage `
-            -Message "Also include the last 7 days of WinUtil logs? The companion file contains raw logs and may include local paths, commands, and error details. Review it before sharing." `
-            -Title "Environment Report" -Button "YesNo" -Icon "Question") -eq "Yes"
+            -Message "Deseja incluir também os últimos 7 dias de logs do WinUtil? O arquivo complementar contém logs brutos e pode incluir caminhos locais, comandos e detalhes de erros. Revise-o antes de compartilhar." `
+            -Title "Relatório de Ambiente" -Button "YesNo" -Icon "Question") -eq "Yes"
 
         Add-Type -AssemblyName System.Windows.Forms
         $dialog = [System.Windows.Forms.SaveFileDialog]::new()
-        $dialog.Title = "Export Environment Report"
-        $dialog.Filter = "JSON files (*.json)|*.json"
+        $dialog.Title = "Exportar Relatório de Ambiente"
+        $dialog.Filter = "Arquivos JSON (*.json)|*.json"
         $dialog.FileName = "WinUtilEnvironmentReport_$(Get-Date -Format 'yyyyMMdd').json"
         $dialog.InitialDirectory = [Environment]::GetFolderPath("Desktop")
 
@@ -24,53 +24,53 @@ function Invoke-WPFExportEnvironmentReport {
         $jsonPath = $dialog.FileName
         $logsPath = Get-WinUtilEnvironmentReportLogsPath -JsonPath $jsonPath
 
-        # SaveFileDialog's own overwrite prompt only covers $jsonPath. A derived companion from a
-        # previous export must neither be silently replaced nor left looking like it belongs to new JSON.
+        # O próprio aviso de substituição do SaveFileDialog cobre apenas $jsonPath. Um arquivo complementar
+        # derivado de uma exportação anterior não deve ser substituído silenciosamente nem parecer pertencer ao novo JSON.
         if (Test-Path -LiteralPath $logsPath) {
             if (-not $includeLogs) {
                 Show-WinUtilMessage `
-                    -Message "A logs file already exists at:`n$logsPath`n`nChoose another report filename or include and replace the existing logs." `
-                    -Title "Environment Report" -Button "OK" -Icon "Warning" | Out-Null
+                    -Message "Já existe um arquivo de logs em:`n$logsPath`n`nEscolha outro nome para o relatório ou inclua e substitua os logs existentes." `
+                    -Title "Relatório de Ambiente" -Button "OK" -Icon "Warning" | Out-Null
                 return
             }
 
             $replaceLogs = (Show-WinUtilMessage `
-                -Message "A logs file already exists at:`n$logsPath`n`nReplace it?" `
-                -Title "Environment Report" -Button "YesNo" -Icon "Warning") -eq "Yes"
+                -Message "Já existe um arquivo de logs em:`n$logsPath`n`nSubstituí-lo?" `
+                -Title "Relatório de Ambiente" -Button "YesNo" -Icon "Warning") -eq "Yes"
             if (-not $replaceLogs) {
                 return
             }
         }
 
-        # Registry reads across every tweak/toggle and the log bundle's file read add up to a
-        # couple of seconds, so the job layer keeps the Settings handler responsive and owns the
-        # progress, taskbar state, logging, and error reporting.
-        Start-WinUtilJob -Name "EnvironmentReport" -Description "Exporting environment report" -Parameters @{
+        # As leituras do Registro em cada ajuste/interruptor e a leitura do pacote de logs somam alguns
+        # segundos, então a camada de jobs mantém o manipulador de Configurações responsivo e cuida do
+        # progresso, do estado da barra de tarefas, do log e do relatório de erros.
+        Start-WinUtilJob -Name "EnvironmentReport" -Description "Exportando relatório de ambiente" -Parameters @{
             JsonPath = $jsonPath
             LogsPath = $logsPath
             IncludeLogs = $includeLogs
         } -ScriptBlock {
             param($JsonPath, $LogsPath, $IncludeLogs)
 
-            Step-WinUtilJob -Status "Collecting environment report" -Percent 10
+            Step-WinUtilJob -Status "Coletando relatório de ambiente" -Percent 10
             $report = Get-WinUtilEnvironmentReport
             $json = $report | ConvertTo-Json -Depth 6
 
             if ($IncludeLogs) {
-                Step-WinUtilJob -Status "Collecting recent WinUtil logs" -Percent 60
+                Step-WinUtilJob -Status "Coletando os logs recentes do WinUtil" -Percent 60
                 $logs = Get-WinUtilRecentLogs
             }
 
-            Step-WinUtilJob -Status "Writing environment export" -Percent 80
+            Step-WinUtilJob -Status "Gravando a exportação do ambiente" -Percent 80
             Write-WinUtilEnvironmentReportExport -JsonPath $JsonPath -Json $json `
                 -LogsPath $LogsPath -Logs $logs -IncludeLogs:$IncludeLogs
 
-            Write-WinUtilLog -Component "EnvironmentReport" -Message "Environment report exported to $JsonPath."
-            Step-WinUtilJob -Status "Environment export completed" -Percent 100
+            Write-WinUtilLog -Component "EnvironmentReport" -Message "Relatório de ambiente exportado para $JsonPath."
+            Step-WinUtilJob -Status "Exportação do ambiente concluída" -Percent 100
         }
     } catch {
-        Write-WinUtilLog -Component "EnvironmentReport" -Level "ERROR" -Message "Environment report export failed: $($_.Exception.Message)"
-        Show-WinUtilMessage -Message "The environment report could not be exported. $($_.Exception.Message)" `
-            -Title "Environment Report" -Button "OK" -Icon "None" | Out-Null
+        Write-WinUtilLog -Component "EnvironmentReport" -Level "ERROR" -Message "A exportação do relatório de ambiente falhou: $($_.Exception.Message)"
+        Show-WinUtilMessage -Message "Não foi possível exportar o relatório de ambiente. $($_.Exception.Message)" `
+            -Title "Relatório de Ambiente" -Button "OK" -Icon "None" | Out-Null
     }
 }

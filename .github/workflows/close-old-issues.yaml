@@ -1,19 +1,19 @@
-name: Close Inactive Issues
+name: Fechar issues inativas
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run daily
-  workflow_dispatch:  # This line enables manual triggering
+    - cron: '0 0 * * *'  # Executar diariamente
+  workflow_dispatch:  # Esta linha habilita o gatilho manual
 
 jobs:
   close-issues:
     runs-on: ubuntu-latest
     permissions:
-      issues: write  # Ensure necessary permissions for issues
+      issues: write  # Garante as permissões necessárias para issues
       pull-requests: none
       contents: none
     steps:
-    - name: Close inactive issues
+    - name: Fechar issues inativas
       uses: actions/stale@v10
       with:
         # A list of labels to reference when looking through issues,

@@ -3,15 +3,14 @@ function Invoke-WPFTab {
     <#
 
     .SYNOPSIS
-        Sets the selected tab to the tab that was clicked
+        Define como selecionada a aba que foi clicada
 
     .PARAMETER ClickedTab
-        The name of the tab that was clicked
+        O nome da aba que foi clicada
 
     .PARAMETER Yield
-        Build the tab's content in slices, letting the interface answer between them. For the
-        tab opened at startup, where the window is already on screen and filling in gradually
-        reads better than holding the thread until it is complete.
+        Cria o conteúdo da aba em fatias, permitindo que a interface responda entre elas. Para a aba aberta na inicialização,
+        em que a janela já está na tela, preencher gradualmente fica melhor do que manter a thread ocupada até a conclusão.
 
     #>
 
@@ -52,7 +51,7 @@ function Invoke-WPFTab {
     }
 
     Measure-WinUtilStep -Scope "Tab" -Name "$ClickedTab search bar" -ScriptBlock {
-        # Show search bar in Install, Tweaks, and AppX tabs
+        # Mostra a barra de pesquisa nas abas Instalar, Ajustes e AppX
         $searchIcon = ($sync.Form.FindName("SearchBar").Parent.Children | Where-Object { $_ -is [System.Windows.Controls.TextBlock] -and $_.Text -eq [char]0xE721 })[0]
         if ($tabNumber -eq 0 -or $tabNumber -eq 1 -or $tabNumber -eq 5) {
             $sync.SearchBar.Visibility = "Visible"

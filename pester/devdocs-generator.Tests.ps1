@@ -20,8 +20,8 @@ BeforeAll {
     & (Join-Path $script:fixtureRoot "tools/devdocs-generator.ps1")
 }
 
-Describe "Generated documentation metadata" {
-    It "preserves title and description strings in <Page>" -TestCases @(
+Describe "Metadados da documentação gerada" {
+    It "preserva as strings de título e descrição em <Page>" -TestCases @(
         @{ Page = "tweaks/Essential-Tweaks/Escaped.mdx"; Escaped = $true }
         @{ Page = "features/Features/Escaped.mdx"; Escaped = $true }
         @{ Page = "tweaks/Essential-Tweaks/Empty.mdx"; Escaped = $false }
@@ -29,8 +29,8 @@ Describe "Generated documentation metadata" {
     ) {
         param($Page, $Escaped)
         $document = Get-Content -LiteralPath (Join-Path $script:fixtureRoot "docs/src/content/docs/code-reference/$Page")
-        # JSON quoted scalars are also YAML quoted scalars. Check the actual emitted
-        # values round-trip, including Windows paths, quotes, newlines and tabs.
+        # Escalares entre aspas em JSON também são escalares entre aspas em YAML. Verifique a ida e volta dos
+        # valores emitidos, incluindo caminhos do Windows, aspas, quebras de linha e tabulações.
         $title = ($document[1] -split ': ', 2)[1] | ConvertFrom-Json -ErrorAction Stop
         $description = ($document[2] -split ': ', 2)[1] | ConvertFrom-Json -ErrorAction Stop
         if ($Escaped) {

@@ -1,4 +1,4 @@
-// Interactive dot field behind the hero.
+// Campo de pontos interativo atrás do hero.
 import DotGrid from '../react-bits/DotGrid.jsx';
 import useStarlightTheme from '../../hooks/useStarlightTheme.js';
 import useAccentColor from '../../hooks/useAccentColor.js';

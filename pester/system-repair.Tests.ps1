@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - System repair exit codes
+# Testes - Códigos de saída da reparação do sistema
 #===========================================================================
 
 BeforeAll {
@@ -11,21 +11,21 @@ BeforeAll {
     function Write-WinUtilLog { param($Message, $Level, $Component) }
 }
 
-Describe "Invoke-WPFSystemRepair chkdsk exit codes" {
+Describe "Invoke-WPFSystemRepair códigos de saída do chkdsk" {
     BeforeEach {
         Mock Write-WinUtilLog { }
         Mock Write-Warning { }
         Mock Step-WinUtilJob { }
     }
 
-    It "treats chkdsk exit code 0 as a clean disk" {
+    It "trata o código de saída 0 do chkdsk como disco limpo" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
         { Invoke-WPFSystemRepair } | Should -Not -Throw
         Should -Invoke -CommandName Start-Process -Times 3 -Exactly
     }
 
-    It "treats chkdsk exit code 1 as success and says what it means" {
+    It "trata o código de saída 1 do chkdsk como sucesso e informa o que ele significa" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 1 } else { 0 }) }
         }
@@ -36,7 +36,7 @@ Describe "Invoke-WPFSystemRepair chkdsk exit codes" {
         }
     }
 
-    It "treats chkdsk exit code 2 as success and says what it means" {
+    It "trata o código de saída 2 do chkdsk como sucesso e informa o que ele significa" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 2 } else { 0 }) }
         }
@@ -47,7 +47,7 @@ Describe "Invoke-WPFSystemRepair chkdsk exit codes" {
         }
     }
 
-    It "fails on chkdsk exit code 3, which an online scan cannot repair" {
+    It "falha no código de saída 3 do chkdsk, que uma verificação online não consegue reparar" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3 } else { 0 }) }
         }
@@ -55,7 +55,7 @@ Describe "Invoke-WPFSystemRepair chkdsk exit codes" {
         { Invoke-WPFSystemRepair } | Should -Throw "*Checking the disk for errors failed with exit code 3*"
     }
 
-    It "does not run the later steps once chkdsk has failed" {
+    It "não executa as etapas seguintes após a falha do chkdsk" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3 } else { 0 }) }
         }
@@ -65,14 +65,14 @@ Describe "Invoke-WPFSystemRepair chkdsk exit codes" {
     }
 }
 
-Describe "Invoke-WPFSystemRepair per step codes" {
+Describe "Invoke-WPFSystemRepair códigos por etapa" {
     BeforeEach {
         Mock Write-WinUtilLog { }
         Mock Write-Warning { }
         Mock Step-WinUtilJob { }
     }
 
-    It "accepts 3010 from DISM as a repaired image awaiting a restart" {
+    It "aceita 3010 do DISM como imagem reparada aguardando uma reinicialização" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "dism") { 3010 } else { 0 }) }
         }
@@ -83,7 +83,7 @@ Describe "Invoke-WPFSystemRepair per step codes" {
         }
     }
 
-    It "fails on 3010 from chkdsk, where it does not mean a pending restart" {
+    It "falha em 3010 do chkdsk, onde isso não significa uma reinicialização pendente" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3010 } else { 0 }) }
         }
@@ -91,7 +91,7 @@ Describe "Invoke-WPFSystemRepair per step codes" {
         { Invoke-WPFSystemRepair } | Should -Throw "*exit code 3010*"
     }
 
-    It "fails on any non-zero from sfc, which has no success codes of its own" {
+    It "falha em qualquer valor diferente de zero do sfc, que não tem códigos de sucesso próprios" {
         Mock Start-Process {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "sfc") { 1 } else { 0 }) }
         }

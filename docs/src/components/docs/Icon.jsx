@@ -1,4 +1,4 @@
-// Icons from src/assets/icons/, inlined so they take on the surrounding text color.
+// Ícones de src/assets/icons/, incorporados inline para assumirem a cor do texto ao redor.
 const files = import.meta.glob('../../assets/icons/*.svg', { query: '?raw', import: 'default', eager: true });
 const icons = Object.fromEntries(
 	Object.entries(files).map(([path, svg]) => [path.match(/([\w-]+)\.svg$/)[1], svg.match(/<svg[^>]*>([\s\S]*)<\/svg>/)[1]])

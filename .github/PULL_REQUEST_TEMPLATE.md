@@ -1,26 +1,26 @@
-<!--The generated code-reference pages (tweaks and features) need no manual updates. Other code-reference pages are hand-written; update them when your change affects them. -->
+<!--As páginas geradas de referência de código (ajustes e recursos) não precisam de atualização manual. As outras páginas de referência de código são escritas à mão; atualize-as quando sua mudança as afetar. -->
 
 <!--
-For proper labeling on each PR better use next title strategy:
-fix(section): Some bug fix for that section
-feat(section): Providing a new feature on that section/major refactoring of present code
-chore(section): Some chores - code clearing, typo fixes etc
-docs: Documentation update
-ui-ux(section): Bare UI/UX updates with no major feature implementation
+Para uma rotulagem correta de cada PR, use a seguinte estratégia de título:
+fix(seção): Alguma correção de bug para aquela seção
+feat(seção): Adição de um novo recurso naquela seção/refatoração maior do código atual
+chore(seção): Tarefas gerais - limpeza de código, correção de typos etc
+docs: Atualização de documentação
+ui-ux(seção): Mudanças apenas de UI/UX sem implementação de recurso relevante
 
-Brackets part is optional, title "tag: added a thing" still results in feature labeling
-The mapped type labels are managed by the title workflow, even when added manually.
-Retitling a PR removes mapped labels that no longer match; an unrecognized title removes all of them.
+A parte entre colchetes é opcional; o título "tag: adicionei algo" ainda resulta na rotulação como recurso.
+Os rótulos de tipo mapeados são gerenciados pelo workflow de título, mesmo quando adicionados manualmente.
+Renomear um PR remove os rótulos mapeados que não correspondem mais; um título não reconhecido remove todos eles.
 
 -->
 
-## Description
-<!--[What does this PR do? Provide Screenshots when possible.]-->
+## Descrição
+<!--[O que este PR faz? Forneça capturas de tela quando possível.]-->
 
-## Issue related to PR
-<!--[List any ISSUES this is related to as it AUTO-CLOSES Them!]-->
-- Resolves #
+## Issue relacionada ao PR
+<!--[Liste as ISSUES relacionadas, pois isso as FECHA AUTOMATICAMENTE!]-->
+- Resolve #
 
-## PR human checks
-- [ ] This PR is not a blind result of a prompt 'make this project better, no mistakes'
-- [ ] I've read the [contributing guidelines](https://github.com/RamonMods/WinUtil/contributing/)
+## Verificações humanas do PR
+- [ ] Este PR não é o resultado cego de um prompt 'melhore este projeto, sem erros'
+- [ ] Li as [diretrizes de contribuição](https://github.com/RamonMods/WinUtil/contributing/)

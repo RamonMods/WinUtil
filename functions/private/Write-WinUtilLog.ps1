@@ -8,14 +8,14 @@ function Write-WinUtilLog {
 
         [string]$Component = "WinUtil",
 
-        # Continuation of an error already counted, such as a stack frame
+        # Continuação de um erro já contabilizado, como um quadro da pilha
         [switch]$Detail,
 
         [switch]$FileOnly
     )
 
-    # UI performance diagnostics are useful to developers but are too noisy for the release
-    # log. Compile.ps1 stamps local builds so DEBUG output cannot leak into CI artifacts.
+    # Os diagnósticos de desempenho da UI são úteis para desenvolvedores, mas são muito ruidosos para o
+    # log de lançamento. Compile.ps1 marca os builds locais para que a saída DEBUG não vaze para os artefatos de CI.
     if ($Level -eq "DEBUG" -and ($null -eq $sync -or -not $sync.IsLocalCompile)) {
         return
     }
@@ -24,9 +24,9 @@ function Write-WinUtilLog {
         $null = $sync.LoggedErrors.Add("[$Component] $Message")
     }
 
-    # Global scope is per runspace, so this counter only ever sees errors logged by the
-    # runspace that owns it: a job worker reads its own, and a tweak on the UI thread reads the
-    # UI thread's
+    # O escopo global é por runspace, então este contador só vê erros registrados pela runspace
+    # que o possui: um worker de job lê o seu, e um ajuste na thread da UI lê o da thread da
+    # UI
     if ($Level -eq "ERROR" -and -not $Detail) {
         $global:WinUtilJobErrorCount++
     }
@@ -45,9 +45,9 @@ function Write-WinUtilLog {
             }
         }
     } catch [System.IO.IOException] {
-        Write-Verbose "Unable to write WinUtil log entry: $($_.Exception.Message)"
+        Write-Verbose "Não foi possível gravar a entrada de log do WinUtil: $($_.Exception.Message)"
     } catch {
-        Write-Warning "Unable to write WinUtil log entry: $($_.Exception.Message)"
+        Write-Warning "Não foi possível gravar a entrada de log do WinUtil: $($_.Exception.Message)"
     }
 
     if (-not $FileOnly) {
@@ -55,7 +55,7 @@ function Write-WinUtilLog {
     }
 }
 
-# Opens the session log once for every runspace to share. Others can still read it, e.g. the environment report.
+# Abre o log da sessão uma vez para que todas as runspaces o compartilhem. Outras ainda podem lê-lo, por exemplo o relatório de ambiente.
 function Get-WinUtilLogWriter {
     $state = $sync
     if ($null -eq $state) {
@@ -114,7 +114,7 @@ function Get-WinUtilLogWriter {
     }
 }
 
-# Lets go of the log file when WinUtil exits, so the terminal it ran in doesn't keep it locked
+# Libera o arquivo de log quando o WinUtil sai, para que o terminal em que ele rodou não o mantenha bloqueado
 function Close-WinUtilLog {
     $state = if ($null -ne $sync) { $sync } else { $script:WinUtilLogState }
     if ($null -eq $state -or $null -eq $state.LogWriter) {
@@ -132,7 +132,7 @@ function Close-WinUtilLog {
     }
 }
 
-# Console-only output like banners and progress. Unlike Write-Host, a job won't log it.
+# Saída apenas no console, como banners e progresso. Diferente de Write-Host, um job não a registra em log.
 function Write-WinUtilHost {
     param(
         [string]$Object = "",
@@ -161,7 +161,7 @@ function Write-WinUtilHost {
     }
 }
 
-# Logs a warning, error or Write-Host record from another runspace, and shows it too unless -Shown says it already was
+# Registra um aviso, erro ou registro de Write-Host de outra runspace e também o exibe, a menos que -Shown indique que ele já foi exibido
 function Write-WinUtilStreamRecord {
     param(
         [Parameter(Mandatory)]
@@ -191,7 +191,7 @@ function Write-WinUtilStreamRecord {
     }
 }
 
-# Logs and clears a runspace's warnings, errors and Write-Host output. Never throws, as the main thread runs it.
+# Registra e limpa os avisos, erros e a saída de Write-Host de uma runspace. Nunca lança exceção, pois é executado na thread principal.
 function Receive-WinUtilStreamOutput {
     param(
         [Parameter(Mandatory)]
@@ -211,6 +211,6 @@ function Receive-WinUtilStreamOutput {
             Write-WinUtilStreamRecord -Record $record -Component $Component
         }
     } catch {
-        Write-Warning "Unable to log $Component output: $($_.Exception.Message)"
+        Write-Warning "Não foi possível registrar a saída de $($Component): $($_.Exception.Message)"
     }
 }

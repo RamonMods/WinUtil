@@ -2,17 +2,17 @@ function Invoke-WinUtilTweaks {
     <#
 
     .SYNOPSIS
-        Invokes the function associated with each provided checkbox
+        Invoca a função associada a cada caixa de seleção fornecida
 
     .PARAMETER CheckBox
-        The checkbox to invoke
+        A caixa de seleção a invocar
 
     .PARAMETER undo
-        Indicates whether to undo the operation contained in the checkbox
+        Indica se deve desfazer a operação contida na caixa de seleção
 
     .PARAMETER KeepServiceStartup
-        Indicates whether to override the startup of a service with the one given from WinUtil,
-        or to keep the startup of said service, if it was changed by the user, or another program, from its default value.
+        Indica se deve substituir a inicialização de um serviço pela fornecida pelo WinUtil,
+        ou manter a inicialização desse serviço, caso tenha sido alterada pelo usuário ou por outro programa em relação ao valor padrão.
     #>
 
     param(
@@ -21,14 +21,14 @@ function Invoke-WinUtilTweaks {
         $KeepServiceStartup = $true
     )
 
-    $action = if ($undo) { "Undo" } else { "Apply" }
-    Write-WinUtilLog -Component "Tweaks" -Message "$action tweak: $CheckBox"
-    # The next status read must hit the registry, not a value cached before this change
+    $action = if ($undo) { "desfeito" } else { "aplicado" }
+    Write-WinUtilLog -Component "Tweaks" -Message "Ajuste $action`: $CheckBox"
+    # A próxima leitura de status deve consultar o registro, e não um valor armazenado em cache antes desta alteração
     if ($sync.ToggleStatusCache) {
         $sync.ToggleStatusCache.Remove($CheckBox)
     }
-    # The counter lives in this runspace, so an error a concurrent job logs from its own
-    # runspace cannot be charged to a toggle flipped on the UI thread
+    # O contador vive neste runspace, portanto um erro registrado por um job concorrente em seu próprio
+    # runspace não pode ser atribuído a um interruptor alternado na thread da interface
     $errorsBefore = [int]$global:WinUtilJobErrorCount
 
     if ($undo) {
@@ -50,29 +50,29 @@ function Invoke-WinUtilTweaks {
         foreach ($item in $sync.configs.tweaks.$CheckBox.service) {
             $changeservice = $true
 
-            # KeepServiceStartup protects a service the user (or another tool) changed away from
-            # the value this tweak expects. Undo uses the same rule in reverse: only restore
-            # OriginalType when the service still sits at the StartupType this tweak applies.
-            # This compares current state, not history: a service already at StartupType
-            # before apply is indistinguishable from one changed by this tweak.
+            # KeepServiceStartup protege um serviço que o usuário (ou outra ferramenta) alterou para longe do
+            # valor esperado por este ajuste. Desfazer usa a mesma regra invertida: restaura
+            # OriginalType somente quando o serviço ainda está no StartupType aplicado por este ajuste.
+            # Isso compara o estado atual, não o histórico: um serviço já no StartupType
+            # antes da aplicação é indistinguível de um alterado por este ajuste.
             $expectedType = if ($undo) { $item.StartupType } else { $item.$($values.OriginalService) }
             if ($KeepServiceStartup) {
                 $serviceName = $item.Name
                 try {
-                    # Check if the service exists
+                    # Verifica se o serviço existe
                     $service = Get-Service -Name $serviceName -ErrorAction Stop
                     if(!($service.StartType.ToString() -eq $expectedType)) {
                         $changeservice = $false
-                        # Say so, or the log reads as if the tweak changed a service it left alone
-                        $skipMessage = "Service $serviceName startup type is $($service.StartType), not $expectedType as this tweak expects; leaving it unchanged."
+                        # Informe isso, ou o log parecerá que o ajuste alterou um serviço que não foi tocado
+                        $skipMessage = "O tipo de inicialização do serviço $serviceName é $($service.StartType), e não $expectedType como este ajuste espera; deixando-o inalterado."
                         Write-Warning $skipMessage
                         Write-WinUtilLog -Level "WARN" -Component "Service" -Message $skipMessage
                     }
                 } catch {
                     if ($_.FullyQualifiedErrorId -like "NoServiceFoundForGivenName,*") {
                         $changeservice = $false
-                        Write-Warning "Service $serviceName was not found."
-                        Write-WinUtilLog -Level "WARN" -Component "Service" -Message "Service $serviceName was not found."
+                        Write-Warning "Serviço $serviceName não encontrado."
+                        Write-WinUtilLog -Level "WARN" -Component "Service" -Message "Serviço $serviceName não encontrado."
                     } else {
                         throw
                     }
@@ -105,8 +105,8 @@ function Invoke-WinUtilTweaks {
     }
     $errorCount = [int]$global:WinUtilJobErrorCount - $errorsBefore
     if ($errorCount -gt 0) {
-        Write-WinUtilLog -Level "WARN" -Component "Tweaks" -Message "$action tweak finished with $errorCount error(s): $CheckBox"
+        Write-WinUtilLog -Level "WARN" -Component "Tweaks" -Message "Ajuste $action com $errorCount erro(s): $CheckBox"
     } else {
-        Write-WinUtilLog -Component "Tweaks" -Message "$action tweak completed: $CheckBox"
+        Write-WinUtilLog -Component "Tweaks" -Message "Ajuste $action concluído: $CheckBox"
     }
 }

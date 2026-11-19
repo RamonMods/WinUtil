@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - XAML Control Wiring
+# Testes - Conexão dos controles XAML
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -110,7 +110,7 @@ BeforeAll {
     }
 }
 
-Describe "Interface startup failures" {
+Describe "Falhas na inicialização da interface" {
     BeforeAll {
         function Measure-WinUtilStep { param($Scope, $Name, $ScriptBlock) $null = $Scope, $Name; & $ScriptBlock }
         function Write-WinUtilLog { param($Level, $Component, $Message) $null = $Level, $Component, $Message }
@@ -129,7 +129,7 @@ Describe "Interface startup failures" {
         Mock Write-Host { }
     }
 
-    It "throws when the XAML cannot create the window" {
+    It "lança erro quando o XAML não pode criar a janela" {
         { Start-WinUtilUserInterface } | Should -Throw "Failed to parse the XAML content*"
 
         Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
@@ -137,19 +137,19 @@ Describe "Interface startup failures" {
         }
     }
 
-    It "exits a direct file process but returns to an in-memory caller after an interface failure" {
+    It "encerra um processo de arquivo direto, mas retorna ao chamador em memória após uma falha na interface" {
         $mainScript = Get-Content -Path (Join-Path $script:scriptsRoot "main.ps1") -Raw
 
         $mainScript | Should -Match '\$uiFailed = \$true[\s\S]*if \(\$uiFailed\) \{\s*\$global:LASTEXITCODE = 1\s*if \(\$script:WinUtilIsFileProcess\) \{ exit 1 \}\s*return 1'
     }
 }
 
-Describe "XAML document" {
-    It "loads inputXML.xaml as a WPF window XML document" {
+Describe "Documento XAML" {
+    It "carrega inputXML.xaml como um documento XML de janela WPF" {
         $script:xaml.DocumentElement.LocalName | Should -Be "Window"
     }
 
-    It "contains expected core controls" {
+    It "contém os controles principais esperados" {
         $xamlNames = @(Get-WinUtilXamlRuntimeNamedControls | ForEach-Object { $_.Name })
         $requiredControls = @(
             "WPFMainGrid",
@@ -224,7 +224,7 @@ Describe "XAML document" {
 
 
 
-    It "presents the three Updates profiles with accurate action labels" {
+    It "apresenta os três perfis de Atualizações com rótulos de ação precisos" {
         $updatesTab = $script:xaml.SelectSingleNode('//*[local-name()="TabItem"][@Name="WPFTab4"]')
         $profileGrid = $updatesTab.SelectSingleNode('.//*[local-name()="UniformGrid"]')
         $expectedButtons = @{
@@ -241,7 +241,7 @@ Describe "XAML document" {
         $updatesTab.SelectSingleNode('.//*[@Name="updatespanel"]') | Should -BeNullOrEmpty
     }
 
-    It "contains Win11 Creator controls used by the ISO workflow" {
+    It "contém os controles do Criador do Win11 usados pelo fluxo do ISO" {
         $xamlNames = @(Get-WinUtilXamlRuntimeNamedControls | ForEach-Object { $_.Name })
         $requiredControls = @(
             "Win11ISOPanel",
@@ -283,7 +283,7 @@ Describe "XAML document" {
         }
     }
 
-    It "names the Win11 Creator wizard controls for screen readers" {
+    It "nomeia os controles do assistente do Criador do Win11 para leitores de tela" {
         $expectedNames = @{
             WPFWin11ISOBackButton = "Previous Step"
             WPFWin11ISOForwardButton = "Next Step"
@@ -299,7 +299,7 @@ Describe "XAML document" {
         }
     }
 
-    It "defines core tabs in the expected order" {
+    It "define as abas principais na ordem esperada" {
         $tabItems = @($script:xaml.SelectNodes('//*[local-name()="TabControl"][@Name="WPFTabNav"]/*[local-name()="TabItem"]'))
         $actualTabs = @($tabItems | ForEach-Object { "$($_.GetAttribute("Name")):$($_.GetAttribute("Header"))" })
         $expectedTabs = @(
@@ -324,7 +324,7 @@ Describe "XAML document" {
 
 
 
-    It "centers top bar controls vertically" {
+    It "centraliza verticalmente os controles da barra superior" {
         $navPanel = $script:xaml.SelectSingleNode('//*[local-name()="StackPanel"][@Name="NavDockPanel"]')
         $minimizeButton = $script:xaml.SelectSingleNode('//*[local-name()="Button"][@Name="WPFMinimizeButton"]')
         $actionPanel = $minimizeButton.ParentNode
@@ -351,7 +351,7 @@ Describe "XAML document" {
 
 
 
-    It "has a queue button that starts hidden and a dropdown that closes on outside clicks" {
+    It "tem um botão de fila que começa oculto e uma lista suspensa que fecha com cliques fora" {
         $button = $script:xaml.SelectSingleNode('//*[local-name()="Button"][@Name="JobQueueButton"]')
         $popup = $script:xaml.SelectSingleNode('//*[local-name()="Popup"][@Name="JobQueuePopup"]')
 
@@ -367,7 +367,7 @@ Describe "XAML document" {
         ($button.OuterXml + $popup.OuterXml) | Should -Not -Match '="#[0-9A-Fa-f]{3,8}"'
     }
 
-    It "wires the queue button and popup and refreshes the rows when the dropdown opens" {
+    It "conecta o botão e o popup da fila e atualiza as linhas quando a lista suspensa abre" {
         $uiSource = Get-Content -Path $script:uiScriptPath -Raw
 
         $uiSource | Should -Match '\$sync\["JobQueueButton"\]\.Add_Click'
@@ -376,7 +376,7 @@ Describe "XAML document" {
         $clickHandler | Should -Match '"JobQueue" = "Show"'
     }
 
-    It "scopes toggle button styles without leaking into combo boxes" {
+    It "delimita os estilos de botões de interruptor sem vazar para caixas de combinação" {
         $resources = $script:xaml.SelectSingleNode('//*[local-name()="Window.Resources"]')
         $implicitToggleStyles = @($resources.SelectNodes('./*[local-name()="Style"][@TargetType="ToggleButton" or @TargetType="{x:Type ToggleButton}"][not(@x:Key)]', $script:xamlNamespace))
         $tabStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@x:Key="TabToggleButton"]', $script:xamlNamespace)
@@ -397,7 +397,7 @@ Describe "XAML document" {
         }
     }
 
-    It "uses state-aware maximize and restore icons" {
+    It "usa ícones de maximizar e restaurar sensíveis ao estado" {
         $themes = Get-WinUtilConfigObject -Name "themes"
         $minimizeButton = $script:xaml.SelectSingleNode('//*[local-name()="Button"][@Name="WPFMinimizeButton"]')
         $maximizeButton = $script:xaml.SelectSingleNode('//*[local-name()="Button"][@Name="WPFMaximizeButton"]')
@@ -422,8 +422,8 @@ Describe "XAML document" {
     }
 }
 
-Describe "XAML and sync wiring" {
-    It "wires generated config panels to existing target grids" {
+Describe "Conexão de XAML e sync" {
+    It "conecta os painéis de configuração gerados às grades de destino existentes" {
         $xamlNames = @(Get-WinUtilXamlRuntimeNamedControls | ForEach-Object { $_.Name })
         $uiLines = Get-Content -Path $script:uiScriptPath
         $invalidTargets = New-Object System.Collections.Generic.List[string]
@@ -457,7 +457,7 @@ Describe "XAML and sync wiring" {
         }
     }
 
-    It "references only XAML, generated, or intentionally dynamic sync members" {
+    It "referencia apenas membros sync do XAML, gerados ou intencionalmente dinâmicos" {
         $sourceText = Get-WinUtilSourceText
         $xamlNames = @(Get-WinUtilXamlRuntimeNamedControls | ForEach-Object { $_.Name })
         $generatedNames = @(Get-WinUtilGeneratedControlNames)
@@ -481,8 +481,8 @@ Describe "XAML and sync wiring" {
             "JobHandoff",
             "JobClosePromptOpen",
             "JobQueuePopupClosedAt",
-            # Intrinsic to the synchronized hashtable rather than WinUtil state; the job layer
-            # locks on it to claim and release the active job slot
+            # Intrínseco ao hashtable sincronizado, e não ao estado do WinUtil; a camada de jobs
+            # usa-o como bloqueio para assumir e liberar a vaga do job ativo
             "SyncRoot",
             "UIRunspace",
             "UIDispatchDelegate",
@@ -567,8 +567,8 @@ Describe "XAML and sync wiring" {
     }
 }
 
-Describe "WPF handler wiring" {
-    It "calls only defined Invoke-WPF functions" {
+Describe "Conexão dos manipuladores WPF" {
+    It "chama apenas funções Invoke-WPF definidas" {
         $sourceText = Get-WinUtilSourceText
         $functionNames = @(Get-WinUtilTopLevelFunctionNames)
         $featureFunctions = @(
@@ -590,7 +590,7 @@ Describe "WPF handler wiring" {
         }
     }
 
-    It "routes static WPF buttons through Invoke-WPFButton or explicit handlers" {
+    It "encaminha botões WPF estáticos por Invoke-WPFButton ou manipuladores explícitos" {
         $runtimeControls = @(Get-WinUtilXamlRuntimeNamedControls)
         $buttonControls = @(
             $runtimeControls |
@@ -608,7 +608,7 @@ Describe "WPF handler wiring" {
             $explicitHandlerPattern = '\$sync\s*(?:\[\s*["'']' + $escapedName + '["'']\s*\]|\.' + $escapedName + ')\.Add_Click'
             $hasExplicitHandler = $uiScript -imatch $explicitHandlerPattern
 
-            # The category chips share one handler, wired from the list that names them
+            # As fichas de categoria compartilham um manipulador, conectado a partir da lista que as nomeia
             $hasChipHandler = $uiScript -imatch ('@\{\s*Name\s*=\s*"' + $escapedName + '"')
 
             if (-not ($hasSwitchHandler -or $hasFeatureHandler -or $hasExplicitHandler -or $hasChipHandler)) {
@@ -621,7 +621,7 @@ Describe "WPF handler wiring" {
         }
     }
 
-    It "invokes existing WPF button names" {
+    It "invoca nomes de botões WPF existentes" {
         $sourceText = Get-WinUtilSourceText
         $xamlNames = @(Get-WinUtilXamlRuntimeNamedControls | ForEach-Object { $_.Name })
         $generatedNames = @(Get-WinUtilGeneratedControlNames)

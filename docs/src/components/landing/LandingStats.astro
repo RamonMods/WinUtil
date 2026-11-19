@@ -1,13 +1,13 @@
 ---
-// Counts the generated tweak and feature reference pages, so the numbers follow config/tweaks.json and feature.json.
+// Conta as páginas de referência de ajustes e recursos geradas, para que os números acompanhem config/tweaks.json e feature.json.
 import { getCollection } from 'astro:content';
 
 const docs = await getCollection('docs');
 const countPages = (dir: string) => docs.filter((entry) => entry.id.startsWith(`code-reference/${dir}/`)).length;
 
 const stats = [
-	{ value: countPages('tweaks'), label: 'Documented tweaks' },
-	{ value: countPages('features'), label: 'Features & fixes' },
+	{ value: countPages('tweaks'), label: 'Ajustes documentados' },
+	{ value: countPages('features'), label: 'Recursos e correções' },
 ];
 ---
 

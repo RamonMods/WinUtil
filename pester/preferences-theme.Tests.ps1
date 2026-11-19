@@ -1,13 +1,13 @@
 #===========================================================================
-# Tests - Preferences and Themes
+# Testes - Preferências e temas
 #===========================================================================
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
-    # Theme application sets Thickness, CornerRadius and GridLength resources, so the real WPF
-    # types have to be loaded here rather than left to whichever other test file happened to
-    # load them first
+    # A aplicação de tema define os recursos Thickness, CornerRadius e GridLength, então os tipos
+    # WPF reais precisam ser carregados aqui, em vez de depender de qualquer outro arquivo de teste
+    # que por acaso os carregasse primeiro
     Add-Type -AssemblyName PresentationFramework
     Add-Type -AssemblyName PresentationCore
     Add-Type -AssemblyName WindowsBase
@@ -204,7 +204,7 @@ Describe "Invoke-WinutilThemeChange" {
         Remove-WinUtilPreferenceGlobals
     }
 
-    It "applies shared and selected theme resources, keeps the preference in memory, and updates the theme button" {
+    It "aplica recursos de tema compartilhados e selecionados, mantém a preferência em memória e atualiza o botão de tema" {
         $script:testRoot = New-WinUtilPreferencesTestRoot
         $global:winutildir = $script:testRoot
         New-WinUtilPreferenceSync
@@ -221,7 +221,7 @@ Describe "Invoke-WinutilThemeChange" {
         Test-Path -Path (Join-Path $script:testRoot "preferences.ini") | Should -BeFalse
     }
 
-    It "uses the system dark-mode toggle when Auto theme is selected" {
+    It "usa o interruptor de modo escuro do sistema quando o tema Auto é selecionado" {
         $script:testRoot = New-WinUtilPreferencesTestRoot
         $global:winutildir = $script:testRoot
         New-WinUtilPreferenceSync
@@ -238,8 +238,8 @@ Describe "Invoke-WinutilThemeChange" {
     }
 }
 
-Describe "Theme configuration" {
-    It "contains resources with value shapes consumed by theme application" {
+Describe "Configuração de temas" {
+    It "contém recursos com formatos de valor consumidos pela aplicação de temas" {
         $themes = Get-Content -Path (Join-Path $script:repoRoot "config\themes.json") -Raw | ConvertFrom-Json
         $invalidEntries = [System.Collections.Generic.List[string]]::new()
 

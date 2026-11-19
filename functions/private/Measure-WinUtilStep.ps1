@@ -1,21 +1,21 @@
 function Measure-WinUtilStep {
     <#
         .SYNOPSIS
-            Times one step of a pipeline and records it for the timing summary
+            Cronometra uma etapa de um pipeline e a registra para o resumo de tempos
 
         .DESCRIPTION
-            Output passes through untouched, so this can wrap an existing expression without
-            changing what the caller receives. Each step is logged as a "timing:" line and kept
-            in $sync.StepTimings for the summary to rank.
+            A saída passa intacta, portanto isso pode envolver uma expressão existente sem
+            alterar o que o chamador recebe. Cada etapa é registrada como uma linha "timing:" e mantida
+            em $sync.StepTimings para que o resumo a ordene.
 
         .PARAMETER Name
-            What the step is, as it should read in the log.
+            O que a etapa é, como deve aparecer no log.
 
         .PARAMETER ScriptBlock
-            The work to time.
+            O trabalho a cronometrar.
 
         .PARAMETER Scope
-            Groups steps that belong to the same run, normally a job name or "UI".
+            Agrupa etapas pertencentes à mesma execução, normalmente um nome de job ou "UI".
     #>
     param(
         [Parameter(Mandatory, Position = 0)]
@@ -45,7 +45,7 @@ function Measure-WinUtilStep {
 
         if ($captureTiming) {
             $level = if ($isUIDiagnostic) { "DEBUG" } else { "INFO" }
-            Write-WinUtilLog -Level $level -Component $Scope -Message "timing: $Name took $($stopwatch.ElapsedMilliseconds) ms"
+            Write-WinUtilLog -Level $level -Component $Scope -Message "timing: $Name levou $($stopwatch.ElapsedMilliseconds) ms"
         }
     }
 }
@@ -53,17 +53,17 @@ function Measure-WinUtilStep {
 function Write-WinUtilTimingSummary {
     <#
         .SYNOPSIS
-            Logs the slowest steps of a scope, so the log answers "what took so long"
+            Registra no log as etapas mais lentas de um escopo, para que o log responda "o que demorou tanto"
 
         .PARAMETER Scope
-            Which group of steps to report on.
+            Qual grupo de etapas deve ser relatado.
 
         .PARAMETER Top
-            How many of the slowest steps to list.
+            Quantas das etapas mais lentas devem ser listadas.
 
         .PARAMETER TotalMilliseconds
-            Wall clock total. Without it the summary sums the steps, missing whatever happened
-            between them.
+            Total em tempo real. Sem ele, o resumo soma as etapas, omitindo o que aconteceu
+            entre elas.
     #>
     param(
         [Parameter(Mandatory)]
@@ -97,7 +97,7 @@ function Write-WinUtilTimingSummary {
     $total = if ($TotalMilliseconds -ge 0) { $TotalMilliseconds } else { $measured }
 
     $level = if ($isUIDiagnostic) { "DEBUG" } else { "INFO" }
-    Write-WinUtilLog -Level $level -Component $Scope -Message "timing summary: $($steps.Count) step(s), $measured ms measured of $total ms total"
+    Write-WinUtilLog -Level $level -Component $Scope -Message "timing summary: $($steps.Count) etapa(s), $measured ms medidos de $total ms no total"
     foreach ($step in ($steps | Sort-Object Milliseconds -Descending | Select-Object -First $Top)) {
         $share = if ($total -gt 0) { [int](($step.Milliseconds / $total) * 100) } else { 0 }
         Write-WinUtilLog -Level $level -Component $Scope -Message "timing summary:   $($step.Milliseconds) ms ($share%)  $($step.Step)"

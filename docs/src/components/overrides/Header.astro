@@ -1,5 +1,5 @@
 ---
-// Header override: site title, search, top navigation, social links, and theme toggle.
+// Substituição do cabeçalho: título do site, busca, navegação superior, links sociais e alternador de tema.
 import config from 'virtual:starlight/user-config';
 import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import { Icon } from '@astrojs/starlight/components';
@@ -9,30 +9,30 @@ import ThemeToggle from '../docs/ThemeToggle.jsx';
 import { siteLinks } from '../../lib/site-links';
 import '../../styles/docs-ui.css';
 
-// Pages with a sidebar already have the sidebar menu button, so only splash pages need SiteNav's.
+// Páginas com barra lateral já têm o botão de menu dela, então só as páginas de abertura precisam do do SiteNav.
 const { hasSidebar } = Astro.locals.starlightRoute;
 
 const navGroups = [
 	{
-		label: 'Documentation',
+		label: 'Documentação',
 		links: [
-			{ label: 'User Guides', href: '/guides/' },
-			{ label: 'Contribution Guides', href: '/contributing/' },
-			{ label: 'Code Reference', href: '/code-reference/architecture/' },
+			{ label: 'Guias do usuário', href: '/guides/' },
+			{ label: 'Guias de contribuição', href: '/contributing/' },
+			{ label: 'Referência de código', href: '/code-reference/architecture/' },
 		],
 	},
 	{
-		label: 'Tools',
+		label: 'Ferramentas',
 		links: [
-			{ label: 'Config Builder', href: '/config-builder/' },
-			{ label: 'Tweak Explorer', href: '/tweak-explorer/' },
+			{ label: 'Construtor de Configurações', href: '/config-builder/' },
+			{ label: 'Explorador de Ajustes', href: '/tweak-explorer/' },
 		],
 	},
 	{
-		label: 'Help',
+		label: 'Ajuda',
 		links: [
 			{ label: 'FAQ', href: '/faq/' },
-			{ label: 'Known Issues', href: '/knownissues/' },
+			{ label: 'Problemas conhecidos', href: '/knownissues/' },
 			{ label: siteLinks.forums.label, href: siteLinks.forums.href, external: true },
 		],
 	},

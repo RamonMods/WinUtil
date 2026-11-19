@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Get-WinUtilVariables
+# Testes - Get-WinUtilVariables
 #===========================================================================
 
 BeforeAll {
@@ -10,7 +10,7 @@ BeforeAll {
     }
     $global:sync = [Hashtable]::Synchronized(@{})
 
-    # Setup some test variables
+    # Configura algumas variáveis de teste
     $global:sync["WPFTestString"] = "I am a string"
     $global:sync["WPFTestObj1"] = [PSCustomObject]@{ Name = "Test1" }
     $global:sync["WPFTestObj2"] = [PSCustomObject]@{ Name = "Test2" }
@@ -30,7 +30,7 @@ AfterAll {
 
 Describe "Get-WinUtilVariables" {
 
-    It "returns all WPF-prefixed keys when no type is provided" {
+    It "retorna todas as chaves com prefixo WPF quando nenhum tipo é fornecido" {
         $result = Get-WinUtilVariables
         $result.Count | Should -Be 4
         $result | Should -Contain "WPFTestString"
@@ -40,20 +40,20 @@ Describe "Get-WinUtilVariables" {
         $result | Should -Not -Contain "OtherVar"
     }
 
-    It "returns only WPF keys matching the specified exact type" {
+    It "retorna apenas chaves WPF que correspondem ao tipo exato especificado" {
         $result = Get-WinUtilVariables -Type "String"
         $result.Count | Should -Be 1
         $result | Should -Contain "WPFTestString"
     }
 
-    It "returns multiple objects matching PSCustomObject" {
+    It "retorna múltiplos objetos que correspondem a PSCustomObject" {
         $result = Get-WinUtilVariables -Type "PSCustomObject"
         $result.Count | Should -Be 2
         $result | Should -Contain "WPFTestObj1"
         $result | Should -Contain "WPFTestObj2"
     }
 
-    It "returns an empty list when no matching type is found" {
+    It "retorna uma lista vazia quando nenhum tipo correspondente é encontrado" {
         $result = Get-WinUtilVariables -Type "Int32"
         $result | Should -BeNullOrEmpty
     }

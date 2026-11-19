@@ -9,8 +9,8 @@ Function Get-WinUtilPowerShellArchitecture {
 }
 
 Function Test-WinUtilPowerShellMSIUpgradeAllowed {
-    # WinGet has no structured pin-list output, and list filters are not honored by all versions.
-    # Conservatively leave upgrades to WinGet whenever any pins exist or the check fails.
+    # O WinGet não tem saída estruturada de lista de pins, e os filtros de list não são respeitados por todas as versões.
+    # Por precaução, deixe as atualizações com o WinGet sempre que existir algum pin ou a verificação falhar.
     try {
         $pinOutput = @(& winget pin list --accept-source-agreements --disable-interactivity 2>&1)
         if ($LASTEXITCODE -ne 0 -or $pinOutput.Count -eq 0) { return $false }
@@ -33,7 +33,7 @@ Function Update-WinUtilPowerShellMSI {
     foreach ($candidate in $candidates) {
         $location = $candidate.InstallLocation
         if (-not $location) {
-            # The official MSI registers its location here, not in the uninstall record.
+            # O MSI oficial registra sua localização aqui, não no registro de desinstalação.
             $registration = Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\PowerShellCore\InstalledVersions\*","HKLM:\SOFTWARE\WOW6432Node\Microsoft\PowerShellCore\InstalledVersions\*" -ErrorAction SilentlyContinue |
                 Where-Object { $_.ProductCode -and $_.ProductCode -eq $candidate.PSChildName } |
                 Select-Object -First 1
@@ -48,22 +48,22 @@ Function Update-WinUtilPowerShellMSI {
     if ($locations.Count -eq 0) {
         return [pscustomobject]@{
             Outcome = "NotInstalled"
-            Detail = "PowerShell is not installed through MSI"
+            Detail = "O PowerShell não foi instalado via MSI"
         }
     }
 
     if ($locations.Count -gt 1) {
-        $detail = "Multiple stable PowerShell MSI installations detected; upgrade each installation manually. No direct MSI upgrade was attempted."
+        $detail = "Várias instalações estáveis do PowerShell via MSI foram detectadas; atualize cada instalação manualmente. Nenhuma atualização direta por MSI foi tentada."
         Write-WinUtilLog -Level "ERROR" -Component "Package" -Message $detail
         return [pscustomobject]@{ Outcome = "Failed"; ExitCode = -1; Detail = $detail }
     }
     $msi = [pscustomobject]@{ InstallLocation = $locations[0] }
 
     if (-not (Test-WinUtilPowerShellMSIUpgradeAllowed)) {
-        Write-WinUtilLog -Component "Package" -Message "Skipping direct PowerShell MSI upgrade: WinGet pins exist or their state could not be verified."
+        Write-WinUtilLog -Component "Package" -Message "Ignorando a atualização direta do PowerShell por MSI: existem pins do WinGet ou o estado deles não pôde ser verificado."
         return [pscustomobject]@{
             Outcome = "Skipped"
-            Detail = "WinGet pins exist or their state could not be verified; MSI upgrade skipped"
+            Detail = "Existem pins do WinGet ou o estado deles não pôde ser verificado; atualização por MSI ignorada"
         }
     }
 
@@ -73,23 +73,23 @@ Function Update-WinUtilPowerShellMSI {
         $latest = ([string]$release.tag_name).TrimStart("v")
 
         if ([version]$installed -ge [version]$latest) {
-            Write-WinUtilLog -Component "Package" -Message "PowerShell is already current ($installed)"
+            Write-WinUtilLog -Component "Package" -Message "O PowerShell já está atualizado ($installed)"
             return [pscustomobject]@{
                 Outcome = "Skipped"
-                Detail = "PowerShell is already current"
+                Detail = "O PowerShell já está atualizado"
             }
         }
 
         $arch = ([string](Get-WinUtilPowerShellArchitecture (Join-Path $msi.InstallLocation "pwsh.exe"))).Trim().ToLowerInvariant()
         if ($arch -notin @("x64", "x86", "arm64")) {
-            throw "Unsupported installed PowerShell architecture: $arch"
+            throw "Arquitetura do PowerShell instalado não é suportada: $arch"
         }
         $asset = $release.assets |
             Where-Object { $_.name -match "^PowerShell-.*-win-$arch\.msi$" } |
             Select-Object -First 1
 
         if (-not $asset) {
-            throw "No PowerShell MSI found for $arch"
+            throw "Nenhum MSI do PowerShell encontrado para $arch"
         }
 
         $msiPath = Join-Path $env:TEMP "PowerShell-$arch-$([guid]::NewGuid()).msi"
@@ -100,7 +100,7 @@ Function Update-WinUtilPowerShellMSI {
             if ($asset.digest) {
                 $hash = (Get-FileHash -LiteralPath $msiPath -Algorithm SHA256).Hash.ToLowerInvariant()
                 if ($hash -ne $asset.digest.Replace("sha256:", "").ToLowerInvariant()) {
-                    throw "PowerShell MSI SHA256 verification failed"
+                    throw "Falha na verificação SHA256 do MSI do PowerShell"
                 }
             }
 
@@ -110,21 +110,21 @@ Function Update-WinUtilPowerShellMSI {
                 -not $signature.SignerCertificate -or
                 $signature.SignerCertificate.Subject -notmatch '(^|,\s*)CN=Microsoft Corporation(,|$)'
             ) {
-                throw "PowerShell MSI signature verification failed"
+                throw "Falha na verificação de assinatura do MSI do PowerShell"
             }
 
             $install = Start-Process msiexec.exe -ArgumentList "/i `"$msiPath`" /qn /norestart" -Wait -PassThru
 
             if ($install.ExitCode -notin @(0,3010,1641)) {
-                throw "PowerShell MSI installation failed with exit code $($install.ExitCode)"
+                throw "A instalação do MSI do PowerShell falhou com o código de saída $($install.ExitCode)"
             }
 
             $detail = switch ($install.ExitCode) {
-                3010 { "PowerShell MSI upgrade succeeded; a restart is required to finish" }
-                1641 { "PowerShell MSI upgrade succeeded; the installer started a restart" }
-                default { "PowerShell MSI upgrade succeeded" }
+                3010 { "Atualização do MSI do PowerShell concluída; é preciso reiniciar para concluir" }
+                1641 { "Atualização do MSI do PowerShell concluída; o instalador iniciou uma reinicialização" }
+                default { "Atualização do MSI do PowerShell concluída" }
             }
-            Write-WinUtilLog -Component "Package" -Message "$detail (exit code $($install.ExitCode))"
+            Write-WinUtilLog -Component "Package" -Message "$detail (código de saída $($install.ExitCode))"
             if ($install.ExitCode -in @(3010, 1641)) { Write-Host $detail }
 
             return [pscustomobject]@{
@@ -138,12 +138,12 @@ Function Update-WinUtilPowerShellMSI {
         }
     }
     catch {
-        Write-WinUtilLog -Level "ERROR" -Component "Package" -Message "PowerShell MSI upgrade failed: $($_.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Package" -Message "Falha na atualização do MSI do PowerShell: $($_.Exception.Message)"
 
         return [pscustomobject]@{
             Outcome = "Failed"
             ExitCode = -1
-            Detail = "PowerShell MSI upgrade failed: $($_.Exception.Message)"
+            Detail = "Falha na atualização do MSI do PowerShell: $($_.Exception.Message)"
         }
     }
 }
@@ -152,15 +152,16 @@ Function Install-WinUtilProgramWinget {
     <#
 
     .SYNOPSIS
-        Installs or uninstalls packages with WinGet and reports the outcome of each one
+        Instala ou desinstala pacotes com o WinGet e reporta o resultado de cada um
 
     .DESCRIPTION
-        Emits one result object per package so the caller can tell what actually happened
-        rather than assuming the run succeeded.
+        Emite um objeto de resultado por pacote para que o chamador saiba o que realmente
+        aconteceu, em vez de presumir que a execução foi bem-sucedida.
 
-        Runs one winget command per package so a failure names the package that failed rather
-        than the whole batch. Progress moves per package: winget hides its own progress bar once
-        its output is redirected, so there is nothing to report from inside a single install.
+        Executa um comando winget por pacote para que uma falha identifique o pacote que falhou,
+        em vez do lote inteiro. O progresso avança por pacote: o winget oculta sua própria barra
+        de progresso quando a saída é redirecionada, então não há nada a reportar de dentro de
+        uma instalação individual.
 
     #>
     param (
@@ -172,24 +173,24 @@ Function Install-WinUtilProgramWinget {
         [string[]]$Programs
     )
 
-    # APPINSTALLER_CLI_ERROR_ADMIN_CONTEXT_ACTION_PROHIBITED. WinGet refuses to act on a package
-    # that was installed in user scope while it is running elevated, and WinUtil is always
-    # elevated, so every per-user app answers this and nothing happens.
+    # APPINSTALLER_CLI_ERROR_ADMIN_CONTEXT_ACTION_PROHIBITED. O WinGet se recusa a agir em um pacote
+    # que foi instalado no escopo do usuário enquanto executa elevado, e o WinUtil sempre executa
+    # elevado, então todo aplicativo por usuário retorna isso e nada acontece.
     $adminContextProhibited = -1978335107
 
-    # WinGet reports "there was nothing to do" through the exit code rather than as success
+    # O WinGet reporta "não havia nada a fazer" pelo código de saída, em vez de como sucesso
     $nothingToDo = @{
-        -1978335135 = "already installed"
-        -1978335189 = "no applicable update"
+        -1978335135 = "já instalado"
+        -1978335189 = "nenhuma atualização aplicável"
     }
 
-    # The installer worked and wants a restart to finish. Windows reports that as its own exit
-    # code rather than as zero, and treating it as a failure marks working installs as broken.
+    # O instalador funcionou e quer reiniciar para concluir. O Windows reporta isso com seu próprio
+    # código de saída, em vez de zero, e tratá-lo como falha marca instalações funcionais como quebradas.
     $rebootExitCodes = @{
-        3010 = "installed, a restart is needed to finish"
-        1641 = "installed, the installer started a restart"
-        -1978334967 = "installed, a restart is needed to finish"
-        -1978334965 = "installed, the installer started a restart"
+        3010 = "instalado, é preciso reiniciar para concluir"
+        1641 = "instalado, o instalador iniciou uma reinicialização"
+        -1978334967 = "instalado, é preciso reiniciar para concluir"
+        -1978334965 = "instalado, o instalador iniciou uma reinicialização"
     }
 
     foreach ($program in $Programs) {
@@ -212,22 +213,22 @@ Function Install-WinUtilProgramWinget {
                     Detail   = $result.Detail
                 }
 
-                # Upgrade All must still update the other packages after reporting the MSI outcome.
+                # Atualizar Tudo ainda deve atualizar os outros pacotes após reportar o resultado do MSI.
                 if (-not $upgradeAll) { continue }
             }
         }
 
-        $source = if ($upgradeAll) { "all configured sources" } else { "winget" }
+        $source = if ($upgradeAll) { "todas as fontes configuradas" } else { "winget" }
 
         if (-not $upgradeAll -and $program.StartsWith("msstore:", [System.StringComparison]::OrdinalIgnoreCase)) {
             $source = "msstore"
             $program = $program.Substring("msstore:".Length)
         }
 
-        Write-WinUtilLog -Component "Package" -Message "$Action winget package: $program (source: $source)"
+        Write-WinUtilLog -Component "Package" -Message "Pacote winget ($Action): $program (fonte: $source)"
 
         $outcome = "Failed"
-        $detail = "no result"
+        $detail = "nenhum resultado"
         $exitCode = -1
 
         $arguments = switch ($Action) {
@@ -251,7 +252,7 @@ Function Install-WinUtilProgramWinget {
 
         if ($exitCode -eq 0) {
             $outcome = "Succeeded"
-            $detail = "exit code 0"
+            $detail = "código de saída 0"
         } elseif ($rebootExitCodes.ContainsKey($exitCode)) {
             $outcome = "Succeeded"
             $detail = $rebootExitCodes[$exitCode]
@@ -261,18 +262,18 @@ Function Install-WinUtilProgramWinget {
         } elseif ($exitCode -eq $adminContextProhibited) {
             $outcome = "Skipped"
             $detail = switch ($Action) {
-                "Install" { "already installed for the current user; elevated WinUtil cannot update it" }
-                "Upgrade" { "not upgraded; installed for the current user and elevated WinUtil cannot modify it" }
-                "Uninstall" { "remains installed for the current user; elevated WinUtil cannot uninstall it" }
+                "Install" { "já instalado para o usuário atual; o WinUtil elevado não pode atualizá-lo" }
+                "Upgrade" { "não atualizado; instalado para o usuário atual e o WinUtil elevado não pode modificá-lo" }
+                "Uninstall" { "continua instalado para o usuário atual; o WinUtil elevado não pode desinstalá-lo" }
             }
         } else {
             $outcome = "Failed"
-            $detail = "WinGet reported 0x{0:X8}. See https://learn.microsoft.com/windows/package-manager/winget/returnCodes" -f $exitCode
+            $detail = "O WinGet reportou 0x{0:X8}. Consulte https://learn.microsoft.com/windows/package-manager/winget/returnCodes" -f $exitCode
         }
 
         $level = if ($outcome -eq "Failed") { "ERROR" } else { "INFO" }
 
-        Write-WinUtilLog -Level $level -Component "Package" -Message "$Action winget package $($outcome.ToLowerInvariant()): $program ($detail)"
+        Write-WinUtilLog -Level $level -Component "Package" -Message "Pacote winget ($Action) $($outcome.ToLowerInvariant()): $program ($detail)"
 
         [pscustomobject]@{
             Package  = $program

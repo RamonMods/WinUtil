@@ -5,10 +5,10 @@ function Invoke-WPFUpdatesdefault {
         Resets Windows Update settings to default
 
     #>
-    Write-WinUtilLog -Component "Updates" -Message "Resetting Windows Update settings to default."
+    Write-WinUtilLog -Component "Updates" -Message "Redefinindo as configurações do Windows Update para os padrões."
 
-    Write-Host "Removing Windows Update settings managed by WinUtil..." -ForegroundColor Green
-    Write-WinUtilLog -Component "Updates" -Message "Removing Windows Update registry values managed by WinUtil."
+    Write-Host "Removendo as configurações do Windows Update gerenciadas pelo WinUtil..." -ForegroundColor Green
+    Write-WinUtilLog -Component "Updates" -Message "Removendo os valores de registro do Windows Update gerenciados pelo WinUtil."
 
     $registryValues = @(
         @{
@@ -46,13 +46,13 @@ function Invoke-WPFUpdatesdefault {
     $explorerPolicyPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"
     $settingsPageVisibility = (Get-ItemProperty -Path $explorerPolicyPath -Name "SettingsPageVisibility" -ErrorAction SilentlyContinue).SettingsPageVisibility
     if ($settingsPageVisibility -eq "hide:windowsupdate") {
-        Write-Host "Removing WinUtil's legacy Windows Update page restriction..."
-        Write-WinUtilLog -Component "Updates" -Message "Removing the legacy Windows Update settings page restriction."
+        Write-Host "Removendo a restrição herdada da página do Windows Update do WinUtil..."
+        Write-WinUtilLog -Component "Updates" -Message "Removendo a restrição herdada da página de configurações do Windows Update."
         Remove-ItemProperty -Path $explorerPolicyPath -Name "SettingsPageVisibility" -ErrorAction SilentlyContinue
     }
 
-    Write-Host "Reenabling Windows Update Services..." -ForegroundColor Green
-    Write-WinUtilLog -Component "Updates" -Message "Restoring Windows Update service startup types."
+    Write-Host "Reativando os serviços do Windows Update..." -ForegroundColor Green
+    Write-WinUtilLog -Component "Updates" -Message "Restaurando os tipos de inicialização dos serviços do Windows Update."
 
     # Other tweak tools can deny SYSTEM write access to these keys. Set-Service goes through the Service
     # Control Manager, which runs as SYSTEM, so clear those rules before restoring startup types.
@@ -70,25 +70,25 @@ function Invoke-WPFUpdatesdefault {
                     $serviceKeyAcl.RemoveAccessRule($denyRule) | Out-Null
                 }
                 Set-Acl -Path $serviceKeyPath -AclObject $serviceKeyAcl -ErrorAction Stop
-                Write-Host "Removed SYSTEM deny rules from $serviceName."
-                Write-WinUtilLog -Component "Updates" -Message "Removed SYSTEM deny rules from the $serviceName service key."
+                Write-Host "Regras de negação do SYSTEM removidas de $serviceName."
+                Write-WinUtilLog -Component "Updates" -Message "Regras de negação do SYSTEM removidas da chave de serviço $serviceName."
             }
         } catch {
-            Write-Host "Could not check SYSTEM deny rules on $serviceName." -ForegroundColor Yellow
-            Write-WinUtilLog -Level "WARN" -Component "Updates" -Message "Could not check SYSTEM deny rules on the $serviceName service key: $($_.Exception.Message)"
+            Write-Host "Não foi possível verificar as regras de negação do SYSTEM em $serviceName." -ForegroundColor Yellow
+            Write-WinUtilLog -Level "WARN" -Component "Updates" -Message "Não foi possível verificar as regras de negação do SYSTEM na chave do serviço $serviceName`: $($_.Exception.Message)"
         }
     }
 
-    Write-Host "Restored BITS to Manual."
-    Write-WinUtilLog -Component "Updates" -Message "Restoring BITS service to Manual."
+    Write-Host "BITS restaurado para Manual."
+    Write-WinUtilLog -Component "Updates" -Message "Restaurando o serviço BITS para Manual."
     Set-Service -Name BITS -StartupType Manual
 
-    Write-Host "Restored wuauserv to Manual."
-    Write-WinUtilLog -Component "Updates" -Message "Restoring wuauserv service to Manual."
+    Write-Host "wuauserv restaurado para Manual."
+    Write-WinUtilLog -Component "Updates" -Message "Restaurando o serviço wuauserv para Manual."
     Set-Service -Name wuauserv -StartupType Manual
 
-    Write-Host "Restored UsoSvc to Automatic."
-    Write-WinUtilLog -Component "Updates" -Message "Starting UsoSvc service and restoring startup type to Automatic."
+    Write-Host "UsoSvc restaurado para Automatic."
+    Write-WinUtilLog -Component "Updates" -Message "Iniciando o serviço UsoSvc e restaurando o tipo de inicialização para Automatic."
     Set-Service -Name UsoSvc -StartupType Automatic
     Start-Service -Name UsoSvc
 
@@ -97,16 +97,16 @@ function Invoke-WPFUpdatesdefault {
     if ((Get-ItemProperty -Path $waaSMedicKeyPath -Name "Start" -ErrorAction SilentlyContinue).Start -ne 3) {
         try {
             Set-ItemProperty -Path $waaSMedicKeyPath -Name "Start" -Type DWord -Value 3 -ErrorAction Stop
-            Write-Host "Restored WaaSMedicSvc to Manual."
-            Write-WinUtilLog -Component "Updates" -Message "Restoring WaaSMedicSvc service to Manual."
+            Write-Host "WaaSMedicSvc restaurado para Manual."
+            Write-WinUtilLog -Component "Updates" -Message "Restaurando o serviço WaaSMedicSvc para Manual."
         } catch {
-            Write-Host "Could not restore WaaSMedicSvc to Manual." -ForegroundColor Yellow
-            Write-WinUtilLog -Level "WARN" -Component "Updates" -Message "Could not restore WaaSMedicSvc to Manual: $($_.Exception.Message)"
+            Write-Host "Não foi possível restaurar o WaaSMedicSvc para Manual." -ForegroundColor Yellow
+            Write-WinUtilLog -Level "WARN" -Component "Updates" -Message "Não foi possível restaurar o WaaSMedicSvc para Manual`: $($_.Exception.Message)"
         }
     }
 
-    Write-Host "Enabling update related scheduled tasks..." -ForegroundColor Green
-    Write-WinUtilLog -Component "Updates" -Message "Enabling update related scheduled tasks."
+    Write-Host "Habilitando tarefas agendadas relacionadas a atualizações..." -ForegroundColor Green
+    Write-WinUtilLog -Component "Updates" -Message "Habilitando tarefas agendadas relacionadas a atualizações."
 
     $Tasks =
         '\Microsoft\Windows\InstallService\*',
@@ -121,6 +121,6 @@ function Invoke-WPFUpdatesdefault {
     }
 
 
-    Write-Host "Note: You must restart your system in order for all changes to take effect." -ForegroundColor Yellow
-    Write-WinUtilLog -Component "Updates" -Message "Windows Update default workflow completed. Restart required."
+    Write-Host "Observação: você deve reiniciar o sistema para que todas as alterações tenham efeito." -ForegroundColor Yellow
+    Write-WinUtilLog -Component "Updates" -Message "Fluxo padrão do Windows Update concluído. É necessário reiniciar."
 }

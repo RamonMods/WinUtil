@@ -1,11 +1,11 @@
-/* WinUtil docs theme: grayscale palette with WinUtil blue (#0567ff) as the single accent, dark by default. */
+/* Tema dos documentos do WinUtil: paleta em tons de cinza com o azul do WinUtil (#0567ff) como único destaque, escuro por padrão. */
 @import './fonts.css';
 
 :root {
 	--sl-font: 'Geist', var(--sl-font-system);
 	--sl-font-mono: 'JetBrains Mono Variable', var(--sl-font-system-mono);
 
-	/* WinUtil brand blue, matching the app logo (#0567ff). */
+	/* Azul da marca WinUtil, igual ao logotipo do aplicativo (#0567ff). */
 	--wu-accent-h: 216;
 	--wu-accent: hsl(var(--wu-accent-h) 100% 51%);
 	--wu-accent-dim: hsl(var(--wu-accent-h) 90% 45%);
@@ -15,7 +15,7 @@
 	--wu-radius-lg: 1rem;
 }
 
-/* Dark mode (default). */
+/* Modo escuro (padrão). */
 :root,
 ::backdrop {
 	--sl-color-accent-low: hsl(var(--wu-accent-h) 60% 18%);
@@ -40,7 +40,7 @@
 	--sl-color-hairline-shade: #000;
 }
 
-/* Light mode. */
+/* Modo claro. */
 :root[data-theme='light'],
 [data-theme='light'] ::backdrop {
 	--sl-color-accent-low: hsl(var(--wu-accent-h) 90% 92%);
@@ -65,13 +65,13 @@
 	--sl-color-hairline-shade: #ececec;
 }
 
-/* Heading weight/tracking. */
+/* Peso e espaçamento dos títulos. */
 .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
 	font-weight: 600;
 	letter-spacing: -0.01em;
 }
 
-/* Rounded code blocks/inline code. */
+/* Blocos de código/código inline com cantos arredondados. */
 .sl-markdown-content code:not(:where(.not-content *)) {
 	border-radius: var(--wu-radius-sm);
 	border: 1px solid var(--sl-color-hairline-light);
@@ -84,7 +84,7 @@
 	border-radius: 0 var(--wu-radius-sm) var(--wu-radius-sm) 0;
 }
 
-/* Windows-style minimize/maximize/close glyph for the code blocks */
+/* Glifo de minimizar/maximizar/fechar estilo Windows para os blocos de código */
 .expressive-code .frame.is-terminal .header::before {
 	left: auto !important;
 	right: 0.85rem !important;
@@ -94,7 +94,7 @@
 	--ec-frm-trmIcon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M4 8h12'/%3E%3Crect x='42' y='3.5' width='12' height='9' rx='0.5'/%3E%3Cpath d='M80 3l12 10M92 3L80 13'/%3E%3C/svg%3E");
 }
 
-/* Cards (CardGrid / LinkCard): rounded, accent border on hover. */
+/* Cartões (CardGrid / LinkCard): cantos arredondados e borda de destaque no hover. */
 .sl-markdown-content .card,
 a.link-card {
 	border-radius: var(--wu-radius) !important;
@@ -107,23 +107,23 @@ a.link-card:hover {
 	border-color: var(--sl-color-accent);
 }
 
-/* Sidebar + nav background/border. */
+/* Barra lateral + plano de fundo/borda da navegação. */
 .sidebar-pane,
 header.header {
 	background-color: var(--sl-color-bg-nav);
 	border-color: var(--sl-color-hairline-light);
 }
 
-/* Prevents a horizontal scrollbar from the hero's full-bleed 100vw background trick. */
+/* Evita uma barra de rolagem horizontal causada pelo truque de fundo 100vw do hero. */
 body {
 	overflow-x: hidden;
 }
 
 /* ============================================================
-   Landing page marketing sections.
+   Seções de marketing da página inicial.
    ============================================================ */
 
-/* Shared buttons (hero actions + mid-page + final CTA). */
+/* Botões compartilhados (ações do hero + meio da página + CTA final). */
 .wu-btn {
 	display: inline-flex;
 	align-items: center;
@@ -140,7 +140,7 @@ body {
 		border-color 0.15s ease,
 		color 0.15s ease;
 }
-/* The right/left-arrow glyph's visual weight sits high in its viewBox, so it reads as floating above the label's baseline without this nudge. */
+/* O peso visual do glifo da seta direita/esquerda fica alto em seu viewBox, então ele parece flutuar acima da linha de base do rótulo sem esse ajuste. */
 .wu-btn .wu-icon-arrow {
 	position: relative;
 	top: 0.05em;
@@ -161,18 +161,18 @@ body {
 	border-color: var(--sl-color-accent);
 	color: var(--sl-color-accent-high);
 }
-/* Neutralizes any stray <p> MDX wraps around icon+text content, so it never breaks the flex row. */
+/* Neutraliza qualquer <p> que o MDX envolva em torno do conteúdo de ícone+texto, para que nunca quebre a linha flex. */
 .wu-btn > p,
 .wu-trust-item > p {
 	display: contents;
 }
 
-/* Cancels Starlight's automatic 1.5rem margin between the hero and the content column. */
+/* Cancela a margem automática de 1,5rem do Starlight entre o hero e a coluna de conteúdo. */
 .wu-hero + .sl-markdown-content {
 	margin-top: 0;
 }
 
-/* Cancels Starlight's automatic 1.5rem inter-block margin inside our own grids/rows (it otherwise lands on item 2+ of each row and breaks alignment). */
+/* Cancela a margem automática de 1,5rem entre blocos do Starlight dentro das nossas próprias grades/linhas (sem isso, ela incide sobre o 2º item em diante de cada linha e quebra o alinhamento). */
 .sl-markdown-content .wu-section,
 .sl-markdown-content .wu-solution-grid > *,
 .sl-markdown-content .wu-feature-grid > *,
@@ -188,7 +188,7 @@ body {
 	margin-top: 0;
 }
 
-/* Section shell: full-bleed hairline dividers, alternating tint, 72rem reading width. */
+/* Estrutura da seção: divisórias finas em largura total, tonalidade alternada e largura de leitura de 72rem. */
 .wu-section {
 	margin-inline: calc(-1 * var(--sl-content-pad-x));
 	padding-inline: var(--sl-content-pad-x);
@@ -239,7 +239,7 @@ body {
 	max-width: none;
 }
 
-/* Shields.io / dcbadge release, download, and Discord badges. */
+/* Selos de versão e download do Shields.io. */
 .wu-badges {
 	display: flex;
 	flex-wrap: wrap;
@@ -254,7 +254,7 @@ body {
 	display: block;
 }
 
-/* Trust bar: icon + label chips under the hero. */
+/* Barra de confiança: etiquetas de ícone + texto abaixo do hero. */
 .wu-trust-bar {
 	display: flex;
 	flex-wrap: wrap;
@@ -276,7 +276,7 @@ body {
 	height: 1rem;
 }
 
-/* Problem list: bullet-circle + text, left aligned. */
+/* Lista de problemas: círculo de marcador + texto, alinhados à esquerda. */
 .wu-problem-list {
 	display: flex;
 	flex-direction: column;
@@ -308,7 +308,7 @@ body {
 	color: var(--sl-color-gray-3);
 }
 
-/* Solution grid: icon-in-box above title + description. */
+/* Grade de soluções: ícone em caixa acima do título + descrição. */
 .wu-solution-grid {
 	display: grid;
 	gap: 2rem;
@@ -342,14 +342,14 @@ body {
 	color: var(--sl-color-gray-3);
 }
 
-/* Feature list: one <CornerCard> per row, so the reading highlight lands on a single card. */
+/* Lista de recursos: um <CornerCard> por linha, para que o destaque de leitura incida sobre um único cartão. */
 .wu-feature-grid {
 	display: grid;
 	gap: 1rem;
 	margin-top: 3rem;
 }
 
-/* Step timeline ("how it works"): connecting line through each numbered circle. */
+/* Linha do tempo de etapas ("como funciona"): linha de conexão que passa por cada círculo numerado. */
 .wu-timeline {
 	position: relative;
 	max-width: 36rem;
@@ -404,7 +404,7 @@ body {
 	border-radius: var(--wu-radius-sm);
 }
 
-/* Benefit checklist. */
+/* Lista de benefícios. */
 .wu-benefit-list {
 	display: flex;
 	flex-direction: column;
@@ -436,7 +436,7 @@ body {
 	color: var(--sl-color-accent);
 }
 
-/* Final call to action. */
+/* Chamada final para a ação. */
 .wu-cta {
 	text-align: center;
 }
@@ -465,7 +465,7 @@ body {
 	color: var(--sl-color-gray-3);
 }
 
-/* Stats row: tweak and feature counts from the reference pages. */
+/* Linha de estatísticas: contagens de ajustes e recursos das páginas de referência. */
 .wu-section--stats {
 	padding-block: 3rem;
 }
@@ -495,7 +495,7 @@ body {
 	font-weight: 500;
 	color: var(--sl-color-gray-3);
 }
-/* Odometer digits built by landing-motion.js: a 1em window over a column of numerals. */
+/* Dígitos de odômetro criados por landing-motion.js: uma janela de 1em sobre uma coluna de números. */
 .wu-odo-digit {
 	display: inline-block;
 	height: 1em;
@@ -506,15 +506,15 @@ body {
 	flex-direction: column;
 }
 
-/* Solution cards: the islands become real grid items so each card can animate on its own. */
+/* Cartões de solução: as ilhas se tornam itens reais da grade para que cada cartão possa animar por conta própria. */
 .wu-solution-grid > astro-island {
 	display: block;
 }
 .wu-solution-grid .border-glow-card {
 	height: 100%;
 }
-/* The card surface follows the theme in CSS so the server-rendered cards are right before they hydrate.
-   BorderGlow only adds its light styles for a hex colour, so they're repeated here for the light theme. */
+/* A superfície do cartão segue o tema no CSS para que os cartões renderizados no servidor estejam corretos antes da hidratação.
+   O BorderGlow só adiciona os estilos claros para uma cor hexadecimal, então eles são repetidos aqui para o tema claro. */
 .wu-solution-grid {
 	--wu-glow-card-bg: #0d0d0d;
 }
@@ -531,7 +531,7 @@ body {
 :root[data-theme='light'] .wu-solution-grid .border-glow-card > .edge-light {
 	mix-blend-mode: normal;
 }
-/* BorderGlow has no reduced-motion handling of its own, so the glow that follows the pointer is left off. */
+/* O BorderGlow não tem tratamento próprio para movimento reduzido, então o brilho que segue o ponteiro fica desligado. */
 @media (prefers-reduced-motion: reduce) {
 	.wu-solution-grid .border-glow-card::before,
 	.wu-solution-grid .border-glow-card::after,
@@ -544,7 +544,7 @@ body {
 	padding: 1.5rem;
 }
 
-/* Feature section: on wide screens the heading stays beside the cards, with a progress bar and counter. */
+/* Seção de recursos: em telas largas o título fica ao lado dos cartões, com uma barra de progresso e contador. */
 .wu-feature-progress {
 	display: flex;
 	align-items: center;
@@ -590,11 +590,11 @@ body {
 }
 
 /* ============================================================
-   Landing motion (landing-motion.js).
-   index.mdx adds .wu-motion to <html> unless the visitor prefers reduced motion.
+   Animações da página inicial (landing-motion.js).
+   index.mdx adiciona .wu-motion a <html>, a menos que o visitante prefira movimento reduzido.
    ============================================================ */
 
-/* The hero starts hidden for its entrance animation, and shows anyway after 4s if the script never runs. */
+/* O hero começa oculto para a animação de entrada e aparece de qualquer forma após 4 s se o script nunca rodar. */
 .wu-motion .wu-hero-copy h1 {
 	visibility: hidden;
 	animation: wu-show 0s 4s forwards;
@@ -618,7 +618,7 @@ body {
 	}
 }
 
-/* Interactive dot field (React Bits DotGrid) replaces the static grid lines when motion is on. */
+/* O campo de pontos interativo (React Bits DotGrid) substitui as linhas estáticas da grade quando as animações estão ativas. */
 .wu-hero-dots {
 	mask-image: radial-gradient(at top, #000 45%, transparent 90%);
 	-webkit-mask-image: radial-gradient(at top, #000 45%, transparent 90%);
@@ -628,7 +628,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	display: none;
 }
 
-/* Trust bar as a scrolling strip with faded edges. */
+/* Barra de confiança como uma faixa rolante com bordas esmaecidas. */
 .wu-marquee {
 	width: 100%;
 	overflow: hidden;
@@ -649,7 +649,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	white-space: nowrap;
 }
 
-/* Problem list: items read dim until they reach the reading line. */
+/* Lista de problemas: os itens aparecem esmaecidos até chegarem à linha de leitura. */
 .wu-motion .wu-problem-list li {
 	color: var(--sl-color-gray-4);
 	transition: color 0.5s ease;
@@ -669,7 +669,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	color: var(--sl-color-accent);
 }
 
-/* Timeline: accent line over the static one, and a ring drawn around each number once reached. */
+/* Linha do tempo: linha de destaque sobre a estática e um anel desenhado ao redor de cada número ao ser alcançado. */
 .wu-timeline-progress {
 	display: none;
 }
@@ -689,13 +689,13 @@ html:not(.wu-motion) .wu-hero-dots,
 		background-color 0.4s ease,
 		color 0.4s ease;
 }
-/* The tint sits on a solid fill so the timeline line doesn't show through the number. */
+/* A tonalidade fica sobre um preenchimento sólido para que a linha da linha do tempo não apareça através do número. */
 .wu-timeline-step.is-active .wu-timeline-number {
 	background:
 		linear-gradient(hsl(var(--wu-accent-h) 100% 51% / 0.12), hsl(var(--wu-accent-h) 100% 51% / 0.12)),
 		var(--sl-color-bg);
 }
-/* Sits on top of the number's border, so the drawn ring replaces it. */
+/* Fica sobre a borda do número, então o anel desenhado a substitui. */
 .wu-ring {
 	position: absolute;
 	inset: -1px;
@@ -712,7 +712,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	stroke-linecap: round;
 }
 
-/* Final CTA: full-bleed WebGL light beams (React Bits Beams) behind the copy. */
+/* CTA final: feixes de luz WebGL em largura total (React Bits Beams) atrás do texto. */
 .wu-section--cta {
 	position: relative;
 	isolation: isolate;
@@ -730,7 +730,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	-webkit-mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent);
 }
 
-/* Closing wordmark: an outline with a filled copy stacked on top (clipped in by landing-motion.js). */
+/* Logotipo final: um contorno com uma cópia preenchida sobreposta (recortada por landing-motion.js). */
 .wu-outro {
 	display: grid;
 	place-items: center;
@@ -758,7 +758,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	color: transparent;
 }
 
-/* Back-to-top button; its ring doubles as page progress. */
+/* Botão de voltar ao topo; seu anel também serve como indicador de progresso da página. */
 .wu-to-top {
 	position: fixed;
 	right: 1.5rem;
@@ -779,7 +779,7 @@ html:not(.wu-motion) .wu-hero-dots,
 	translate: 0 0.5rem;
 	visibility: hidden;
 	pointer-events: none;
-	/* visibility waits for the fade-out, so the hidden button also leaves the tab order. */
+	/* visibility espera o desaparecimento, então o botão oculto também sai da ordem de Tab. */
 	transition:
 		opacity 0.3s ease,
 		translate 0.3s ease,
@@ -816,7 +816,7 @@ html:not(.wu-motion) .wu-to-top {
 .wu-to-top-track {
 	stroke: var(--sl-color-hairline-light);
 }
-/* Start the progress ring at 12 o'clock. */
+/* Começa o anel de progresso às 12 horas. */
 .wu-to-top-ring {
 	stroke: var(--sl-color-accent);
 	rotate: -90deg;
@@ -824,7 +824,7 @@ html:not(.wu-motion) .wu-to-top {
 	transform-box: fill-box;
 }
 
-/* Grid breakpoints: 1 col mobile, 2 col tablet, 3 col desktop. */
+/* Pontos de quebra da grade: 1 coluna no celular, 2 no tablet, 3 no desktop. */
 @media (min-width: 40em) {
 	.wu-solution-grid {
 		grid-template-columns: repeat(2, 1fr);

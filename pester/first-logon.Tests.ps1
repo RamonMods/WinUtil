@@ -13,16 +13,16 @@ BeforeAll {
             $_.Left.VariablePath.UserPath -eq $Variable
         })
         if ($start.Count -ne 1) { throw "Expected one $Variable assignment in $Name." }
-        # Execute only completion coordination, never setup commands, downloads, or installers.
+        # Executa apenas a coordenação de conclusão, nunca comandos de configuração, downloads ou instaladores.
         [scriptblock]::Create($text.Substring($start[0].Extent.StartOffset))
     }
     $script:publishCompletion = Get-CompletionTail 'UserOnce' 'completionDir'
     $script:awaitCompletion = Get-CompletionTail 'FirstLogon' 'completionPath'
-    # Shadow the real restart command even on Windows; a missing mock must never reboot a test host.
+    # Sobrescreve o comando real de reinício mesmo no Windows; um mock ausente nunca deve reiniciar o host de teste.
     function Restart-Computer { param([switch]$Force) throw 'Restart must be mocked.' }
 }
 
-Describe 'First-logon restart coordination' {
+Describe 'Coordenação de reinício no primeiro logon' {
     BeforeEach {
         $script:savedLocalAppData = $env:LOCALAPPDATA
         $env:LOCALAPPDATA = Join-Path $TestDrive ('profile[1]-' + [guid]::NewGuid())
@@ -40,7 +40,7 @@ Describe 'First-logon restart coordination' {
         $env:LOCALAPPDATA = $script:savedLocalAppData
     }
 
-    It 'restarts immediately when user configuration finished first' {
+    It 'reinicia imediatamente quando a configuração do usuário termina primeiro' {
         & $script:publishCompletion
         Test-Path -LiteralPath $script:completionPath | Should -BeTrue
         & $script:awaitCompletion
@@ -49,7 +49,7 @@ Describe 'First-logon restart coordination' {
         Test-Path -LiteralPath $script:completionPath | Should -BeTrue
     }
 
-    It 'waits for delayed user configuration before restarting' {
+    It 'aguarda a configuração atrasada do usuário antes de reiniciar' {
         Mock Start-Sleep {
             $script:sleeps++
             if ($script:sleeps -eq 2) { & $script:publishCompletion }
@@ -63,14 +63,14 @@ Describe 'First-logon restart coordination' {
         Should -Invoke Restart-Computer -Times 1 -Exactly
     }
 
-    It 'logs the timeout and leaves the machine running when completion never arrives' {
+    It 'registra o tempo limite e deixa a máquina ligada quando a conclusão nunca chega' {
         & $script:awaitCompletion
         Should -Invoke Start-Sleep -Times 5 -Exactly
         Should -Invoke Restart-Computer -Times 0 -Exactly
         ($script:messages -join '\n') | Should -Match 'Timed out.*Automatic restart skipped'
     }
 
-    It 'does not restart if the completion check fails' {
+    It 'não reinicia se a verificação de conclusão falhar' {
         Mock Test-Path { throw 'Cannot read completion marker' }
         { & $script:awaitCompletion } | Should -Throw '*Cannot read completion marker*'
         Should -Invoke Restart-Computer -Times 0 -Exactly

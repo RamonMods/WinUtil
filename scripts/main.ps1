@@ -20,7 +20,7 @@ CCC::::::::::::C         T:::::::::T            T:::::::::T
 =====Caixa de Ferramentas do Windows=====
 "@
 
-Write-WinUtilLog -Message "WinUtil $($sync.version) on PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition)), $([Environment]::OSVersion.VersionString), process $PID."
+Write-WinUtilLog -Message "WinUtil $($sync.version) no PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition)), $([Environment]::OSVersion.VersionString), processo $PID."
 
 # Carrega os arquivos de configuração
 

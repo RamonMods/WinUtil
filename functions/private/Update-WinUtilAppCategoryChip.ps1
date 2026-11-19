@@ -1,12 +1,12 @@
 function Update-WinUtilAppCategoryChip {
     <#
         .SYNOPSIS
-            Pushes the current category selection onto the Install tab filter chips
+            Aplica a seleção de categoria atual aos chips de filtro da aba Instalar
 
         .DESCRIPTION
-            The chips are toggle buttons, so their checked state has to follow the selection
-            rather than whatever the last click did to them. The All chip is checked when no
-            category is selected.
+            Os chips são botões de alternância, então seu estado de marcado deve acompanhar a
+            seleção, e não o que o último clique fez com eles. O chip Todos é marcado quando
+            nenhuma categoria está selecionada.
     #>
     $selected = $sync.SelectedAppCategories
     if ($null -eq $selected) { return }

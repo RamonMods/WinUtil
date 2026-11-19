@@ -127,7 +127,7 @@ C 21.36,47.14 28.67,50.71 30.01,52.63
           $scaleTransform = New-Object Windows.Media.ScaleTransform($scaleFactor, $scaleFactor)
           $canvas.LayoutTransform = $scaleTransform
 
-          # Define the circle path
+          # Define o caminho do círculo
           $circlePathData = "M 256,0 A 256,256 0 1,0 256,512 A 256,256 0 1,0 256,0"
           $circlePath = New-Object Windows.Shapes.Path
           $circlePath.Data = [Windows.Media.Geometry]::Parse($circlePathData)

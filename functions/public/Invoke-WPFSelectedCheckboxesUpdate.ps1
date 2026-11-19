@@ -14,8 +14,8 @@ function Invoke-WPFSelectedCheckboxesUpdate ($type, $checkboxName) {
             $selectionChanged = $true
         }
     } else {
-        # Imported keys are validated case-insensitively, so checkbox events must
-        # use the same comparison even when the imported spelling differs.
+        # As chaves importadas são validadas sem diferenciar maiúsculas de minúsculas, portanto os eventos das caixas
+        # de seleção devem usar a mesma comparação, mesmo quando a grafia importada for diferente.
         for ($index = $sync.$listName.Count - 1; $index -ge 0; $index--) {
             if ($sync.$listName[$index] -eq $checkboxName) {
                 $sync.$listName.RemoveAt($index)

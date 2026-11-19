@@ -1,18 +1,18 @@
 #===========================================================================
-# Tests - Install tab rendering
+# Testes - Renderização da aba Instalar
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 }
 
-Describe "Install app rendering startup contract" {
+Describe "Contrato de inicialização da renderização de aplicativos na aba Instalar" {
 
 
 
 
 
 
-    It "drains queued app batches on the WPF dispatcher without timer scope errors" {
+    It "drena lotes de aplicativos enfileirados no dispatcher do WPF sem erros de escopo do timer" {
         Add-Type -AssemblyName WindowsBase
         function global:Test-WinUtilUIAlive { $null -ne $sync.Form -and $null -ne $sync.Form.Dispatcher }
         . (Join-Path $script:repoRoot "functions\private\Start-WinUtilBackgroundQueue.ps1")

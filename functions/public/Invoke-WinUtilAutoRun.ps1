@@ -28,11 +28,11 @@ function Invoke-WinUtilAutoRun {
     )
 
     $steps = @(
-        [pscustomobject]@{ Name = "Tweaks";          Count = @($sync.selectedTweaks).Count;   Action = { Invoke-WPFtweaksbutton } }
-        [pscustomobject]@{ Name = "Toggles";         Count = @($sync.selectedToggles).Count;  Action = { Invoke-WPFToggleSelections } }
-        [pscustomobject]@{ Name = "Features";        Count = @($sync.selectedFeatures).Count; Action = { Invoke-WPFFeatureInstall } }
-        [pscustomobject]@{ Name = "Applications";    Count = @($sync.selectedApps).Count;     Action = { Invoke-WPFInstall } }
-        [pscustomobject]@{ Name = "AppX removal";    Count = @($sync.selectedAppx).Count;     Action = { Invoke-WPFAppxRemoval } }
+        [pscustomobject]@{ Name = "Ajustes";          Count = @($sync.selectedTweaks).Count;   Action = { Invoke-WPFtweaksbutton } }
+        [pscustomobject]@{ Name = "Interruptores";         Count = @($sync.selectedToggles).Count;  Action = { Invoke-WPFToggleSelections } }
+        [pscustomobject]@{ Name = "Recursos";        Count = @($sync.selectedFeatures).Count; Action = { Invoke-WPFFeatureInstall } }
+        [pscustomobject]@{ Name = "Aplicativos";    Count = @($sync.selectedApps).Count;     Action = { Invoke-WPFInstall } }
+        [pscustomobject]@{ Name = "Remoção de AppX";    Count = @($sync.selectedAppx).Count;     Action = { Invoke-WPFAppxRemoval } }
     )
 
     $planned = @($steps | Where-Object { $_.Count -gt 0 })
@@ -83,12 +83,12 @@ function Invoke-WinUtilAutoRun {
             TimedOut = $timedOut
         })
 
-        $outcome = if ($timedOut) { "timed out" } elseif ($newErrors -gt 0) { "finished with $newErrors error(s)" } elseif ($newWarnings -gt 0) { "finished with $newWarnings warning(s)" } else { "finished" }
-        Write-WinUtilLog -Component "AutoRun" -Message "$($step.Name): $outcome after $([int]$stepClock.Elapsed.TotalSeconds)s."
+        $outcome = if ($timedOut) { "tempo esgotado" } elseif ($newErrors -gt 0) { "concluído com $newErrors erro(s)" } elseif ($newWarnings -gt 0) { "concluído com $newWarnings aviso(s)" } else { "concluído" }
+        Write-WinUtilLog -Component "AutoRun" -Message "$($step.Name): $outcome após $([int]$stepClock.Elapsed.TotalSeconds)s."
 
         if ($timedOut) {
-            # The worker is still on the pool. Clearing the slot on its own would let the next
-            # step start beside it, so two runs would be changing the machine at once.
+            # O worker ainda está no pool. Limpar a vaga por conta própria permitiria que a próxima
+            # etapa começasse ao lado dele, fazendo com que duas execuções alterassem a máquina ao mesmo tempo.
             Stop-WinUtilActiveWork -NoWait | Out-Null
 
             $stopDeadline = (Get-Date).AddSeconds($StopTimeoutSeconds)
@@ -96,11 +96,11 @@ function Invoke-WinUtilAutoRun {
                 Start-Sleep -Milliseconds 200
             }
 
-            # A job that never cleared the flag would make every later step refuse to start
+            # Um job que nunca limpou o sinalizador faria com que todas as etapas seguintes se recusassem a iniciar
             $null = Clear-WinUtilActiveJob
 
             if (Test-WinUtilActiveWorkRunning) {
-                Write-WinUtilLog -Level "ERROR" -Component "AutoRun" -Message "$($step.Name) could not be stopped, so the remaining steps are abandoned rather than run beside it."
+                Write-WinUtilLog -Level "ERROR" -Component "AutoRun" -Message "$($step.Name) não pôde ser interrompido, então as etapas restantes foram abandonadas em vez de executadas ao lado dele."
                 break
             }
         }
@@ -121,7 +121,7 @@ function Invoke-WinUtilAutoRun {
 function Write-WinUtilAutoRunSummary {
     <#
         .SYNOPSIS
-            Prints what a headless run did and returns the exit code it should end with
+            Mostra o que uma execução sem interface fez e retorna o código de saída com que deve terminar
     #>
     param(
         [Parameter(Mandatory)]
@@ -129,36 +129,36 @@ function Write-WinUtilAutoRunSummary {
     )
 
     Write-Host ""
-    Write-Host "=== WinUtil headless run ===" -ForegroundColor Cyan
+    Write-Host "=== Execução sem interface do WinUtil ===" -ForegroundColor Cyan
 
     foreach ($step in @($Summary.Steps)) {
-        $state = if ($step.TimedOut) { "TIMED OUT" } elseif ($step.Errors -gt 0) { "$($step.Errors) error(s)" } elseif ($step.Warnings -gt 0) { "$($step.Warnings) warning(s)" } else { "ok" }
+        $state = if ($step.TimedOut) { "TEMPO ESGOTADO" } elseif ($step.Errors -gt 0) { "$($step.Errors) erro(s)" } elseif ($step.Warnings -gt 0) { "$($step.Warnings) aviso(s)" } else { "ok" }
         $colour = if ($step.TimedOut -or $step.Errors -gt 0 -or $step.Warnings -gt 0) { "Yellow" } else { "Green" }
-        Write-Host ("  {0,-14} {1,3} item(s)  {2,5}s  {3}" -f $step.Name, $step.Items, $step.Seconds, $state) -ForegroundColor $colour
+        Write-Host ("  {0,-14} {1,3} item(ns)  {2,5}s  {3}" -f $step.Name, $step.Items, $step.Seconds, $state) -ForegroundColor $colour
     }
 
     if (@($Summary.Steps).Count -eq 0) {
-        Write-Host "  nothing was selected" -ForegroundColor Yellow
+        Write-Host "  nada foi selecionado" -ForegroundColor Yellow
         Write-Host ""
         return 2
     }
 
     if ($Summary.TimedOut -gt 0 -or $Summary.Failed -gt 0) {
         Write-Host ""
-        Write-Host "Finished with problems. See $($sync.logPath)" -ForegroundColor Yellow
+        Write-Host "Concluído com problemas. Veja $($sync.logPath)" -ForegroundColor Yellow
         Write-Host ""
         return 1
     }
 
     if ($Summary.Warnings -gt 0) {
         Write-Host ""
-        Write-Host "Completed with warnings. See $($sync.logPath)" -ForegroundColor Yellow
+        Write-Host "Concluído com avisos. Veja $($sync.logPath)" -ForegroundColor Yellow
         Write-Host ""
         return 0
     }
 
     Write-Host ""
-    Write-Host "All steps completed. Log: $($sync.logPath)" -ForegroundColor Green
+    Write-Host "Todas as etapas foram concluídas. Log: $($sync.logPath)" -ForegroundColor Green
     Write-Host ""
     return 0
 }

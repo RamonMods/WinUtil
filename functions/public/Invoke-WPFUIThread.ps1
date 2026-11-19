@@ -1,11 +1,11 @@
 function Test-WinUtilUIAlive {
     <#
         .SYNOPSIS
-            Whether there is a window that can still be posted to
+            Se existe uma janela na qual ainda é possível postar
 
         .DESCRIPTION
-            False for a headless run, and for a window closed over running work: a shut down
-            dispatcher accepts posts and discards them.
+            Falso para uma execução sem interface e para uma janela fechada durante uma tarefa em
+            andamento: um dispatcher desligado aceita postagens e as descarta.
     #>
 
     return $null -ne $sync.Form -and $null -ne $sync.Form.Dispatcher -and -not $sync.Form.Dispatcher.HasShutdownStarted
@@ -28,31 +28,34 @@ function Test-WinUtilDispatcherShutdownException {
 function Invoke-WPFUIThread {
     <#
         .SYNOPSIS
-            Runs a scriptblock on the interface thread
+            Executa um scriptblock na thread da interface
 
         .DESCRIPTION
-            Controls may only be touched from the thread that owns the window.
+            Os controles só podem ser acessados pela thread que possui a janela.
 
-            The body is handed over as text and rebuilt in the interface runspace rather than
-            marshalled as a scriptblock: a scriptblock keeps the session state it was written in,
-            and running one across runspaces costs roughly twenty times as much per command. So
-            values come in through Parameters rather than captured from the caller's scope.
+            O corpo é entregue como texto e reconstruído no runspace da interface, em vez de ser
+            empacotado como scriptblock: um scriptblock mantém o estado da sessão em que foi
+            escrito, e executá-lo entre runspaces custa cerca de vinte vezes mais por comando.
+            Por isso, os valores entram por Parameters em vez de serem capturados do escopo do
+            chamador.
 
-            A no-op once the window is gone, so a job outliving the interface finishes quietly.
+            Não faz nada depois que a janela desaparece, para que um job que sobreviva à interface
+            termine silenciosamente.
 
         .PARAMETER ScriptBlock
-            The work to run on the interface thread. Declare a param block for anything it needs.
+            O trabalho a executar na thread da interface. Declare um bloco param para tudo o que
+            ele precisar.
 
         .PARAMETER Parameters
-            Values passed to the body by name.
+            Valores passados ao corpo por nome.
 
         .PARAMETER Async
-            Post and return instead of waiting. For progress and log updates, which must never
-            stall the caller.
+            Posta e retorna em vez de esperar. Para atualizações de progresso e de log, que nunca
+            devem bloquear o chamador.
 
         .PARAMETER PassThru
-            Return what the body produced. Off by default so a caller that only wanted a control
-            updated gets no stray output.
+            Retorna o que o corpo produziu. Desativado por padrão para que um chamador que só
+            queria atualizar um controle não receba saída indesejada.
     #>
     param(
         [Parameter(Mandatory, Position = 0)]
@@ -78,11 +81,11 @@ function Invoke-WPFUIThread {
 
     $executor = $sync.UIDispatchDelegate
     if ($null -eq $executor) {
-        # No interface runspace to hand the work to, so the block itself is marshalled. It has to
-        # receive its parameters and return what it produced, and [action] carries neither.
+        # Não há runspace da interface para entregar o trabalho, então o próprio bloco é empacotado.
+        # Ele precisa receber seus parâmetros e retornar o que produziu, e [action] não faz nem isso.
         if ($Async) {
-            # The values travel as the dispatcher's argument, since this call returns before the
-            # block runs and anything captured from here would be gone by then
+            # Os valores viajam como argumento do dispatcher, pois esta chamada retorna antes de o
+            # bloco executar e qualquer coisa capturada daqui já teria desaparecido até então
             try {
                 $null = $dispatcher.BeginInvoke(
                     [Windows.Threading.DispatcherPriority]::Background,
@@ -106,7 +109,7 @@ function Invoke-WPFUIThread {
             return
         }
 
-        # Synchronous, so this frame is still alive while the block runs and can be captured from
+        # Síncrono, então este frame ainda está vivo enquanto o bloco executa e pode ser capturado daqui
         try {
             $fallbackResult = $dispatcher.Invoke([System.Func[object]]{ & $ScriptBlock @Parameters })
         } catch {
@@ -121,8 +124,9 @@ function Invoke-WPFUIThread {
     $work = @{
         Body = $ScriptBlock.ToString()
         Parameters = $Parameters
-        # A synchronous caller is waiting for a required UI handoff and must see its failure.
-        # Fire-and-forget posts have nobody to receive an exception, so the delegate only logs it.
+        # Um chamador síncrono está aguardando uma transferência obrigatória para a interface e
+        # precisa ver a falha. Postagens sem retorno não têm ninguém para receber uma exceção,
+        # então o delegado apenas a registra no log.
         PropagateErrors = -not $Async
     }
 

@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Lazy tab initialization
+# Testes - Inicialização lenta de abas
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -41,7 +41,7 @@ Describe "Initialize-WinUtilTabContent" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "initializes the install tab once" {
+    It "inicializa a aba Instalar uma vez" {
         Initialize-WinUtilTabContent -TabName "Install"
         Initialize-WinUtilTabContent -TabName "Install"
 
@@ -55,11 +55,11 @@ Describe "Initialize-WinUtilTabContent" {
         $script:sync.InitializedTabs["Install"] | Should -BeTrue
     }
 
-    It "leaves the app navigation to Initialize-WPFUI so its buttons keep their handlers" {
-        # Rendering it here as well built the navigation twice. The second pass cleared the
-        # first one's controls, and because the "already wired" guard goes by name the
-        # replacements counted as wired and never got a click handler, so Install and
-        # Uninstall did nothing at all.
+    It "deixa a navegação de aplicativos para Initialize-WPFUI para que seus botões mantenham os handlers" {
+        # Renderizá-la também aqui criava a navegação duas vezes. A segunda passagem limpava os
+        # controles da primeira, e como a verificação de "já conectado" era pelo nome, os
+        # substitutos contavam como conectados e nunca recebiam um handler de clique, então Instalar e
+        # Desinstalar não faziam absolutamente nada.
         Initialize-WinUtilTabContent -TabName "Install"
 
         Should -Invoke -CommandName Invoke-WPFUIElements -Times 0 -Exactly -ParameterFilter {
@@ -67,7 +67,7 @@ Describe "Initialize-WinUtilTabContent" {
         }
     }
 
-    It "initializes deferred config-backed tabs once" {
+    It "inicializa uma vez as abas diferidas baseadas em configurações" {
         Initialize-WinUtilTabContent -TabName "Tweaks"
         Initialize-WinUtilTabContent -TabName "Config"
         Initialize-WinUtilTabContent -TabName "AppX"
@@ -86,8 +86,8 @@ Describe "Initialize-WinUtilTabContent" {
         }
     }
 
-    It "re-applies checkbox selections after building a tab's controls" {
-        # controls built just now start unchecked, so an import or a preset has to reach them
+    It "reaplica as seleções das caixas de seleção após criar os controles de uma aba" {
+        # os controles recém-criados começam desmarcados, então uma importação ou uma predefinição precisa alcançá-los
         Initialize-WinUtilTabContent -TabName "Tweaks"
 
         Should -Invoke -CommandName Reset-WPFCheckBoxes -Times 1 -Exactly -ParameterFilter {
@@ -95,14 +95,14 @@ Describe "Initialize-WinUtilTabContent" {
         }
     }
 
-    It "does not re-apply checkbox selections on a tab that is already built" {
+    It "não reaplica as seleções das caixas de seleção em uma aba já criada" {
         Initialize-WinUtilTabContent -TabName "Tweaks"
         Initialize-WinUtilTabContent -TabName "Tweaks"
 
         Should -Invoke -CommandName Reset-WPFCheckBoxes -Times 1 -Exactly
     }
 
-    It "checks for existing Win11ISO work when the tab is initialized" {
+    It "verifica se existe trabalho Win11ISO quando a aba é inicializada" {
         Add-Type -AssemblyName WindowsBase
         $dispatcher = [pscustomobject]@{}
         $dispatcher | Add-Member -MemberType ScriptMethod -Name BeginInvoke -Value {
@@ -135,7 +135,7 @@ Describe "Initialize-WPFUI" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "renders app navigation through the app category target" {
+    It "renderiza a navegação de aplicativos pelo destino da categoria de aplicativos" {
         { Initialize-WPFUI -TargetGridName "appscategory" } | Should -Throw "App category rendered"
 
         Should -Invoke -CommandName Invoke-WPFUIElements -Times 1 -Exactly -ParameterFilter {
@@ -146,10 +146,10 @@ Describe "Initialize-WPFUI" {
     }
 }
 
-Describe "Startup lazy tab wiring" {
-    It "builds no tab content before first paint" {
-        # Startup moved out of main.ps1 and onto the interface thread. Nothing is built up front
-        # at all now: Invoke-WPFTab builds whichever tab it selects, and the warmup does the rest.
+Describe "Conexão lenta de abas na inicialização" {
+    It "não cria conteúdo de aba antes da primeira renderização" {
+        # A inicialização saiu de main.ps1 e foi para a thread da interface. Nada mais é criado
+        # antecipadamente: Invoke-WPFTab cria a aba que seleciona, e o aquecimento faz o restante.
         $uiScript = Get-Content -Path (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw
 
         $uiScript | Should -Match 'Invoke-WPFTab "WPFTab1BT"'
@@ -158,24 +158,24 @@ Describe "Startup lazy tab wiring" {
         $uiScript | Should -Not -Match 'targetGridName "appxpanel"'
     }
 
-    It "initializes tab content when a tab is selected" {
+    It "inicializa o conteúdo da aba quando uma aba é selecionada" {
         $tabScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFTab.ps1") -Raw
 
         $tabScript | Should -Match 'Initialize-WinUtilTabContent -TabName \$sync\.currentTab'
     }
 
-    It "binds generated button clicks when lazy panels are rendered" {
+    It "vincula cliques de botões gerados quando os painéis lentos são renderizados" {
         $rendererScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
         $mainScript = Get-Content -Path (Join-Path $script:repoRoot "scripts\main.ps1") -Raw
 
         $rendererScript | Should -Match '(?s)"Button"\s*\{.*\$button\.Add_Click\(\{.*Invoke-WPFButton \$Sender\.name'
         $rendererScript | Should -Match '\$sync\.Buttons\.Add\(\$button\.Name\)'
-        # The "already wired" gate moved to the interface thread with the rest of startup
+        # A verificação de "já conectado" mudou para a thread da interface junto com o restante da inicialização
         $uiScript = Get-Content -Path (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw
         $uiScript | Should -Match '\$alreadyWired'
     }
 
-    It "binds generated documentation links when lazy panels are rendered" {
+    It "vincula links de documentação gerados quando os painéis lentos são renderizados" {
         $rendererScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
         $mainScript = Get-Content -Path (Join-Path $script:repoRoot "scripts\main.ps1") -Raw
 
@@ -183,14 +183,14 @@ Describe "Startup lazy tab wiring" {
         $mainScript | Should -Not -Match '\.Name\.EndsWith\("Link"\)'
     }
 
-    It "checks for an existing outer ScrollViewer before nesting an inner ScrollViewer" {
+    It "verifica se existe um ScrollViewer externo antes de aninhar um ScrollViewer interno" {
         $rendererScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
 
         $rendererScript | Should -Match '\$hasOuterScrollViewer'
         $rendererScript | Should -Match 'if\s*\(\$hasOuterScrollViewer\)'
     }
 
-    It "reapplies the live search after yielded tab controls finish rendering" {
+    It "reaplica a busca ao vivo após a conclusão da renderização dos controles da aba" {
         $rendererScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
         $tabScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFTab.ps1") -Raw
 
@@ -199,7 +199,7 @@ Describe "Startup lazy tab wiring" {
         $tabScript | Should -Match 'Find-AppsByNameOrDescription -SearchString \$searchText'
     }
 
-    It "passes the yield frame into the dispatcher callback" {
+    It "passa o frame de yield para o callback do dispatcher" {
         $rendererScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
 
         $rendererScript | Should -Match '(?s)DispatcherOperationCallback\]\s*\{\s*param\(\$dispatcherFrame\).*\$dispatcherFrame\.Continue = \$false.*\},\s*\$frame\)'

@@ -1,11 +1,11 @@
 function Register-WinUtilInputWatch {
     <#
         .SYNOPSIS
-            Records when the user last did something, so background work can step aside
+            Registra quando o usuário fez algo pela última vez, para que o trabalho em segundo plano possa sair da frente
 
         .DESCRIPTION
-            Preview events run before the control handles the input, so the timestamp is set
-            even for a click the control then spends time on.
+            Eventos de preview rodam antes de o controle tratar a entrada, então o carimbo é definido
+            mesmo para um clique em que o controle depois gasta tempo.
     #>
 
     $sync.LastInputAt = [datetime]::MinValue
@@ -19,16 +19,16 @@ function Register-WinUtilInputWatch {
 function Test-WinUtilDeferBackgroundWork {
     <#
         .SYNOPSIS
-            Whether speculative work should wait rather than run now
+            Se trabalho especulativo deve esperar em vez de rodar agora
 
         .DESCRIPTION
-            Background priority queues work behind input but does not make it interruptible:
-            whatever is running must finish before a click is looked at, which is why the pieces
-            are kept short. Waits while the user is active, or while the work draws into a tab
-            that is not on screen.
+            Prioridade em segundo plano enfileira o trabalho atrás da entrada, mas não o torna interrompível:
+            o que está rodando deve terminar antes de um clique ser examinado, e é por isso que as partes
+            são mantidas curtas. Espera enquanto o usuário está ativo, ou enquanto o trabalho desenha em uma aba
+            que não está na tela.
 
         .PARAMETER RequiresTab
-            The tab this work draws into. Work for a hidden tab waits.
+            A aba na qual este trabalho desenha. Trabalho para uma aba oculta espera.
     #>
     param(
         [string]$RequiresTab
@@ -36,7 +36,7 @@ function Test-WinUtilDeferBackgroundWork {
 
     if ($sync.LastInputAt) {
         $sinceInput = ([datetime]::Now - $sync.LastInputAt).TotalMilliseconds
-        # long enough to cover a click and the work it starts, short enough not to be noticed
+        # longo o suficiente para cobrir um clique e o trabalho que ele inicia, curto o suficiente para não ser notado
         if ($sinceInput -lt 400) {
             return $true
         }
@@ -52,21 +52,21 @@ function Test-WinUtilDeferBackgroundWork {
 function Invoke-WinUtilWhenIdle {
     <#
         .SYNOPSIS
-            Runs a callback once the interface is not being used
+            Executa um retorno de chamada quando a interface não está em uso
 
         .DESCRIPTION
-            A one shot timer, not a dispatcher post: a post at background priority runs straight
-            away and the point is to leave a gap.
+            Um temporizador de disparo único, não uma postagem no dispatcher: uma postagem em prioridade de
+            segundo plano roda imediatamente, e o objetivo é deixar uma pausa.
 
         .PARAMETER Callback
-            What to run once the wait is over.
+            O que executar quando a espera terminar.
 
         .PARAMETER Argument
-            Passed to the callback. Carried on the timer rather than captured, so the callback
-            resolves commands where it was written, not in a copied scope.
+            Passado ao retorno de chamada. Levado no temporizador em vez de capturado, para que o retorno
+            resolva comandos onde foi escrito, e não em um escopo copiado.
 
         .PARAMETER DelayMilliseconds
-            How long to wait before looking again.
+            Quanto tempo esperar antes de verificar novamente.
     #>
     param(
         [Parameter(Mandatory)]
@@ -81,12 +81,12 @@ function Invoke-WinUtilWhenIdle {
         return
     }
 
-    # Bound to the interface dispatcher explicitly: the default picks up the calling thread's,
-    # which is only correct while every caller reaches here through a UI post
+    # Vinculado explicitamente ao dispatcher da interface: o padrão pega o da thread chamadora,
+    # o que só está correto enquanto todo chamador chega aqui por uma postagem da interface
     $timer = New-Object System.Windows.Threading.DispatcherTimer([System.Windows.Threading.DispatcherPriority]::Background, $sync.Form.Dispatcher)
     $timer.Interval = [timespan]::FromMilliseconds($DelayMilliseconds)
     $timer.Tag = @{ Callback = $Callback; Argument = $Argument }
-    # Sender taken from the argument, matching how the rest of this codebase handles timer ticks
+    # Remetente retirado do argumento, seguindo como o restante deste código trata os ticks do temporizador
     $timer.Add_Tick({
         param($eventSender)
         $ticked = [System.Windows.Threading.DispatcherTimer]$eventSender

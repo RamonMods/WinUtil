@@ -1,7 +1,7 @@
 BeforeAll {
     $tweaks = Get-Content (Join-Path $PSScriptRoot '../config/tweaks.json') -Raw | ConvertFrom-Json
     $script:oneDrive = $tweaks.WPFTweaksRemoveOneDrive
-    # Isolate only the template guard, never the destructive OneDrive script around it.
+    # Isole apenas a proteção do modelo, nunca o script destrutivo do OneDrive ao redor dela.
     function Get-OneSyncGuard {
         param($Action)
         $source = [scriptblock]::Create($script:oneDrive.$Action -join "`n")
@@ -23,13 +23,13 @@ BeforeAll {
     }
 }
 
-Describe 'OneDrive per-user service template' {
+Describe 'Modelo de serviço do OneDrive por usuário' {
     BeforeEach {
         Mock Set-Service {}
         Mock Get-Service { throw 'No running service instance is visible' }
     }
 
-    It 'configures an existing template without querying a running instance (<Action>)' -TestCases @(
+    It 'configura um modelo existente sem consultar uma instância em execução (<Action>)' -TestCases @(
         @{ Action = 'InvokeScript'; ExpectedType = 'Disabled' }
         @{ Action = 'UndoScript'; ExpectedType = 'Automatic' }
     ) {
@@ -48,7 +48,7 @@ Describe 'OneDrive per-user service template' {
         Should -Invoke Get-Service -Times 0 -Exactly
     }
 
-    It 'skips the operation when the template is absent (<Action>)' -TestCases @(
+    It 'ignora a operação quando o modelo está ausente (<Action>)' -TestCases @(
         @{ Action = 'InvokeScript' }
         @{ Action = 'UndoScript' }
     ) {

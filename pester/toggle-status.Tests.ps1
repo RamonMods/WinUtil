@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Toggle status checks
+# Testes - Verificações de estado dos interruptores
 #===========================================================================
 
 BeforeAll {
@@ -49,7 +49,7 @@ Describe "Get-WinUtilToggleStatus" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "does not create missing registry paths while reading toggle state" {
+    It "não cria caminhos de registro ausentes ao ler o estado do interruptor" {
         Get-WinUtilToggleStatus "WPFToggleExample" | Should -BeTrue
 
         Should -Invoke -CommandName Test-Path -Times 1 -Exactly -ParameterFilter {
@@ -59,13 +59,13 @@ Describe "Get-WinUtilToggleStatus" {
         Should -Invoke -CommandName Get-ItemProperty -Times 0 -Exactly
     }
 
-    It "uses configured false default when the registry path is missing" {
+    It "usa o padrão false configurado quando o caminho do registro está ausente" {
         Get-WinUtilToggleStatus "WPFToggleDisabledByDefault" | Should -BeFalse
 
         Should -Invoke -CommandName New-Item -Times 0 -Exactly
     }
 
-    It "caches toggle results for repeated checks" {
+    It "armazena em cache os resultados dos interruptores para verificações repetidas" {
         Mock Test-Path { $true } -ParameterFilter { $Path -eq "HKCU:\Software\WinUtilToggle" }
         Mock Get-ItemProperty { [pscustomobject]@{ Enabled = "1" } } -ParameterFilter {
             $Path -eq "HKCU:\Software\WinUtilToggle"

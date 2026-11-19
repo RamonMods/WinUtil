@@ -1,20 +1,20 @@
 function Register-WinUtilRunspaceCleanup {
     <#
         .SYNOPSIS
-            Disposes a PowerShell instance and any owned runspace once its work has finished
+            Descarta uma instância do PowerShell e qualquer runspace de sua propriedade quando seu trabalho termina
 
         .DESCRIPTION
-            Ends the invocation and disposes the instance from a thread pool callback, so
-            nothing has to wait for a fire-and-forget runspace to complete just to clean it up.
+            Encerra a invocação e descarta a instância a partir de um callback do pool de threads, para
+            que nada precise esperar a conclusão de um runspace "fire-and-forget" apenas para limpá-lo.
 
         .PARAMETER PowerShell
-            The instance to dispose.
+            A instância a descartar.
 
         .PARAMETER Handle
-            The handle returned by its BeginInvoke.
+            O identificador retornado por seu BeginInvoke.
 
         .PARAMETER Runspace
-            A dedicated runspace owned by the invocation. Shared pool invocations omit it.
+            Um runspace dedicado pertencente à invocação. Invocações em pool compartilhado o omitem.
     #>
     param(
         [Parameter(Mandatory)]
@@ -26,8 +26,8 @@ function Register-WinUtilRunspaceCleanup {
         $Runspace
     )
 
-    # Version the CLR helper because Add-Type definitions survive repeated in-memory WinUtil runs.
-    # Older sessions can already contain the V1 type, whose state object has no Runspace property.
+    # Versiona o auxiliar CLR porque as definições Add-Type sobrevivem a execuções repetidas do WinUtil em memória.
+    # Sessões antigas podem já conter o tipo V1, cujo objeto de estado não tem a propriedade Runspace.
     if (-not ("WinUtilRunspaceCleanupV3" -as [type])) {
         Add-Type @"
 using System;
@@ -55,8 +55,8 @@ public static class WinUtilRunspaceCleanupV3
         }
         catch
         {
-            // Registration is normally infallible, but work has already started. A background
-            // waiter preserves asynchronous cleanup without blocking the WPF dispatcher.
+            // O registro normalmente não falha, mas o trabalho já começou. Uma thread de espera em segundo plano
+            // preserva a limpeza assíncrona sem bloquear o dispatcher do WPF.
             try
             {
                 var thread = new Thread(() =>
@@ -126,6 +126,6 @@ public static class WinUtilRunspaceCleanupV3
     $cleanupState.Runspace = $Runspace
     $registered = [WinUtilRunspaceCleanupV3]::Register($cleanupState)
     if (-not $registered) {
-        Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Could not register asynchronous cleanup for background work; it will be reclaimed when later work or shutdown inspects it."
+        Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Não foi possível registrar a limpeza assíncrona para o trabalho em segundo plano; ela será recuperada quando trabalho posterior ou o desligamento a inspecionar."
     }
 }

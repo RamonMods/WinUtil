@@ -1,14 +1,14 @@
 function Invoke-WPFToggleAllCategories {
     <#
         .SYNOPSIS
-            Expands or collapses all categories in the Install tab
+            Expande ou recolhe todas as categorias na aba Instalar
 
         .PARAMETER Action
-            The action to perform: "Expand" or "Collapse"
+            A ação a executar: "Expand" ou "Collapse"
 
         .DESCRIPTION
-            This function iterates through all category containers in the Install tab
-            and expands or collapses their WrapPanels while updating the toggle button labels
+            Esta função percorre todos os contêineres de categoria na aba Instalar
+            e expande ou recolhe seus WrapPanels enquanto atualiza os rótulos dos botões de alternância
     #>
 
     param(
@@ -19,7 +19,7 @@ function Invoke-WPFToggleAllCategories {
 
     try {
         if ($null -eq $sync.ItemsControl) {
-            Write-Warning "ItemsControl not initialized"
+            Write-Warning "ItemsControl não inicializado"
             return
         }
 
@@ -27,17 +27,17 @@ function Invoke-WPFToggleAllCategories {
         $targetPrefix = if ($Action -eq "Expand") { "-" } else { "+" }
         $sourcePrefix = if ($Action -eq "Expand") { "+" } else { "-" }
 
-        # Iterate through all items in the ItemsControl
+        # Itera por todos os itens no ItemsControl
         $sync.ItemsControl.Items | ForEach-Object {
             $categoryContainer = $_
 
-            # Check if this is a category container (StackPanel with children)
+            # Verifica se este é um contêiner de categoria (StackPanel com filhos)
             if ($categoryContainer -is [System.Windows.Controls.StackPanel] -and $categoryContainer.Children.Count -ge 2) {
-                # Get the WrapPanel (second child)
+                # Obtém o WrapPanel (segundo filho)
                 $wrapPanel = $categoryContainer.Children[1]
                 $wrapPanel.Visibility = $targetVisibility
 
-                # Update the label to show the correct state
+                # Atualiza o rótulo para mostrar o estado correto
                 $categoryLabel = $categoryContainer.Children[0]
                 if ($categoryLabel.Content -like "$sourcePrefix*") {
                     $escapedSourcePrefix = [regex]::Escape($sourcePrefix)
@@ -47,6 +47,6 @@ function Invoke-WPFToggleAllCategories {
         }
     }
     catch {
-        Write-Error "Error toggling categories: $_"
+        Write-Error "Erro ao alternar categorias: $_"
     }
 }

@@ -1,3 +1,3 @@
-# Copilot Instructions
+# Instruções do Copilot
 
-Read `AGENTS.md` in the repository root for operating instructions before doing anything else.
+Leia o `AGENTS.md` na raiz do repositório para obter as instruções de operação antes de fazer qualquer outra coisa.

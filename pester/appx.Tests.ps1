@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - AppX Management
+# Testes - Gerenciamento de AppX
 #===========================================================================
 
 BeforeAll {
@@ -114,7 +114,7 @@ Describe "Get-WinUtilInstalledAPPX" {
         }
     }
 
-    It "queries installed package names through Windows PowerShell" {
+    It "consulta os nomes dos pacotes instalados por meio do Windows PowerShell" {
         $result = Get-WinUtilInstalledAPPX
 
         $result | Should -Be @("Example.One", "Example.Two")
@@ -122,7 +122,7 @@ Describe "Get-WinUtilInstalledAPPX" {
         Should -Invoke -CommandName Write-WinUtilLog -Times 0 -Exactly
     }
 
-    It "logs query failures and returns no package names" {
+    It "registra falhas de consulta e não retorna nomes de pacotes" {
         Mock powershell.exe {
             $global:LASTEXITCODE = 1
             "AppX query failed"
@@ -150,7 +150,7 @@ Describe "Install-WinUtilAPPX" {
         }
     }
 
-    It "uses a local manifest without contacting the Microsoft Store" {
+    It "usa um manifesto local sem contatar a Microsoft Store" {
         $result = Install-WinUtilAPPX -Name "Example.Package" -StoreId "9EXAMPLE1234"
 
         $result.Outcome | Should -Be "Succeeded"
@@ -163,7 +163,7 @@ Describe "Install-WinUtilAPPX" {
         }
     }
 
-    It "falls back to the Microsoft Store when no local manifest is available" {
+    It "recorre à Microsoft Store quando não há manifesto local disponível" {
         Mock powershell.exe { $global:LASTEXITCODE = 0 }
 
         Install-WinUtilAPPX -Name "Example.Package" -StoreId "9EXAMPLE1234"
@@ -174,7 +174,7 @@ Describe "Install-WinUtilAPPX" {
         }
     }
 
-    It "does not return WinGet bootstrap output as a package result" {
+    It "não retorna a saída de inicialização do WinGet como resultado de pacote" {
         Mock powershell.exe { $global:LASTEXITCODE = 0 }
         Mock Install-WinUtilWinget { [pscustomobject]@{ Provider = "NuGet" } }
         Mock Install-WinUtilProgramWinget {
@@ -188,7 +188,7 @@ Describe "Install-WinUtilAPPX" {
         $result[0].Outcome | Should -Be "Skipped"
     }
 
-    It "logs local registration failures before using the Microsoft Store" {
+    It "registra falhas de registro local antes de usar a Microsoft Store" {
         Mock powershell.exe {
             $global:LASTEXITCODE = 1
             "Registration failed"
@@ -204,7 +204,7 @@ Describe "Install-WinUtilAPPX" {
         Should -Invoke -CommandName Install-WinUtilProgramWinget -Times 1 -Exactly
     }
 
-    It "returns a failed result when neither install method is available" {
+    It "retorna um resultado de falha quando nenhum método de instalação está disponível" {
         Mock powershell.exe { $global:LASTEXITCODE = 0 }
 
         $result = @(Install-WinUtilAPPX -Name "Example.Package")
@@ -221,7 +221,7 @@ Describe "Install-WinUtilAPPX" {
         }
     }
 
-    It "registers an installed package manifest through Windows PowerShell" {
+    It "registra o manifesto de um pacote instalado por meio do Windows PowerShell" {
         Mock Get-AppxPackage {
             [pscustomobject]@{
                 InstallLocation = "C:\Program Files\WindowsApps\Example.Package"
@@ -240,7 +240,7 @@ Describe "Install-WinUtilAPPX" {
     }
 }
 
-Describe "Get installed AppX selection" {
+Describe "Seleção de pacotes AppX instalados" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             ActiveJob = $null
@@ -269,7 +269,7 @@ Describe "Get installed AppX selection" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "selects configured packages returned by the compatibility-safe query" {
+    It "seleciona os pacotes configurados retornados pela consulta compatível com segurança" {
         Invoke-WPFButton -Button "WPFGetInstalledAppx"
 
         Should -Invoke -CommandName Start-WinUtilJob -Times 1 -Exactly -ParameterFilter {
@@ -280,7 +280,7 @@ Describe "Get installed AppX selection" {
         $script:sync.WPFAppxMissing.IsChecked | Should -BeFalse
     }
 
-    It "routes the install button to the AppX install workflow" {
+    It "roteia o botão de instalação para o fluxo de instalação de AppX" {
         Invoke-WPFButton -Button "WPFInstallSelectedAppx"
 
         Should -Invoke -CommandName Invoke-WPFAppxInstall -Times 1 -Exactly
@@ -306,7 +306,7 @@ Describe "Remove-WinUtilAPPX" {
         Mock Remove-AppxPackage { }
     }
 
-    It "removes matching installed AppX packages" {
+    It "remove os pacotes AppX instalados correspondentes" {
         Remove-WinUtilAPPX -Name "Microsoft.Xbox*"
 
         Should -Invoke -CommandName Get-AppxPackage -Times 1 -Exactly -ParameterFilter {
@@ -319,7 +319,7 @@ Describe "Remove-WinUtilAPPX" {
         }
     }
 
-    It "logs installed AppX removal failures" {
+    It "registra falhas na remoção de pacotes AppX instalados" {
         Mock Remove-AppxPackage { throw "Removal failed" }
 
         { Remove-WinUtilAPPX -Name "Example.Package" } | Should -Not -Throw
@@ -343,7 +343,7 @@ Describe "Remove-WinUtilProvisionedAPPX" {
         Mock Remove-AppxProvisionedPackage { }
     }
 
-    It "queries provisioned packages once for all selected package names" {
+    It "consulta os pacotes provisionados uma vez para todos os nomes de pacotes selecionados" {
         & $script:provisionedRemovalScriptBlock "Example.One" "Example.Two"
 
         Should -Invoke -CommandName Get-AppxProvisionedPackage -Times 1 -Exactly -ParameterFilter {
@@ -357,7 +357,7 @@ Describe "Remove-WinUtilProvisionedAPPX" {
         }
     }
 
-    It "surfaces provisioned package removal failures from the child process" {
+    It "expõe falhas de remoção de pacotes provisionados do processo filho" {
         Mock Remove-AppxProvisionedPackage { throw "DISM failed" }
 
         { & $script:provisionedRemovalScriptBlock "Example.One" } |
@@ -369,7 +369,7 @@ Describe "Remove-WinUtilProvisionedAPPX" {
         }
     }
 
-    It "throws after logging child process failures" {
+    It "lança exceção após registrar falhas do processo filho" {
         $source = Get-Content -Path $provisionedSourcePath -Raw
 
         $source | Should -Match '\$removalOutput = powershell\.exe .* 2>&1'
@@ -416,7 +416,7 @@ Describe "Invoke-WPFAppxInstall" {
         Remove-Variable -Name capturedAppxInstallParameterList -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "prompts and exits when no AppX packages are selected for install" {
+    It "exibe aviso e sai quando nenhum pacote AppX foi selecionado para instalação" {
         Invoke-WPFAppxInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
@@ -428,7 +428,7 @@ Describe "Invoke-WPFAppxInstall" {
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "queues an install job for the selected AppX packages" {
+    It "enfileira um job de instalação para os pacotes AppX selecionados" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
 
         Invoke-WPFAppxInstall
@@ -439,7 +439,7 @@ Describe "Invoke-WPFAppxInstall" {
         $script:capturedAppxInstallParameters.Selected[0] | Should -Be "WPFAppxExample"
     }
 
-    It "installs selected AppX packages with their Store IDs" {
+    It "instala os pacotes AppX selecionados com seus IDs da Store" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
 
         Invoke-WPFAppxInstall
@@ -457,7 +457,7 @@ Describe "Invoke-WPFAppxInstall" {
         }
     }
 
-    It "lets an install failure surface so the job layer can handle it" {
+    It "permite que uma falha de instalação apareça para que a camada de job possa tratá-la" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         Mock Install-WinUtilAPPX { throw "Install failed" }
 
@@ -467,7 +467,7 @@ Describe "Invoke-WPFAppxInstall" {
         { & $script:capturedAppxInstallScriptBlock @jobParameters } | Should -Throw "Install failed"
     }
 
-    It "keeps installing the remaining packages when one returns a failed result" {
+    It "continua instalando os demais pacotes quando um retorna resultado de falha" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         $script:sync.configs.appxHashtable.WPFAppxNoSource = [pscustomobject]@{
             Content = "No Source App"
@@ -508,7 +508,7 @@ Describe "Invoke-WPFAppxInstall" {
         }
     }
 
-    It "passes a skipped Store result to package completion and reports it as skipped" {
+    It "repassa um resultado ignorado da Store à conclusão do pacote e o reporta como ignorado" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         Mock Install-WinUtilAPPX {
             [pscustomobject]@{
@@ -598,7 +598,7 @@ Describe "Invoke-WPFAppxRemoval" {
         Remove-Variable -Name apps -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "prompts and exits when no AppX packages are selected" {
+    It "exibe aviso e sai quando nenhum pacote AppX foi selecionado" {
         Invoke-WPFAppxRemoval
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
@@ -610,7 +610,7 @@ Describe "Invoke-WPFAppxRemoval" {
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "queues a removal job with a snapshot of the selection and app metadata" {
+    It "enfileira um job de remoção com um instantâneo da seleção e dos metadados dos aplicativos" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         $script:sync.configs.appxHashtable = $script:apps
 
@@ -626,7 +626,7 @@ Describe "Invoke-WPFAppxRemoval" {
         $script:capturedAppxRemovalParameters.Apps["WPFAppxExample"].PackageId | Should -Be "Example.Package"
     }
 
-    It "removes the selected packages and reports progress for each one" {
+    It "remove os pacotes selecionados e reporta o progresso de cada um" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         $script:sync.configs.appxHashtable = $script:apps
 
@@ -654,7 +654,7 @@ Describe "Invoke-WPFAppxRemoval" {
         }
     }
 
-    It "lets a removal failure surface so the job layer can handle it" {
+    It "permite que uma falha de remoção apareça para que a camada de job possa tratá-la" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         $script:sync.configs.appxHashtable = $script:apps
         Mock Remove-WinUtilAPPX { throw "Removal failed" }
@@ -666,7 +666,7 @@ Describe "Invoke-WPFAppxRemoval" {
         Should -Invoke -CommandName Remove-WinUtilProvisionedAPPX -Times 0 -Exactly
     }
 
-    It "lets a provisioned removal failure surface so the job layer can handle it" {
+    It "permite que uma falha de remoção provisionada apareça para que a camada de job possa tratá-la" {
         $script:sync.selectedAppx.Add("WPFAppxExample")
         $script:sync.configs.appxHashtable = $script:apps
         Mock Remove-WinUtilProvisionedAPPX { throw "Provisioned removal failed" }
@@ -677,7 +677,7 @@ Describe "Invoke-WPFAppxRemoval" {
         { & $script:capturedAppxRemovalScriptBlock @jobParameters } | Should -Throw "Provisioned removal failed"
     }
 
-    It "applies special cleanup for Xbox overlay, Notepad, and Teams selections" {
+    It "aplica limpeza especial para seleções de Xbox overlay, Notepad e Teams" {
         foreach ($key in @("WPFAppxMicrosoft_XboxGamingOverlay", "WPFAppxMicrosoft_WindowsNotepad", "WPFAppxMSTeams")) {
             $script:sync.selectedAppx.Add($key)
         }

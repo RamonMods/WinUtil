@@ -1,8 +1,8 @@
 #===========================================================================
-# Tests - WinOneShot Catalog Compatibility
+# Testes - Compatibilidade do catálogo WinOneShot
 #===========================================================================
-# WinOneShot downloads these files from WinUtil's main/config raw GitHub URLs.
-# Keep the known field types aligned with WinOneShot Models.cs; extra fields are allowed.
+# O WinOneShot baixa estes arquivos das URLs brutas do GitHub em main/config do WinUtil.
+# Mantenha os tipos de campo conhecidos alinhados com WinOneShot Models.cs; campos extras são permitidos.
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $catalogCases = @(
@@ -305,9 +305,9 @@ BeforeAll {
     }
 }
 
-Describe "WinOneShot catalog download contract" {
+Describe "Contrato de download do catálogo WinOneShot" {
     foreach ($catalogCase in $catalogCases) {
-        It "publishes <Name> at the exact raw-download path" -TestCases $catalogCase {
+        It "publica <Name> no caminho exato de download bruto" -TestCases $catalogCase {
             param([string]$Path)
 
             Test-Path -LiteralPath $Path -PathType Leaf | Should -BeTrue
@@ -318,7 +318,7 @@ Describe "WinOneShot catalog download contract" {
             $exactNameMatch.Count | Should -Be 1
         }
 
-        It "loads <Name> with WinOneShot-compatible field types" -TestCases $catalogCase {
+        It "carrega <Name> com tipos de campo compatíveis com o WinOneShot" -TestCases $catalogCase {
             param(
                 [string]$Name,
                 [string]$Path,
@@ -336,8 +336,8 @@ Describe "WinOneShot catalog download contract" {
     }
 }
 
-Describe "WinOneShot catalog contract guard" {
-    It "rejects consumer-breaking <Name> fixture: <ExpectedError>" -TestCases $invalidCatalogCases {
+Describe "Proteção do contrato do catálogo WinOneShot" {
+    It "rejeita a fixture <Name> que quebra o consumidor: <ExpectedError>" -TestCases $invalidCatalogCases {
         param(
             [string]$Name,
             [string]$Json,

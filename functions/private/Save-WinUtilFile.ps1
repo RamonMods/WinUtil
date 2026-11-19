@@ -1,11 +1,11 @@
 function Save-WinUtilFile {
     <#
     .SYNOPSIS
-        Downloads a file and reports transfer progress.
+        Baixa um arquivo e relata o progresso da transferência.
 
     .PARAMETER ProgressCallback
-        Called with the percentage completed and the total size in bytes. The size is -1 when
-        the server sends no Content-Length, in which case only the final 100% call is made.
+        Chamado com a porcentagem concluída e o tamanho total em bytes. O tamanho é -1 quando
+        o servidor não envia Content-Length, caso em que apenas a chamada final de 100% é feita.
     #>
     param(
         [Parameter(Mandatory)]

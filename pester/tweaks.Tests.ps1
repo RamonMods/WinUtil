@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Tweak Orchestration
+# Testes - Orquestração de ajustes
 #===========================================================================
 
 BeforeAll {
@@ -114,7 +114,7 @@ Describe "Invoke-WinUtilTweaks" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "dispatches apply actions to service, registry, script, and AppX helpers" {
+    It "envia ações de aplicação para os auxiliares de serviço, registro, script e AppX" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksExample"
 
         Should -Invoke -CommandName Get-Service -Times 1 -Exactly -ParameterFilter {
@@ -140,7 +140,7 @@ Describe "Invoke-WinUtilTweaks" {
         }
     }
 
-    It "uses original registry values and service startup types in undo mode" {
+    It "usa os valores originais do registro e os tipos de inicialização de serviço no modo de desfazer" {
         Mock Get-Service {
             [pscustomobject]@{
                 Name = "DiagTrack"
@@ -167,7 +167,7 @@ Describe "Invoke-WinUtilTweaks" {
         Should -Invoke -CommandName Remove-WinUtilProvisionedAPPX -Times 0 -Exactly
     }
 
-    It "keeps a user-changed service startup type by default" {
+    It "mantém por padrão o tipo de inicialização de serviço alterado pelo usuário" {
         Mock Get-Service {
             [pscustomobject]@{
                 Name = "DiagTrack"
@@ -179,7 +179,7 @@ Describe "Invoke-WinUtilTweaks" {
 
         Should -Invoke -CommandName Get-Service -Times 1 -Exactly
         Should -Invoke -CommandName Set-WinUtilService -Times 0 -Exactly
-        # The skip is reported, so the log does not read as if the tweak changed the service
+        # A omissão é relatada, para que o log não pareça que o ajuste alterou o serviço
         Should -Invoke -CommandName Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
             $Level -eq "WARN" -and $Message -match "DiagTrack.*Manual.*Automatic"
         }
@@ -188,7 +188,7 @@ Describe "Invoke-WinUtilTweaks" {
         }
     }
 
-    It "leaves a service alone on undo when its startup type is not the applied value" {
+    It "não altera um serviço ao desfazer quando seu tipo de inicialização não é o valor aplicado" {
         Mock Get-Service {
             [pscustomobject]@{
                 Name = "DiagTrack"
@@ -205,7 +205,7 @@ Describe "Invoke-WinUtilTweaks" {
         }
     }
 
-    It "forces the service back to its original startup type on undo when it still matches the applied value" {
+    It "força o serviço de volta ao seu tipo de inicialização original ao desfazer quando ele ainda corresponde ao valor aplicado" {
         Mock Get-Service {
             [pscustomobject]@{
                 Name = "DiagTrack"
@@ -220,7 +220,7 @@ Describe "Invoke-WinUtilTweaks" {
         }
     }
 
-    It "drops the cached toggle status so the next status read hits the registry" {
+    It "descarta o status de interruptor em cache para que a próxima leitura consulte o registro" {
         $script:sync.ToggleStatusCache = @{ WPFTweaksServiceOnly = $true }
 
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksServiceOnly"
@@ -228,7 +228,7 @@ Describe "Invoke-WinUtilTweaks" {
         $script:sync.ToggleStatusCache.ContainsKey("WPFTweaksServiceOnly") | Should -BeFalse
     }
 
-    It "forces a service startup type when KeepServiceStartup is disabled" {
+    It "força um tipo de inicialização de serviço quando KeepServiceStartup está desativado" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksServiceOnly" -KeepServiceStartup $false
 
         Should -Invoke -CommandName Get-Service -Times 0 -Exactly
@@ -237,7 +237,7 @@ Describe "Invoke-WinUtilTweaks" {
         }
     }
 
-    It "skips a missing service and applies the remaining services and tweaks" {
+    It "ignora um serviço ausente e aplica os demais serviços e ajustes" {
         $script:sync.configs.tweaks.WPFTweaksExample.service = @(
             [pscustomobject]@{
                 Name = "CscService"
@@ -278,7 +278,7 @@ Describe "Invoke-WinUtilTweaks" {
         }
     }
 
-    It "rethrows service lookup errors that do not identify a missing service" {
+    It "relança erros de busca de serviço que não identificam um serviço ausente" {
         Mock Get-Service {
             $exception = [System.Exception]::new("Service lookup failed.")
             $errorRecord = [System.Management.Automation.ErrorRecord]::new(
@@ -299,7 +299,7 @@ Describe "Invoke-WinUtilTweaks" {
     }
 }
 
-Describe "Invoke-WinUtilTweaks completion status" {
+Describe "Status de conclusão de Invoke-WinUtilTweaks" {
     BeforeAll {
         . (Join-Path $script:repoRoot "functions\private\Write-WinUtilLog.ps1")
         . (Join-Path $script:repoRoot "functions\private\Invoke-WinUtilScript.ps1")
@@ -319,18 +319,18 @@ Describe "Invoke-WinUtilTweaks completion status" {
                     WPFTweaksClean = [pscustomobject]@{
                         InvokeScript = @("Write-Output 'apply tweak'")
                     }
-                    # A job worker logging an error from its own runspace lands in the shared
-                    # list without passing through this runspace's logger
+                    # Um worker do job que registra um erro em seu próprio runspace vai parar na lista
+                    # compartilhada sem passar pelo agente de log deste runspace
                     WPFTweaksDuringJob = [pscustomobject]@{
                         InvokeScript = @("`$null = `$sync.LoggedErrors.Add('[Job] error from a concurrent job'); Write-Output 'apply tweak'")
                     }
                 }
             }
-            # Seeded with an earlier error: only errors logged during this tweak may count
+            # Inicializado com um erro anterior: apenas erros registrados durante este ajuste podem contar
             LoggedErrors = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new(@("[UI] earlier unrelated failure")))
         })
-        # Toggle switches run the tweak on the UI thread, outside any job worker. The runspace
-        # counter starts non-zero: only errors logged during this tweak may count
+        # Interruptores executam o ajuste na thread da interface, fora de qualquer worker de job. O contador do
+        # runspace começa diferente de zero: apenas erros registrados durante este ajuste podem contar
         Remove-Variable -Name WinUtilIsJobWorker -Scope Global -ErrorAction SilentlyContinue
         $global:WinUtilJobErrorCount = 3
 
@@ -345,7 +345,7 @@ Describe "Invoke-WinUtilTweaks completion status" {
         Remove-Item -Path $script:testRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    It "warns instead of reporting completion when a tweak step logged an error" {
+    It "avisa em vez de relatar conclusão quando uma etapa de ajuste registrou um erro" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksFailing"
 
         $log = Get-Content -Path $script:logPath -Raw
@@ -354,7 +354,7 @@ Describe "Invoke-WinUtilTweaks completion status" {
         $log | Should -Not -Match "tweak completed: WPFTweaksFailing"
     }
 
-    It "warns when an undo step logged an error" {
+    It "avisa quando uma etapa de desfazer registrou um erro" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksFailing" -undo $true
 
         $log = Get-Content -Path $script:logPath -Raw
@@ -363,7 +363,7 @@ Describe "Invoke-WinUtilTweaks completion status" {
         $log | Should -Not -Match "tweak completed: WPFTweaksFailing"
     }
 
-    It "reports completion when every tweak step succeeded" {
+    It "relata conclusão quando todas as etapas de ajuste tiveram sucesso" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksClean"
 
         $log = Get-Content -Path $script:logPath -Raw
@@ -372,7 +372,7 @@ Describe "Invoke-WinUtilTweaks completion status" {
         $log | Should -Not -Match "\[ERROR\]"
     }
 
-    It "ignores an error another runspace logged while the tweak ran" {
+    It "ignora um erro registrado por outro runspace enquanto o ajuste era executado" {
         Invoke-WinUtilTweaks -CheckBox "WPFTweaksDuringJob"
 
         $log = Get-Content -Path $script:logPath -Raw
@@ -386,7 +386,7 @@ Describe "Get-WinUtilTweakDisplayName" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "returns the configured Content label" {
+    It "retorna o rótulo Content configurado" {
         $script:sync = [Hashtable]::Synchronized(@{
             configs = @{
                 tweaks = [pscustomobject]@{
@@ -398,7 +398,7 @@ Describe "Get-WinUtilTweakDisplayName" {
         Get-WinUtilTweakDisplayName -Key "WPFTweaksTelemetry" | Should -Be "Telemetry - Disable"
     }
 
-    It "falls back to the key when the entry or configs are missing" {
+    It "usa a chave como fallback quando a entrada ou as configurações estão ausentes" {
         $script:sync = [Hashtable]::Synchronized(@{
             configs = @{ tweaks = [pscustomobject]@{} }
         })
@@ -429,7 +429,7 @@ Describe "Invoke-WPFtweaksbutton" {
         $script:capturedTweaksJob = $null
 
         Mock Invoke-WinUtilTweaks { }
-        # the real one returns $true on success, and the workflow now stops when it does not
+        # o real retorna $true em caso de sucesso, e o fluxo agora para quando não retorna
         Mock Set-WinUtilDNS { return $true }
         Mock Invoke-WPFUIThread { }
         Mock Write-WinUtilLog { }
@@ -449,7 +449,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Remove-Variable -Name capturedTweaksJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "prompts and exits when nothing is selected and DNS is left at the default" {
+    It "solicita confirmação e sai quando nada está selecionado e o DNS permanece no padrão" {
         $script:sync.WPFchangedns.text = "Default"
 
         Invoke-WPFtweaksbutton
@@ -460,7 +460,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "queues a tweak job with the selection and DNS provider" {
+    It "enfileira um job de ajustes com a seleção e o provedor de DNS" {
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         $script:sync.selectedTweaks.Add("WPFTweaksServices")
 
@@ -474,7 +474,7 @@ Describe "Invoke-WPFtweaksbutton" {
         $script:capturedTweaksJob.Parameters.DnsProvider | Should -Be "Cloudflare"
     }
 
-    It "applies every selected tweak and the DNS provider inside the job body" {
+    It "aplica cada ajuste selecionado e o provedor de DNS dentro do corpo do job" {
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         $script:sync.selectedTweaks.Add("WPFTweaksServices")
 
@@ -494,8 +494,8 @@ Describe "Invoke-WPFtweaksbutton" {
         }
     }
 
-    It "stops the run when the DNS change fails" {
-        # carrying on would leave the machine half configured, so the job ends and reports it
+    It "interrompe a execução quando a alteração de DNS falha" {
+        # continuar deixaria a máquina meio configurada, então o job termina e relata isso
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         Mock Set-WinUtilDNS { return $false }
 
@@ -506,7 +506,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Should -Invoke -CommandName Invoke-WinUtilTweaks -Times 0 -Exactly
     }
 
-    It "carries on when the DNS change succeeds" {
+    It "continua quando a alteração de DNS tem sucesso" {
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         Mock Set-WinUtilDNS { return $true }
 
@@ -517,7 +517,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Should -Invoke -CommandName Invoke-WinUtilTweaks -Times 1 -Exactly
     }
 
-    It "takes the restore point before any other tweak runs" {
+    It "cria o ponto de restauração antes de qualquer outro ajuste ser executado" {
         $script:sync.selectedTweaks.Add("WPFTweaksRestorePoint")
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         $script:appliedOrder = [System.Collections.Generic.List[string]]::new()
@@ -536,7 +536,7 @@ Describe "Invoke-WPFtweaksbutton" {
         }
     }
 
-    It "falls back to the tweak key when no label is configured" {
+    It "usa a chave do ajuste como fallback quando nenhum rótulo está configurado" {
         $script:sync.configs.tweaks = [pscustomobject]@{}
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
 
@@ -582,7 +582,7 @@ Describe "Invoke-WPFundoall" {
         Remove-Variable -Name capturedUndoJob -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "prompts and exits when nothing is selected" {
+    It "solicita confirmação e sai quando nada está selecionado" {
         Invoke-WPFundoall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
@@ -591,7 +591,7 @@ Describe "Invoke-WPFundoall" {
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
 
-    It "undoes every selected tweak inside the job body" {
+    It "desfaz cada ajuste selecionado dentro do corpo do job" {
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         $script:sync.selectedTweaks.Add("WPFTweaksServices")
 

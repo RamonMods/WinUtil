@@ -1,35 +1,35 @@
 function Invoke-WinUtilISOScript {
     <#
     .SYNOPSIS
-        Prepares copied Windows setup media without modifying its install image.
+        Prepara a mídia de instalação do Windows copiada sem modificar sua imagem de instalação.
 
     .DESCRIPTION
-        Stages WinUtil's AppX removal, registry tweaks, and scheduled-task cleanup
-        in the answer file for first logon, writes sources\ei.cfg for the selected
-        edition, and optionally adds current-system drivers to boot.wim index 2 and
-        one install.wim index.
+        Prepara a remoção de AppX, os ajustes de registro e a limpeza de tarefas agendadas do WinUtil
+        no arquivo de resposta para o primeiro logon, grava sources\ei.cfg para a edição
+        selecionada e, opcionalmente, adiciona drivers do sistema atual ao boot.wim índice 2 e
+        a um índice do install.wim.
 
     .PARAMETER ISOContentsDir
-        Root directory of the copied ISO contents.
+        Diretório raiz do conteúdo da ISO copiada.
 
     .PARAMETER AutoUnattendXml
-        Full XML content for autounattend.xml.
+        Conteúdo XML completo do autounattend.xml.
 
     .PARAMETER InstallEditionId
-        Windows setup EditionID for sources\ei.cfg, for example Professional or Core.
+        EditionID de instalação do Windows para sources\ei.cfg, por exemplo Professional ou Core.
 
     .PARAMETER InstallImagePath
-        Copied install.wim to service when current-system driver injection is enabled.
+        install.wim copiado a ser servido quando a injeção de drivers do sistema atual estiver habilitada.
 
     .PARAMETER InstallImageIndex
-        Selected edition index in install.wim.
+        Índice da edição selecionada no install.wim.
 
     .PARAMETER Log
-        Optional ScriptBlock for progress/status logging. Receives a single [string] argument.
+        ScriptBlock opcional para registro de progresso/status. Recebe um único argumento [string].
 
     .PARAMETER DriversInjected
-        Optional [ref] set to $true only if driver injection actually mounted and committed
-        install.wim; stays $false if injection was skipped or no package was added successfully.
+        [ref] opcional definido como $true somente se a injeção de drivers realmente montou e confirmou
+        o install.wim; permanece $false se a injeção foi ignorada ou nenhum pacote foi adicionado com sucesso.
     #>
     param (
         [Parameter(Mandatory)][string]$ISOContentsDir,
@@ -58,7 +58,7 @@ function Invoke-WinUtilISOScript {
             try {
                 return (Get-Content -LiteralPath $InfFile.FullName -Raw -ErrorAction Stop) -match '(?im)^\s*Class\s*=\s*(SCSIAdapter|HDC)\s*(?:;.*)?$'
             } catch {
-                & $Logger "Warning: could not classify storage driver '$($InfFile.FullName)': $_"
+                & $Logger "Warning: não foi possível classificar o driver de armazenamento '$($InfFile.FullName)': $_"
                 return $false
             }
         }
@@ -69,13 +69,13 @@ function Invoke-WinUtilISOScript {
             try {
                 $infText = Get-Content -LiteralPath $InfFile.FullName -Raw -ErrorAction Stop
             } catch {
-                $null = & $Logger "Warning: could not read '$($InfFile.FullName)' to determine its driver version: $_"
+                $null = & $Logger "Warning: não foi possível ler '$($InfFile.FullName)' para determinar a versão do driver: $_"
                 return $null
             }
 
-            # The version component of DriverVer is optional per the INF spec (date-only entries
-            # are valid); treat a missing version as 0.0 so date-only entries still rank correctly
-            # instead of being discarded as unparseable.
+            # O componente de versão do DriverVer é opcional conforme a especificação INF (entradas
+            # somente com data são válidas); trate uma versão ausente como 0.0 para que essas entradas ainda sejam
+            # classificadas corretamente, em vez de descartadas como ilegíveis.
             $match = [regex]::Match($infText, '(?im)^\s*DriverVer\s*=\s*(?<date>\d{1,2}/\d{1,2}/\d{4})\s*(?:,\s*(?<version>\d+(?:\.\d+){0,3}))?\s*(?:;.*)?$')
             if (-not $match.Success) {
                 return $null
@@ -89,7 +89,7 @@ function Invoke-WinUtilISOScript {
                 }
                 $version = [version]$versionText
             } catch {
-                $null = & $Logger "Warning: could not parse DriverVer '$($match.Value.Trim())' in '$($InfFile.FullName)': $_"
+                $null = & $Logger "Warning: não foi possível interpretar o DriverVer '$($match.Value.Trim())' em '$($InfFile.FullName)': $_"
                 return $null
             }
 
@@ -106,7 +106,7 @@ function Invoke-WinUtilISOScript {
             try {
                 $infText = Get-Content -LiteralPath $InfFile.FullName -Raw -ErrorAction Stop
             } catch {
-                $null = & $Logger "Warning: could not read '$($InfFile.FullName)' to determine its provider: $_"
+                $null = & $Logger "Warning: não foi possível ler '$($InfFile.FullName)' para determinar seu fornecedor: $_"
                 return ''
             }
 
@@ -129,11 +129,11 @@ function Invoke-WinUtilISOScript {
             foreach ($driverFolderGroup in $DriverFolderGroups) {
                 $driverFolder = [string]$driverFolderGroup.Name
 
-                # DISM names exported package folders <infname>_<arch>_<hash>; grouping on infname+arch
-                # (dropping the hash) is what lets us recognize two exports of the same driver. When a
-                # folder doesn't match that pattern, fall back to the full path rather than the leaf name:
-                # two unrelated folders at different depths (e.g. group_a\duplicate and group_b\duplicate)
-                # can share a leaf name, and the full path is guaranteed unique per group.
+                # O DISM nomeia as pastas de pacotes exportados como <infname>_<arch>_<hash>; agrupar por infname+arch
+                # (sem o hash) é o que nos permite reconhecer duas exportações do mesmo driver. Quando uma
+                # pasta não corresponde a esse padrão, use o caminho completo em vez do nome final:
+                # duas pastas sem relação em níveis diferentes (ex.: group_a\duplicate e group_b\duplicate)
+                # podem ter o mesmo nome final, e o caminho completo é garantidamente único por grupo.
                 $leafName = Split-Path -Path $driverFolder -Leaf
                 $dedupKey = $driverFolder
                 $nameMatch = [regex]::Match($leafName, '(?i)^(?<infname>.+)_(?<arch>x86|amd64|arm64|arm|wow)_[0-9a-f]{16}$')
@@ -163,7 +163,7 @@ function Invoke-WinUtilISOScript {
 
                 $withVersion = @($ranked | Where-Object { $_.Version })
                 if ($withVersion.Count -eq 0) {
-                    $null = & $Logger "Warning: could not determine DriverVer for any duplicate of '$dedupKey'; keeping all $($ranked.Count) package(s) rather than guessing."
+                    $null = & $Logger "Warning: não foi possível determinar o DriverVer de nenhuma duplicata de '$dedupKey'; mantendo todos os $($ranked.Count) pacote(s) em vez de adivinhar."
                     foreach ($candidate in $ranked) {
                         $survivingFolders.Add($candidate.Folder)
                     }
@@ -177,8 +177,8 @@ function Invoke-WinUtilISOScript {
                     if ($candidate.Folder -eq $kept.Folder) {
                         continue
                     }
-                    $droppedVersion = if ($candidate.Version) { $candidate.Version.Raw } else { 'unknown' }
-                    $null = & $Logger "Excluding stale duplicate driver package '$($candidate.Folder)' (DriverVer $droppedVersion) superseded by '$($kept.Folder)' (DriverVer $($kept.Version.Raw))."
+                    $droppedVersion = if ($candidate.Version) { $candidate.Version.Raw } else { 'desconhecida' }
+                    $null = & $Logger "Excluindo o pacote de driver duplicado e desatualizado '$($candidate.Folder)' (DriverVer $droppedVersion), substituído por '$($kept.Folder)' (DriverVer $($kept.Version.Raw))."
                 }
             }
 
@@ -186,18 +186,18 @@ function Invoke-WinUtilISOScript {
         }
 
         $knownExitCode = @{
-            112 = "Disk is full"
-            5 = "Access denied"
-            2 = "File not found"
-            3 = "Path not found"
-            87 = "Invalid parameter"
-            1168 = "Element not found"
-            1392 = "File or directory is corrupted"
-            32 = "File in use / sharing violation"
-            21 = "Device not ready"
-            1460 = "Operation timed out"
-            1223 = "Operation cancelled by user"
-            50 = "Request not supported"
+            112 = "Disco cheio"
+            5 = "Acesso negado"
+            2 = "Arquivo não encontrado"
+            3 = "Caminho não encontrado"
+            87 = "Parâmetro inválido"
+            1168 = "Elemento não encontrado"
+            1392 = "Arquivo ou diretório corrompido"
+            32 = "Arquivo em uso / violação de compartilhamento"
+            21 = "Dispositivo não pronto"
+            1460 = "Tempo limite da operação"
+            1223 = "Operação cancelada pelo usuário"
+            50 = "Solicitação não suportada"
         }
 
         function Invoke-WinUtilISODism {
@@ -215,13 +215,13 @@ function Invoke-WinUtilISOScript {
                     }
                 }
                 if ($knownExitCode.ContainsKey($exitCode)) {
-                    throw "DISM $Operation failed with exit code $exitCode ($($knownExitCode[$exitCode]))."
+                    throw "DISM $Operation falhou com o código de saída $exitCode ($($knownExitCode[$exitCode]))."
                 } else {
-                    throw "DISM $Operation failed with exit code $exitCode."
+                    throw "DISM $Operation falhou com o código de saída $exitCode."
                 }
             }
             if ($Operation -ne 'metadata') {
-                & $Logger "DISM $Operation completed."
+                & $Logger "DISM $Operation concluído."
             }
             return $output
         }
@@ -248,12 +248,12 @@ function Invoke-WinUtilISOScript {
             foreach ($key in 'Languages', 'Installation', 'Edition', 'ProductSuite', 'ProductType') {
                 $beforeValue = [string]$Before[$key]
                 if ($beforeValue -eq '<undefined>' -or ($key -in 'Installation', 'Edition', 'ProductType' -and [string]::IsNullOrWhiteSpace($beforeValue))) {
-                    throw "install.wim metadata is already invalid: $key is undefined. Driver injection was not attempted."
+                    throw "Os metadados do install.wim já são inválidos: $key não está definido. A injeção de drivers não foi tentada."
                 }
                 if ($After) {
                     $afterValue = [string]$After[$key]
                     if ($afterValue -eq '<undefined>' -or ($beforeValue -and $afterValue -ne $beforeValue)) {
-                        throw "install.wim metadata validation failed after driver injection: $key changed from '$beforeValue' to '$afterValue'."
+                        throw "A validação dos metadados do install.wim falhou após a injeção de drivers: $key mudou de '$beforeValue' para '$afterValue'."
                     }
                 }
             }
@@ -294,7 +294,7 @@ function Invoke-WinUtilISOScript {
             )
 
             if ($DriverFolders.Count -eq 0) {
-                & $Logger "No driver packages to add to ${ImageLabel}."
+                & $Logger "Nenhum pacote de driver a adicionar a ${ImageLabel}."
                 return 0
             }
 
@@ -303,7 +303,7 @@ function Invoke-WinUtilISOScript {
 
             $remainingDriverFolders = @($DriverFolders)
             while ($remainingDriverFolders.Count -gt 0) {
-                & $Logger "Mounting $ImageLabel index $ImageIndex for driver injection..."
+                & $Logger "Montando $ImageLabel índice $ImageIndex para injeção de drivers..."
                 Invoke-WinUtilISODism -Arguments @('/English', '/Mount-Image', "/ImageFile:$ImagePath", "/Index:$ImageIndex", "/MountDir:$MountDir") -Operation 'mount' | Out-Null
                 $ImageMounted.Value = $true
 
@@ -314,7 +314,7 @@ function Invoke-WinUtilISOScript {
                     try {
                         Invoke-WinUtilISODism -Arguments @('/English', "/Image:$MountDir", '/Add-Driver', "/Driver:$driverFolder", '/Recurse') -Operation "add-driver:$driverName" | Out-Null
                     } catch {
-                        & $Logger "Warning: failed to add driver package '$driverName': $_"
+                        & $Logger "Warning: falha ao adicionar o pacote de driver '$driverName': $_"
                         $failedDriverFolder = $driverFolder
                         break
                     }
@@ -324,12 +324,12 @@ function Invoke-WinUtilISOScript {
                     break
                 }
 
-                & $Logger "Discarding the potentially partial $ImageLabel mount before continuing without '$driverName'."
+                & $Logger "Descartando a montagem potencialmente parcial de $ImageLabel antes de continuar sem '$driverName'."
                 try {
                     Invoke-WinUtilISODism -Arguments @('/English', '/Unmount-Image', "/MountDir:$MountDir", '/Discard') -Operation 'discard' | Out-Null
                     $ImageMounted.Value = $false
                 } catch {
-                    throw "Failed to discard the potentially partial $ImageLabel mount after driver package '$driverName' failed: $_"
+                    throw "Falha ao descartar a montagem potencialmente parcial de $ImageLabel após a falha do pacote de driver '$driverName': $_"
                 }
 
                 $remainingDriverFolders = @($remainingDriverFolders | Where-Object { $_ -ne $failedDriverFolder })
@@ -338,47 +338,47 @@ function Invoke-WinUtilISOScript {
             $addedCount = $remainingDriverFolders.Count
             if ($addedCount -eq 0) {
                 if ($ImageLabel -eq 'install.wim') {
-                    & $Logger "Warning: none of the $($DriverFolders.Count) exported driver packages could be added; continuing with an unmodified install.wim."
+                    & $Logger "Warning: nenhum dos $($DriverFolders.Count) pacotes de driver exportados pôde ser adicionado; continuando com um install.wim não modificado."
                 } else {
-                    & $Logger "Warning: none of the $($DriverFolders.Count) driver packages could be added to ${ImageLabel}."
+                    & $Logger "Warning: nenhum dos $($DriverFolders.Count) pacotes de driver pôde ser adicionado a ${ImageLabel}."
                 }
                 return 0
             }
 
-            & $Logger "Added $addedCount of $($DriverFolders.Count) driver packages to ${ImageLabel}."
-            & $Logger "Committing the driver-only $ImageLabel change..."
+            & $Logger "Adicionados $addedCount de $($DriverFolders.Count) pacotes de driver a ${ImageLabel}."
+            & $Logger "Confirmando a alteração somente de drivers em $ImageLabel..."
             Invoke-WinUtilISODism -Arguments @('/English', '/Unmount-Image', "/MountDir:$MountDir", '/Commit') -Operation 'commit' | Out-Null
             $ImageMounted.Value = $false
             return $addedCount
         }
 
         if ([IO.Path]::GetExtension($InstallImagePath) -ne '.wim') {
-            throw 'Current-system driver injection requires install.wim; install.esd cannot be serviced in place.'
+            throw 'A injeção de drivers do sistema atual requer install.wim; install.esd não pode ser servido no local.'
         }
         if (-not (Test-Path -LiteralPath $InstallImagePath)) {
-            throw "install.wim was not found: $InstallImagePath"
+            throw "install.wim não foi encontrado: $InstallImagePath"
         }
         if ($InstallImageIndex -lt 1) {
-            throw 'Current-system driver injection requires a valid install.wim image index.'
+            throw 'A injeção de drivers do sistema atual requer um índice de imagem válido no install.wim.'
         }
 
         $driverExportRoot = Join-Path $env:TEMP "WinUtil_DriverExport_$(Get-Date -Format 'yyyyMMdd_HHmmss')_$(([guid]::NewGuid()).ToString('N').Substring(0, 8))"
         $mountDir = Join-Path (Split-Path -Path $ContentRoot -Parent) 'wim_mount'
         New-Item -Path $driverExportRoot -ItemType Directory -Force | Out-Null
 
-        # %TEMP% can be an 8.3 alias, but Get-ChildItem below reports long paths, so the
-        # exported folders would not share this prefix unless it is expanded first.
+        # %TEMP% pode ser um alias 8.3, mas o Get-ChildItem abaixo relata caminhos longos, então as
+        # pastas exportadas não compartilhariam este prefixo a menos que ele seja expandido primeiro.
         $driverExportRoot = (Get-Item -LiteralPath $driverExportRoot).FullName
         $imageMounted = $false
 
         try {
-            & $Logger "Exporting current system drivers before WIM driver injection..."
+            & $Logger "Exportando os drivers do sistema atual antes da injeção de drivers no WIM..."
             $dismLog = Join-Path $env:TEMP "WinUtil_DismDriverExport_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
             Invoke-WinUtilISODism -Arguments @('/English', '/Online', '/Export-Driver', "/Destination:$driverExportRoot", "/LogPath:$dismLog") -Operation 'export-driver' | Out-Null
 
             $driverInfs = @(Get-ChildItem -LiteralPath $driverExportRoot -Filter '*.inf' -Recurse -File)
             if ($driverInfs.Count -eq 0) {
-                throw 'DISM exported no driver INF files.'
+                throw 'O DISM não exportou nenhum arquivo INF de driver.'
             }
             $driverFolders = @($driverInfs | Group-Object { $_.Directory.FullName })
             $stagedDriverFolders = @(Select-WinUtilISOStagedDriverPackages -DriverFolderGroups $driverFolders -Logger $Logger)
@@ -397,24 +397,24 @@ function Invoke-WinUtilISOScript {
                             Remove-Item -LiteralPath $excludedInf.FullName -Force -ErrorAction Stop
                         }
                     } catch {
-                        throw "Failed to remove excluded driver INF files from package '$excludedFolder' before injection: $_"
+                        throw "Falha ao remover os arquivos INF de driver excluídos do pacote '$excludedFolder' antes da injeção: $_"
                     }
 
-                    & $Logger "Keeping excluded driver package directory '$excludedFolder' because it contains a retained nested package, after removing its excluded INF files."
+                    & $Logger "Mantendo o diretório do pacote de driver excluído '$excludedFolder' porque ele contém um pacote aninhado retido, após remover seus arquivos INF excluídos."
                     continue
                 }
 
                 try {
                     Remove-Item -LiteralPath $excludedFolder -Recurse -Force -ErrorAction Stop
                 } catch {
-                    throw "Failed to remove excluded driver package '$excludedFolder' before injection: $_"
+                    throw "Falha ao remover o pacote de driver excluído '$excludedFolder' antes da injeção: $_"
                 }
             }
 
-            & $Logger "Exported $($stagedDriverFolders.Count) of $($driverFolders.Count) driver packages ($($excludedDriverFolderGroups.Count) excluded)."
+            & $Logger "Exportados $($stagedDriverFolders.Count) de $($driverFolders.Count) pacotes de driver ($($excludedDriverFolderGroups.Count) excluídos)."
 
-            # Storage for Setup comes from the same surviving set as install.wim, so stale
-            # duplicates never reach boot.wim.
+            # Os drivers de armazenamento para a Instalação vêm do mesmo conjunto sobrevivente do install.wim, então
+            # duplicatas desatualizadas nunca chegam ao boot.wim.
             $storageFolders = @(
                 $driverFolders |
                     Where-Object { $_.Name -in $stagedDriverFolders } |
@@ -428,19 +428,19 @@ function Invoke-WinUtilISOScript {
             $bootWim = Join-Path $ContentRoot 'sources\boot.wim'
             if ($storageRootFolders.Count -gt 0) {
                 if (Test-Path -LiteralPath $bootWim) {
-                    & $Logger "Adding $($storageRootFolders.Count) root storage driver packages to boot.wim."
+                    & $Logger "Adicionando $($storageRootFolders.Count) pacotes de driver de armazenamento raiz ao boot.wim."
                     $null = Add-WinUtilISODriversToImage -ImagePath $bootWim -ImageIndex 2 -MountDir $mountDir -DriverFolders $storageRootFolders -ImageLabel 'boot.wim' -ImageMounted $imageMountedRef
                 } else {
-                    & $Logger 'Warning: boot.wim was not found; Windows Setup will not have injected storage drivers.'
+                    & $Logger 'Warning: boot.wim não foi encontrado; a Instalação do Windows não terá drivers de armazenamento injetados.'
                 }
             }
 
-            & $Logger "Adding $($rootPackageFolders.Count) root driver packages to install.wim."
+            & $Logger "Adicionando $($rootPackageFolders.Count) pacotes de driver raiz ao install.wim."
             $addedCount = Add-WinUtilISODriversToImage -ImagePath $InstallImagePath -ImageIndex $InstallImageIndex -MountDir $mountDir -DriverFolders $rootPackageFolders -ImageLabel 'install.wim' -ImageMounted $imageMountedRef
             if ($addedCount -gt 0) {
                 $metadataAfter = Get-WinUtilISOWimMetadata -ImagePath $InstallImagePath -Index $InstallImageIndex
                 Assert-WinUtilISOWimMetadata -Before $metadataBefore -After $metadataAfter
-                & $Logger 'Driver injection complete; install.wim metadata validation passed.'
+                & $Logger 'Injeção de drivers concluída; a validação dos metadados do install.wim passou.'
                 $DriversInjected.Value = $true
             }
         } finally {
@@ -448,7 +448,7 @@ function Invoke-WinUtilISOScript {
                 try {
                     Invoke-WinUtilISODism -Arguments @('/English', '/Unmount-Image', "/MountDir:$mountDir", '/Discard') -Operation 'discard' | Out-Null
                 } catch {
-                    & $Logger "Warning: could not discard the failed WIM mount: $_"
+                    & $Logger "Warning: não foi possível descartar a montagem falha do WIM: $_"
                 }
             }
             Remove-Item -LiteralPath $mountDir -Recurse -Force -ErrorAction SilentlyContinue
@@ -469,11 +469,11 @@ function Invoke-WinUtilISOScript {
         $pidPath = Join-Path $sourcesDir "PID.txt"
         if (Test-Path $pidPath) {
             Remove-Item -Path $pidPath -Force
-            & $Logger "Removed sources\PID.txt so setup will not force a stale or mismatched product key."
+            & $Logger "Removido sources\PID.txt para que a instalação não force uma chave de produto desatualizada ou incompatível."
         }
 
         if ([string]::IsNullOrWhiteSpace($EditionId)) {
-            & $Logger "Warning: selected edition ID is unknown - skipping sources\ei.cfg fallback."
+            & $Logger "Warning: o ID da edição selecionada é desconhecido - ignorando o fallback de sources\ei.cfg."
             return
         }
 
@@ -488,7 +488,7 @@ Retail
 "@.Trim()
 
         Set-Content -Path $eiCfgPath -Value $eiCfg -Encoding ASCII -Force
-        & $Logger "Written sources\ei.cfg for EditionID '$EditionId'."
+        & $Logger "Gravado sources\ei.cfg para o EditionID '$EditionId'."
     }
 
     function Add-WinUtilISOSetupCustomizations {
@@ -515,7 +515,7 @@ Retail
 Start-Transcript -Path `$logPath -Append -ErrorAction SilentlyContinue
 
 try {
-    Write-Host 'WinUtil: Removing provisioned AppX packages...'
+    Write-Host 'WinUtil: Removendo pacotes AppX provisionados...'
     `$packages = @(
 $appxList
     )
@@ -553,7 +553,7 @@ $appxList
         reg.exe delete "`$contentDeliveryManager\SuggestedApps" /f 2>&1 | Out-Null
     }
 
-    Write-Host 'WinUtil: Applying registry tweaks...'
+    Write-Host 'WinUtil: Aplicando ajustes de registro...'
     Set-WinUtilRegistryValue 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager' 'ShippedWithReserves' 'REG_DWORD' '0'
     Set-WinUtilRegistryValue 'HKLM\SYSTEM\CurrentControlSet\Control\BitLocker' 'PreventDeviceEncryption' 'REG_DWORD' '1'
     Set-WinUtilRegistryValue 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Chat' 'ChatIcon' 'REG_DWORD' '3'
@@ -626,7 +626,7 @@ $appxList
     Set-WinUtilRegistryValue 'HKCU\Software\Microsoft\InputPersonalization\TrainedDataStore' 'HarvestContacts' 'REG_DWORD' '0'
     Set-WinUtilRegistryValue 'HKCU\Software\Microsoft\Personalization\Settings' 'AcceptedPrivacyPolicy' 'REG_DWORD' '0'
 
-    Write-Host 'WinUtil: Removing scheduled task definitions...'
+    Write-Host 'WinUtil: Removendo definições de tarefas agendadas...'
     `$taskPaths = @(
         'C:\Windows\System32\Tasks\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser',
         'C:\Windows\System32\Tasks\Microsoft\Windows\Customer Experience Improvement Program',
@@ -643,7 +643,7 @@ $appxList
     foreach (`$taskPath in `$taskPaths) { Remove-Item -LiteralPath `$taskPath -Recurse -Force -ErrorAction SilentlyContinue }
 
     Start-Process -FilePath 'C:\Windows\System32\OneDriveSetup.exe' -ArgumentList '/uninstall' -Wait -ErrorAction SilentlyContinue
-    Write-Host 'WinUtil: Post-install customization complete.'
+    Write-Host 'WinUtil: Personalização pós-instalação concluída.'
 } finally {
     Stop-Transcript -ErrorAction SilentlyContinue
 }
@@ -660,7 +660,7 @@ $appxList
         $extensions = $xmlDoc.SelectSingleNode('//sg:Extensions', $nsMgr)
         $firstLogonFile = $xmlDoc.SelectSingleNode('//sg:File[@path="C:\Windows\Setup\Scripts\FirstLogon.ps1"]', $nsMgr)
         if (-not $setupComponent -or -not $extensions -or -not $firstLogonFile) {
-            throw 'autounattend.xml is missing a required Windows Setup, Extensions, or FirstLogon.ps1 node.'
+            throw 'autounattend.xml está sem um nó obrigatório de Windows Setup, Extensions ou FirstLogon.ps1.'
         }
 
         $imageInstall = $setupComponent.SelectSingleNode('u:ImageInstall', $nsMgr)
@@ -700,7 +700,7 @@ $appxList
 
         $firstLogonFile.InnerText = "& 'C:\Windows\Setup\Scripts\WinUtil-PostInstall.ps1';`r`n`r`n$($firstLogonFile.InnerText.Trim())"
 
-        $null = & $Logger 'Added WinUtil post-install AppX, registry, and scheduled-task customizations to autounattend.xml.'
+        $null = & $Logger 'Adicionadas as personalizações pós-instalação do WinUtil (AppX, registro e tarefas agendadas) ao autounattend.xml.'
         return $xmlDoc.OuterXml
     }
 
@@ -745,21 +745,21 @@ $appxList
             $useConfigurationSet.InnerText = 'true'
             [System.IO.File]::WriteAllText((Join-Path $ContentRoot 'autounattend.xml'), $xmlDoc.OuterXml, [System.Text.UTF8Encoding]::new($false))
         }
-        & $Logger "Staged $stagedCount WinUtil setup script fallback files at '$setupScriptsRoot'."
+        & $Logger "Preparados $stagedCount arquivos de fallback de script de instalação do WinUtil em '$setupScriptsRoot'."
     }
 
     if (-not (Test-Path $ISOContentsDir)) {
-        throw "ISO contents directory does not exist: $ISOContentsDir"
+        throw "O diretório de conteúdo da ISO não existe: $ISOContentsDir"
     }
 
     if ([string]::IsNullOrWhiteSpace($AutoUnattendXml)) {
-        throw "autounattend.xml content is required to prepare setup media."
+        throw "O conteúdo do autounattend.xml é necessário para preparar a mídia de instalação."
     }
 
     $preparedAutoUnattendXml = Add-WinUtilISOSetupCustomizations -XmlContent $AutoUnattendXml -InstallImageIndex $InstallImageIndex -Logger $Log
     $unattendPath = Join-Path $ISOContentsDir "autounattend.xml"
     [System.IO.File]::WriteAllText($unattendPath, $preparedAutoUnattendXml, [System.Text.UTF8Encoding]::new($false))
-    & $Log "Written autounattend.xml with WinUtil setup customizations to ISO root ($unattendPath)."
+    & $Log "Gravado autounattend.xml com as personalizações de instalação do WinUtil na raiz da ISO ($unattendPath)."
     Add-WinUtilISOSetupScriptFallback -ContentRoot $ISOContentsDir -XmlContent $preparedAutoUnattendXml -Logger $Log
 
     Write-WinUtilISOEditionConfig -ContentRoot $ISOContentsDir -EditionId $InstallEditionId -Logger $Log

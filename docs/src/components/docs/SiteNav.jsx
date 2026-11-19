@@ -3,7 +3,7 @@ import Icon from './Icon.jsx';
 
 const externalProps = (link) => (link.external ? { target: '_blank', rel: 'noreferrer' } : {});
 
-// Closes once focus moves out of it, so a keyboard user tabbing on doesn't leave the menu over the page.
+// Fecha quando o foco sai dele, para que quem navega com o teclado não deixe o menu sobre a página.
 const closeOnBlur = (close) => (event) => {
 	if (!event.currentTarget.contains(event.relatedTarget)) close();
 };
@@ -33,7 +33,7 @@ export default function SiteNav({ groups, links, showMenuButton }) {
 	const rootRef = useRef(null);
 
 	useEffect(() => {
-		// The path as it was when clicked: the menu button swaps its icon, so event.target may already be detached.
+		// O caminho como estava no clique: o botão do menu troca seu ícone, então event.target pode já estar desanexado.
 		const onClick = (event) => {
 			if (event.composedPath().includes(rootRef.current)) return;
 			setOpenGroup(null);
@@ -41,14 +41,14 @@ export default function SiteNav({ groups, links, showMenuButton }) {
 		};
 		const onKey = (event) => {
 			if (event.key !== 'Escape') return;
-			// Closing hides a focused menu link, so focus goes back to the button that opened that menu.
+			// Ao fechar, o link focado do menu fica oculto, então o foco volta ao botão que abriu esse menu.
 			const owner = document.activeElement?.closest('.docs-nav-dropdown, .docs-nav-mobile');
 			if (owner && rootRef.current?.contains(owner)) owner.querySelector('button')?.focus();
 			setOpenGroup(null);
 			setMenuOpen(false);
 		};
 		const wide = matchMedia('(min-width: 50em)');
-		// The desktop and mobile menus swap at this width, so neither should still be open on the other side.
+		// Os menus desktop e mobile trocam nessa largura, então nenhum dos dois deve continuar aberto do outro lado.
 		const onResize = () => {
 			setOpenGroup(null);
 			setMenuOpen(false);
@@ -65,7 +65,7 @@ export default function SiteNav({ groups, links, showMenuButton }) {
 
 	return (
 		<div className="docs-nav" ref={rootRef}>
-			<nav className="docs-nav-desktop" aria-label="Top">
+			<nav className="docs-nav-desktop" aria-label="Navegação superior">
 				{groups.map((group) => (
 					<Dropdown
 						key={group.label}
@@ -89,7 +89,7 @@ export default function SiteNav({ groups, links, showMenuButton }) {
 						className="docs-icon-button"
 						aria-expanded={menuOpen}
 						aria-controls="docs-nav-panel"
-						aria-label="Site navigation"
+						aria-label="Navegação do site"
 						onClick={() => setMenuOpen(!menuOpen)}
 					>
 						<Icon name={menuOpen ? 'close' : 'bars'} size="1.25rem" />

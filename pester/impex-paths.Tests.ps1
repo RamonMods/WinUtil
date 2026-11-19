@@ -4,7 +4,7 @@ BeforeAll {
     . (Join-Path $repoRoot "functions\private\Update-WinUtilSelections.ps1")
 }
 
-Describe "Configuration file paths" {
+Describe "Caminhos de arquivos de configuração" {
     BeforeEach {
         $script:sync = [Hashtable]::Synchronized(@{
             configs = @{
@@ -23,7 +23,7 @@ Describe "Configuration file paths" {
         Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "imports the exact file at <RelativePath> instead of its wildcard match" -ForEach @(
+    It "importa o arquivo exato em <RelativePath> em vez de sua correspondência curinga" -ForEach @(
         @{ RelativePath = 'config[1].json'; DecoyPath = 'config1.json' }
         @{ RelativePath = '[backup]\config.json'; DecoyPath = 'b\config.json' }
     ) {
@@ -39,7 +39,7 @@ Describe "Configuration file paths" {
         @($script:sync.selectedApps) | Should -Be @("WPFInstallGit")
     }
 
-    It "imports remote JSON without web-page parsing" {
+    It "importa JSON remoto sem análise de página web" {
         Mock Invoke-WebRequest {
             if (-not $UseBasicParsing) { throw "Unsafe web-page parsing requested" }
             [pscustomobject]@{ Content = '["WPFInstallGit"]' }
@@ -53,7 +53,7 @@ Describe "Configuration file paths" {
         }
     }
 
-    It "rejects a remote HTML response without changing selections" {
+    It "rejeita uma resposta HTML remota sem alterar as seleções" {
         $script:sync.selectedApps.Add("WPFInstallFirefox")
         Mock Invoke-WebRequest {
             if (-not $UseBasicParsing) { throw "Unsafe web-page parsing requested" }
@@ -66,7 +66,7 @@ Describe "Configuration file paths" {
         Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter { $UseBasicParsing }
     }
 
-    It "exports to the exact file at <RelativePath> without overwriting its wildcard match" -ForEach @(
+    It "exporta para o arquivo exato em <RelativePath> sem sobrescrever sua correspondência curinga" -ForEach @(
         @{ RelativePath = 'export[1].json'; DecoyPath = 'export1.json' }
         @{ RelativePath = '[export]\config.json'; DecoyPath = 'e\config.json' }
     ) {

@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - UI Selection and State Helpers
+# Testes - Auxiliares de seleção e estado da interface
 #===========================================================================
 
 BeforeAll {
@@ -195,7 +195,7 @@ Describe "Update-WinUtilSelections" {
         Remove-Variable -Name sync -Scope Global -ErrorAction SilentlyContinue
     }
 
-    It "adds imported checkbox keys to the matching selected lists" {
+    It "adiciona chaves de caixas de seleção importadas às listas de seleção correspondentes" {
         Update-WinUtilSelections @(
             "WPFInstallGit",
             "WPFTweaksTelemetry",
@@ -211,7 +211,7 @@ Describe "Update-WinUtilSelections" {
         @($script:sync.selectedAppx) | Should -Be @("WPFAppxExample")
     }
 
-    It "keeps repeated <Key> entries selected only once when replacing selections" -ForEach @(
+    It "mantém entradas <Key> repetidas selecionadas apenas uma vez ao substituir seleções" -ForEach @(
         @{ Key = 'WPFInstallGit'; List = 'selectedApps' }
         @{ Key = 'WPFTweaksTelemetry'; List = 'selectedTweaks' }
         @{ Key = 'WPFToggleDarkMode'; List = 'selectedToggles' }
@@ -223,7 +223,7 @@ Describe "Update-WinUtilSelections" {
         @($script:sync[$List]) | Should -Be @($Key)
     }
 
-    It "fully deselects a repeated imported tweak when unchecked once" {
+    It "desseleciona completamente um ajuste importado repetido quando desmarcado uma vez" {
         Update-WinUtilSelections -flatJson @('WPFTweaksTelemetry', 'WPFTweaksTelemetry') -Replace
 
         Invoke-WPFSelectedCheckboxesUpdate -type 'Remove' -checkboxName 'WPFTweaksTelemetry'
@@ -231,7 +231,7 @@ Describe "Update-WinUtilSelections" {
         @($script:sync.selectedTweaks) | Should -Be @()
     }
 
-    It "fully deselects case-variant imports after checkbox synchronization" {
+    It "desseleciona completamente importações com variação de caixa após a sincronização das caixas de seleção" {
         Update-WinUtilSelections -flatJson @('wpftweakstelemetry', 'WPFTweaksTelemetry') -Replace
 
         Invoke-WPFSelectedCheckboxesUpdate -type 'Add' -checkboxName 'WPFTweaksTelemetry'
@@ -241,7 +241,7 @@ Describe "Update-WinUtilSelections" {
         @($script:sync.selectedTweaks) | Should -Be @()
     }
 
-    It "replaces selections only after every imported key is validated" {
+    It "substitui seleções somente após todas as chaves importadas serem validadas" {
         $script:sync.selectedApps.Add("WPFInstallExisting")
         $script:sync.selectedTweaks.Add("WPFTweaksExisting")
 
@@ -255,7 +255,7 @@ Describe "Update-WinUtilSelections" {
         @($script:sync.selectedFeatures) | Should -Be @("WPFFeatureSandbox")
     }
 
-    It "preserves existing selections when an imported key is unsupported" {
+    It "preserva seleções existentes quando uma chave importada não é suportada" {
         $script:sync.selectedApps.Add("WPFInstallExisting")
         $script:sync.selectedTweaks.Add("WPFTweaksExisting")
 
@@ -271,7 +271,7 @@ Describe "Update-WinUtilSelections" {
         @($script:sync.selectedFeatures) | Should -Be @()
     }
 
-    It "preserves existing selections when an imported key is not in the current catalog" {
+    It "preserva seleções existentes quando uma chave importada não está no catálogo atual" {
         $script:sync.selectedApps.Add("WPFInstallExisting")
 
         {
@@ -287,12 +287,12 @@ Describe "Update-WinUtilSelections" {
     }
 }
 
-Describe "Reset-WPFCheckBoxes over a changing sync" {
-    It "survives entries being added to sync while it runs" {
-        # The tab warmup builds controls into $sync while this runs, and setting IsChecked runs
-        # handlers that add to it as well. Enumerating $sync live threw "Collection was modified".
+Describe "Reset-WPFCheckBoxes com um sync em mudança" {
+    It "sobrevive à adição de entradas ao sync durante sua execução" {
+        # O aquecimento da aba cria controles em $sync enquanto isso acontece, e definir IsChecked executa
+        # manipuladores que também adicionam a ele. Enumerar $sync ao vivo gerava "Collection was modified".
         $global:sync = [hashtable]::Synchronized(@{})
-        # the grower has to actually change state, or its handler never runs and nothing grows
+        # o grower precisa realmente mudar de estado, ou seu manipulador nunca é executado e nada cresce
         $sync.selectedApps = [System.Collections.Generic.List[string]]::new()
         $sync.selectedApps.Add("WPFInstallgrower")
         $sync.selectedTweaks = [System.Collections.Generic.List[string]]::new()
@@ -300,7 +300,7 @@ Describe "Reset-WPFCheckBoxes over a changing sync" {
         $sync.selectedAppx = [System.Collections.Generic.List[string]]::new()
         $sync.selectedToggles = [System.Collections.Generic.List[string]]::new()
 
-        # a checkbox that grows $sync the moment it is set, standing in for the real handlers
+        # uma caixa de seleção que faz $sync crescer no momento em que é definida, representando os manipuladores reais
         $grower = New-Object System.Windows.Controls.CheckBox
         $grower.Add_Checked({ $sync["grown_$([guid]::NewGuid().ToString('N'))"] = 1 })
         $grower.Add_Unchecked({ $sync["grown_$([guid]::NewGuid().ToString('N'))"] = 1 })
@@ -312,7 +312,7 @@ Describe "Reset-WPFCheckBoxes over a changing sync" {
     }
 }
 
-Describe "Invoke-WPFImpex import selection state" {
+Describe "Estado da seleção na importação de Invoke-WPFImpex" {
     BeforeEach {
         New-WinUtilUiStateTestContext
         $script:sync.Form = [pscustomobject]@{}
@@ -328,7 +328,7 @@ Describe "Invoke-WPFImpex import selection state" {
         Remove-Variable -Name sync -Scope Global -ErrorAction SilentlyContinue
     }
 
-    It "replaces selections and resets the UI after a valid import" {
+    It "substitui seleções e redefine a interface após uma importação válida" {
         $script:sync.selectedApps.Add("WPFInstallExisting")
         $script:sync.selectedTweaks.Add("WPFTweaksExisting")
         $configPath = Join-Path $TestDrive "valid-config.json"
@@ -348,7 +348,7 @@ Describe "Invoke-WPFImpex import selection state" {
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
     }
 
-    It "imports supported legacy selections and reports retired entries" {
+    It "importa seleções legadas suportadas e relata entradas desativadas" {
         $configPath = Join-Path $script:repoRoot "pester\fixtures\legacy-config.json"
 
         Invoke-WPFImpex -type "import" -Config $configPath
@@ -371,7 +371,7 @@ Describe "Invoke-WPFImpex import selection state" {
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
     }
 
-    It "ignores unrelated string metadata in a legacy configuration" {
+    It "ignora metadados de string não relacionados em uma configuração legada" {
         $configPath = Join-Path $TestDrive "legacy-config-with-metadata.json"
         [pscustomobject]@{
             Install = @([pscustomobject]@{ winget = "Git.Git"; choco = "git" })
@@ -391,7 +391,7 @@ Describe "Invoke-WPFImpex import selection state" {
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
     }
 
-    It "preserves selections when every legacy entry is retired" {
+    It "preserva seleções quando todas as entradas legadas estão desativadas" {
         $script:sync.selectedApps.Add("WPFInstallExisting")
         $configPath = Join-Path $TestDrive "retired-legacy-config.json"
         [pscustomobject]@{
@@ -414,7 +414,7 @@ Describe "Invoke-WPFImpex import selection state" {
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
     }
 
-    It "imports legacy selection groups without treating Install metadata as a selection" {
+    It "importa grupos de seleção legados sem tratar metadados de Install como uma seleção" {
         $legacyConfigPath = Join-Path $TestDrive "legacy-config.json"
         [ordered]@{
             Install = @(
@@ -438,7 +438,7 @@ Describe "Invoke-WPFImpex import selection state" {
         Should -Invoke -CommandName Write-Error -Times 0 -Exactly
     }
 
-    It "preserves selections and does not reset the UI after an invalid import" {
+    It "preserva seleções e não redefine a interface após uma importação inválida" {
         $script:sync.selectedApps.Add("WPFInstallExisting")
         $script:sync.selectedTweaks.Add("WPFTweaksExisting")
         $configPath = Join-Path $TestDrive "invalid-config.json"
@@ -469,7 +469,7 @@ Describe "Invoke-WPFSelectedCheckboxesUpdate" {
         Remove-Variable -Name sync -Scope Global -ErrorAction SilentlyContinue
     }
 
-    It "adds each checkbox family without duplicating existing selections" {
+    It "adiciona cada família de caixas de seleção sem duplicar seleções existentes" {
         Invoke-WPFSelectedCheckboxesUpdate -type "Add" -checkboxName "WPFInstallGit"
         Invoke-WPFSelectedCheckboxesUpdate -type "Add" -checkboxName "WPFInstallGit"
         Invoke-WPFSelectedCheckboxesUpdate -type "Add" -checkboxName "WPFTweaksTelemetry"
@@ -487,7 +487,7 @@ Describe "Invoke-WPFSelectedCheckboxesUpdate" {
         $script:sync.selectedAppsstackPanel.Children[0].Key | Should -Be "WPFInstallGit"
     }
 
-    It "removes checkbox keys from the matching selected lists" {
+    It "remove chaves de caixas de seleção das listas de seleção correspondentes" {
         $script:sync.selectedApps.Add("WPFInstallGit")
         $script:sync.selectedTweaks.Add("WPFTweaksTelemetry")
         $script:sync.selectedToggles.Add("WPFToggleDarkMode")
@@ -510,7 +510,7 @@ Describe "Invoke-WPFSelectedCheckboxesUpdate" {
     }
 }
 
-Describe "Invoke-WPFGetInstalled selection state" {
+Describe "Estado da seleção de Invoke-WPFGetInstalled" {
     BeforeEach {
         New-WinUtilUiStateTestContext
 
@@ -546,7 +546,7 @@ Describe "Invoke-WPFGetInstalled selection state" {
         Remove-Variable -Name capturedGetInstalledParameters -Scope Script -ErrorAction SilentlyContinue
     }
 
-    It "updates the selected app model, checkbox, count, and popup" {
+    It "atualiza o modelo de aplicativos selecionados, a caixa de seleção, a contagem e o popup" {
         Invoke-WPFGetInstalled -CheckBox "winget"
 
         $jobParameters = $script:capturedGetInstalledParameters
@@ -559,7 +559,7 @@ Describe "Invoke-WPFGetInstalled selection state" {
         $script:sync.selectedAppsstackPanel.Children[0].Key | Should -Be "WPFInstallGit"
     }
 
-    It "queues detection as a job with the manager preference" {
+    It "enfileira a detecção como um job com a preferência de gerenciador" {
         Invoke-WPFGetInstalled -CheckBox "winget"
 
         Should -Invoke -CommandName Start-WinUtilJob -Times 1 -Exactly -ParameterFilter {
@@ -569,7 +569,7 @@ Describe "Invoke-WPFGetInstalled selection state" {
         $script:capturedGetInstalledParameters.ManagerPreference | Should -Be "Winget"
     }
 
-    It "lets a detection failure surface so the job layer can handle it" {
+    It "permite que uma falha de detecção apareça para que a camada de jobs possa tratá-la" {
         Mock Invoke-WinUtilCurrentSystem { throw "detection failed" }
 
         Invoke-WPFGetInstalled -CheckBox "winget"

@@ -1,4 +1,4 @@
-Describe "PowerShell MSI upgrade" {
+Describe "Atualização MSI do PowerShell" {
     BeforeAll {
         . "$PSScriptRoot/../functions/private/Install-WinUtilProgramWinget.ps1"
         . "$PSScriptRoot/../functions/private/Write-WinUtilLog.ps1"
@@ -48,7 +48,7 @@ Describe "PowerShell MSI upgrade" {
         }
     }
 
-    It "upgrades MSI PowerShell successfully" {
+    It "atualiza o PowerShell MSI com sucesso" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
         $result = Update-WinUtilPowerShellMSI
@@ -59,7 +59,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 1
     }
 
-    It "treats reboot exit code <Code> as successful" -TestCases @(@{ Code = 3010 }, @{ Code = 1641 }) {
+    It "trata o código de saída de reinício <Code> como sucesso" -TestCases @(@{ Code = 3010 }, @{ Code = 1641 }) {
         param($Code)
         Mock Start-Process { [pscustomobject]@{ ExitCode = $Code } }
         $result = Update-WinUtilPowerShellMSI
@@ -72,7 +72,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 1 -Exactly
     }
 
-    It "reports MSI installation failure" {
+    It "informa falha na instalação MSI" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 1603 } }
 
         $result = Update-WinUtilPowerShellMSI
@@ -83,7 +83,7 @@ Describe "PowerShell MSI upgrade" {
         }
     }
 
-    It "skips download when PowerShell is already current" {
+    It "ignora o download quando o PowerShell já está atualizado" {
         Mock Get-WinUtilPowerShellVersion { "7.5.3" }
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
@@ -94,7 +94,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 0
     }
 
-    It "returns NotInstalled when PowerShell is not MSI-installed" {
+    It "retorna NotInstalled quando o PowerShell não foi instalado por MSI" {
         Mock Get-ItemProperty { $null }
 
         $result = Update-WinUtilPowerShellMSI
@@ -104,7 +104,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 0
     }
 
-    It "rejects an invalid or missing signer certificate" {
+    It "rejeita um certificado de assinante inválido ou ausente" {
         Mock Get-AuthenticodeSignature {
             [pscustomobject]@{
                 Status = "NotTrusted"
@@ -120,7 +120,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 0
     }
 
-    It "rejects a non-Microsoft certificate containing Microsoft" {
+    It "rejeita um certificado não Microsoft que contém Microsoft" {
         Mock Get-AuthenticodeSignature {
             [pscustomobject]@{
                 Status = "Valid"
@@ -138,7 +138,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 0
     }
 
-    It "rejects a mismatched SHA256 digest" {
+    It "rejeita um digest SHA256 incompatível" {
         Mock Invoke-RestMethod {
             [pscustomobject]@{
                 tag_name = "v7.5.3"
@@ -166,7 +166,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 0
     }
 
-    It "uses MSI for selected PowerShell Install and Upgrade" {
+    It "usa MSI para Instalar e Atualizar o PowerShell selecionado" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
         foreach ($action in @("Install", "Upgrade")) {
@@ -182,7 +182,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 2
     }
 
-    It "falls back to WinGet when PowerShell is not MSI-installed" {
+    It "recorre ao WinGet quando o PowerShell não foi instalado por MSI" {
         Mock Get-ItemProperty { $null }
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
@@ -195,7 +195,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 1
     }
 
-    It "does not fall through to WinGet after MSI handling" {
+    It "não recai para o WinGet após o tratamento MSI" {
         Mock Start-Process { [pscustomobject]@{ ExitCode = 0 } }
 
         $result = Install-WinUtilProgramWinget `
@@ -210,7 +210,7 @@ Describe "PowerShell MSI upgrade" {
         }
     }
 
-    It "reports MSI handling and still upgrades other packages with WinGet all" {
+    It "informa o tratamento MSI e ainda atualiza outros pacotes com o WinGet all" {
         $result = @(Install-WinUtilProgramWinget -Action Upgrade -Programs @("all"))
         $result.Count | Should -Be 2
         $result[0].Manager | Should -Be "msi"
@@ -221,14 +221,14 @@ Describe "PowerShell MSI upgrade" {
         }
     }
 
-    It "reports MSI failures even when the remaining upgrades succeed" {
+    It "informa falhas MSI mesmo quando as demais atualizações têm sucesso" {
         Mock Update-WinUtilPowerShellMSI { [pscustomobject]@{ Outcome = 'Failed'; ExitCode = -1; Detail = 'failed' } }
         $result = @(Install-WinUtilProgramWinget -Action Upgrade -Programs @('all'))
         $result[0].Outcome | Should -Be 'Failed'
         $result[1].Outcome | Should -Be 'Succeeded'
     }
 
-    It "resolves the official MSI registration by ProductCode without uninstall InstallLocation" {
+    It "resolve o registro MSI oficial pelo ProductCode sem desinstalar o InstallLocation" {
         Mock Get-ItemProperty {
             [pscustomobject]@{ WindowsInstaller = 1; DisplayName = 'PowerShell 7-x64'; PSChildName = '{stable-product}' }
         } -ParameterFilter { $Path[0] -like '*Uninstall*' }
@@ -242,14 +242,14 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Get-WinUtilPowerShellVersion -Times 1 -Exactly -ParameterFilter { $Path -eq 'C:\Custom\PowerShell\7\pwsh.exe' }
     }
 
-    It "does not download an MSI when pins exist or cannot be checked" {
+    It "não baixa um MSI quando há pins ou não é possível verificá-los" {
         Mock Test-WinUtilPowerShellMSIUpgradeAllowed { $false }
         (Update-WinUtilPowerShellMSI).Outcome | Should -Be 'Skipped'
         Should -Invoke Invoke-RestMethod -Times 0 -Exactly
         Should -Invoke Start-Process -Times 0 -Exactly
     }
 
-    It "reports unsupported side-by-side MSI installations without upgrading either" {
+    It "informa instalações MSI lado a lado não suportadas sem atualizar nenhuma" {
         Mock Get-ItemProperty {
             @(
                 [pscustomobject]@{ WindowsInstaller = 1; DisplayName = 'PowerShell 7-x64'; InstallLocation = 'C:\PowerShell-x64\7' },
@@ -263,7 +263,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 0 -Exactly
     }
 
-    It "does not treat duplicate registration of one path as multiple installations" {
+    It "não trata o registro duplicado de um caminho como várias instalações" {
         Mock Get-ItemProperty {
             @(
                 [pscustomobject]@{ WindowsInstaller = 1; DisplayName = 'PowerShell 7-x64'; InstallLocation = 'C:\PowerShell\7' },
@@ -274,12 +274,12 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Start-Process -Times 1 -Exactly
     }
 
-    It "matches official versioned MSI names" {
+    It "corresponde a nomes MSI oficiais com versão" {
         Mock Get-ItemProperty { [pscustomobject]@{ WindowsInstaller = 1; DisplayName = 'PowerShell 7.5.2.0-x64'; InstallLocation = 'C:\PowerShell\7' } }
         (Update-WinUtilPowerShellMSI).Outcome | Should -Be 'Succeeded'
     }
 
-    It "uses the installed x86 architecture on a different host architecture" {
+    It "usa a arquitetura x86 instalada em uma arquitetura de host diferente" {
         Mock Get-WinUtilPowerShellArchitecture { 'X86' }
         Mock Invoke-RestMethod { [pscustomobject]@{ tag_name = 'v7.5.3'; assets = @(
             [pscustomobject]@{ name = 'PowerShell-7.5.3-win-x86.msi'; browser_download_url = 'https://example.com/x86.msi' },
@@ -289,7 +289,7 @@ Describe "PowerShell MSI upgrade" {
         Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter { $Uri -eq 'https://example.com/x86.msi' }
     }
 
-    It "ignores PowerShell preview installations" {
+    It "ignora instalações de versão prévia do PowerShell" {
         Mock Get-ItemProperty {
             @(
                 [pscustomobject]@{
@@ -313,24 +313,24 @@ Describe "PowerShell MSI upgrade" {
     }
 }
 
-Describe "MSI pin protection" {
+Describe "Proteção de pin do MSI" {
     BeforeAll {
         . "$PSScriptRoot/../functions/private/Install-WinUtilProgramWinget.ps1"
         function winget { }
     }
-    It "allows MSI only when pin listing succeeds without a table" {
+    It "permite MSI somente quando a listagem de pins tem sucesso sem uma tabela" {
         Mock winget { $global:LASTEXITCODE = 0; 'No pins exist.' }
         Test-WinUtilPowerShellMSIUpgradeAllowed | Should -BeTrue
     }
-    It "blocks MSI for a localized pin table" {
+    It "bloqueia MSI para uma tabela de pins localizada" {
         Mock winget { $global:LASTEXITCODE = 0; "Nom ID Version`n-------------------`nPowerShell Microsoft.PowerShell 7.5" }
         Test-WinUtilPowerShellMSIUpgradeAllowed | Should -BeFalse
     }
-    It "blocks MSI when the pin command fails" {
+    It "bloqueia MSI quando o comando de pin falha" {
         Mock winget { $global:LASTEXITCODE = 1; 'error' }
         Test-WinUtilPowerShellMSIUpgradeAllowed | Should -BeFalse
     }
-    It "blocks MSI when the pin command produces no output" {
+    It "bloqueia MSI quando o comando de pin não produz saída" {
         Mock winget { $global:LASTEXITCODE = 0 }
         Test-WinUtilPowerShellMSIUpgradeAllowed | Should -BeFalse
     }

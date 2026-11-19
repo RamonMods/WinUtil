@@ -3,16 +3,16 @@ function Invoke-WPFRunspace {
     <#
 
     .SYNOPSIS
-        Creates and invokes a runspace using the given scriptblock and argumentlist
+        Cria e invoca um runspace usando o scriptblock e a lista de argumentos informados
 
     .PARAMETER ScriptBlock
-        The scriptblock to invoke in the runspace
+        O scriptblock a invocar no runspace
 
     .PARAMETER ArgumentList
-        A list of arguments to pass to the runspace
+        Uma lista de argumentos a passar para o runspace
 
     .PARAMETER ParameterList
-        A list of named parameters that should be provided.
+        Uma lista de parâmetros nomeados que devem ser fornecidos.
     .EXAMPLE
         Invoke-WPFRunspace `
             -ScriptBlock $sync.ScriptsInstallPrograms `
@@ -34,37 +34,37 @@ function Invoke-WPFRunspace {
     $poolLock = Get-WinUtilRunspacePoolLock
     [System.Threading.Monitor]::Enter($poolLock)
     try {
-        # The lifecycle lock keeps the final shutdown check, invocation start, and registration
-        # atomic with pool closure. Otherwise shutdown can miss a newly started invocation.
+        # O bloqueio de ciclo de vida mantém a verificação final de desligamento, o início da invocação e o registro
+        # atômicos em relação ao fechamento do pool. Caso contrário, o desligamento pode perder uma invocação recém-iniciada.
         if ($sync.ShuttingDown) {
-            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Refused to start background work, WinUtil is closing."
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Recusado iniciar trabalho em segundo plano; o WinUtil está sendo fechado."
             return $null
         }
 
         Initialize-WinUtilRunspacePool | Out-Null
 
-        # Create a PowerShell instance
+        # Cria uma instância do PowerShell
         $powershell = [powershell]::Create()
 
-        # Add Scriptblock and Arguments to runspace
+        # Adiciona o scriptblock e os argumentos ao runspace
         [void]$powershell.AddScript($ScriptBlock)
         [void]$powershell.AddArgument($ArgumentList)
 
         foreach ($parameter in $ParameterList) {
-            # A single pair written as @(("Name", $value)) collapses to a two element array, and
-            # indexing it then yields the first two characters of the name
+            # Um único par escrito como @(("Name", $value)) é reduzido a um array de dois elementos e
+            # indexá-lo então retorna os dois primeiros caracteres do nome
             if ($parameter -is [string] -or $parameter.Count -ne 2) {
-                throw "ParameterList takes name and value pairs. Received '$parameter'. A single pair needs a leading comma: -ParameterList (,('Name', `$value))"
+                throw "ParameterList recebe pares de nome e valor. Recebido '$parameter'. Um único par precisa de uma vírgula inicial: -ParameterList (,('Name', `$value))"
             }
             [void]$powershell.AddParameter($parameter[0], $parameter[1])
         }
 
         $powershell.RunspacePool = $sync.runspace
 
-        # Track before starting so no exception after BeginInvoke can make the caller release its
-        # job token while work is actually running. Cleanup registration is best-effort and has a
-        # background-thread fallback; it must never synchronously wait on a worker from the WPF
-        # dispatcher because the worker's finalizer may be waiting to restore UI state.
+        # Registra antes de iniciar para que nenhuma exceção após o BeginInvoke faça o chamador liberar seu
+        # token de trabalho enquanto o trabalho está realmente em execução. O registro de limpeza é melhor-esforço e conta com
+        # um fallback em thread de segundo plano; ele nunca deve esperar sincronamente por um worker no dispatcher do WPF,
+        # pois o finalizador do worker pode estar esperando para restaurar o estado da interface.
         try {
             Register-WinUtilActiveShell -PowerShell $powershell
         } catch {
@@ -84,9 +84,9 @@ function Invoke-WPFRunspace {
         try {
             Register-WinUtilRunspaceCleanup -PowerShell $powershell -Handle $handle
         } catch {
-            # The worker remains tracked and owns its job token. Treat it as scheduled so another
-            # system-changing job cannot start beside it; later work/shutdown can reclaim the shell.
-            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Could not register background cleanup: $($_.Exception.Message)"
+            # O worker continua monitorado e é dono do seu token de trabalho. Trate-o como agendado para que outro
+            # trabalho que altere o sistema não possa iniciar ao lado dele; trabalhos posteriores/o desligamento podem recuperar o shell.
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Não foi possível registrar a limpeza em segundo plano: $($_.Exception.Message)"
         }
 
         return $handle

@@ -1,39 +1,39 @@
 function Invoke-WPFSystemRepair {
     <#
     .SYNOPSIS
-        Checks for system corruption using SFC, and DISM
-        Checks for disk failure using Chkdsk
+        Verifica corrupção do sistema usando SFC e DISM
+        Verifica falhas no disco usando o Chkdsk
 
     .DESCRIPTION
-        1. Chkdsk - Checks for disk errors, which can cause system file corruption and notifies of early disk failure
-        2. SFC - scans protected system files for corruption and fixes them
-        3. DISM - Repair a corrupted Windows operating system image
+        1. Chkdsk - Verifica erros no disco, que podem causar corrupção de arquivos do sistema, e notifica falhas incipientes no disco
+        2. SFC - verifica arquivos protegidos do sistema em busca de corrupção e os corrige
+        3. DISM - repara uma imagem corrompida do sistema operacional Windows
     #>
 
-    # SuccessCodes maps the non-zero exits a step treats as success to what they mean. The codes
-    # are per step because the same number means different things: 1 and 2 are ordinary chkdsk
-    # outcomes, while 1 from sfc is a failure, and 3010 is a repaired image from DISM only.
+    # SuccessCodes mapeia as saídas não zero que uma etapa trata como sucesso para seus significados. Os códigos
+    # são por etapa porque o mesmo número significa coisas diferentes: 1 e 2 são resultados comuns do chkdsk,
+    # enquanto 1 do sfc é uma falha, e 3010 é uma imagem reparada apenas no DISM.
     $steps = @(
         @{
-            Label = "Checking the disk for errors"
+            Label = "Verificando o disco em busca de erros"
             Arguments = "/c chkdsk /scan /perf"
-            # 3 is left out: the disk could not be checked, or has errors an online scan cannot
-            # fix, and the steps after this one are not worth running on a disk in that state.
+            # 3 é omitido: o disco não pôde ser verificado ou apresenta erros que uma verificação online não
+            # consegue corrigir, e as etapas seguintes não valem a pena em um disco nesse estado.
             SuccessCodes = @{
-                1 = "errors were found and fixed"
-                2 = "cleanup was performed, or was skipped because /f was not given"
+                1 = "erros foram encontrados e corrigidos"
+                2 = "a limpeza foi realizada ou foi ignorada porque /f não foi informado"
             }
         },
         @{
-            Label = "Scanning protected system files"
+            Label = "Verificando arquivos protegidos do sistema"
             Arguments = "/c sfc /scannow"
             SuccessCodes = @{}
         },
         @{
-            Label = "Repairing the Windows image"
+            Label = "Reparando a imagem do Windows"
             Arguments = "/c dism /online /cleanup-image /restorehealth"
             SuccessCodes = @{
-                3010 = "a restart is needed for the repair to take effect"
+                3010 = "é necessário reiniciar para que o reparo tenha efeito"
             }
         }
     )
@@ -42,18 +42,18 @@ function Invoke-WPFSystemRepair {
     foreach ($step in $steps) {
         Step-WinUtilJob -Status "$($step.Label) ($($completed + 1)/$($steps.Count))" -Percent ([int](($completed / $steps.Count) * 100))
         Write-WinUtilLog -Component "SystemRepair" -Message $step.Label
-        # Start-Process does not throw on a nonzero exit, so without this a failed chkdsk, sfc
-        # or dism run would still be reported as a completed repair
+        # Start-Process não lança exceção em uma saída diferente de zero, portanto, sem isso, uma execução falha do chkdsk, sfc
+        # ou dism ainda seria reportada como um reparo concluído
         $process = Start-Process cmd.exe -ArgumentList $step.Arguments -NoNewWindow -Wait -PassThru
         $exitCode = $process.ExitCode
 
         if ($exitCode -ne 0) {
             if ($step.SuccessCodes.ContainsKey($exitCode)) {
-                # Start-WinUtilJob records WarningRecord output in both the session log and the
-                # job result, so accepted nonzero outcomes cannot finish with a green checkmark.
-                Write-Warning "$($step.Label) finished: $($step.SuccessCodes[$exitCode])."
+                # Start-WinUtilJob registra a saída WarningRecord tanto no log da sessão quanto
+                # no resultado do trabalho, portanto resultados não zero aceitos não podem terminar com uma marca de verificação verde.
+                Write-Warning "$($step.Label) concluído: $($step.SuccessCodes[$exitCode])."
             } else {
-                throw "$($step.Label) failed with exit code $exitCode."
+                throw "$($step.Label) falhou com o código de saída $exitCode."
             }
         }
 

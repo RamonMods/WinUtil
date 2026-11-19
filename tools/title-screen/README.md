@@ -1,75 +1,75 @@
-# WinUtil title screen
+# Tela de título do WinUtil
 
-This tool generates the Light and Dark composite used as WinUtil's title screen
-in the repository README and documentation site. It opens the Tweaks tab,
-captures both themes, and combines them into one PNG. The two raw captures are
-temporary and are removed when the command finishes.
+Esta ferramenta gera a composição Claro e Escuro usada como tela de título do
+WinUtil no README do repositório e no site de documentação. Ela abre a aba
+Ajustes, captura ambos os temas e os combina em um único PNG. As duas capturas
+brutas são temporárias e são removidas quando o comando termina.
 
-## Requirements
+## Requisitos
 
-- Windows with an interactive desktop
+- Windows com uma área de trabalho interativa
 - [uv](https://docs.astral.sh/uv/)
-- WinUtil compiled and running
-- An elevated PowerShell terminal
+- WinUtil compilado e em execução
+- Um terminal do PowerShell elevado
 
-Run the commands below from `tools/title-screen`.
+Execute os comandos abaixo em `tools/title-screen`.
 
-## Generate and review a test image
+## Gerar e revisar uma imagem de teste
 
-Start WinUtil from the repository root:
+Inicie o WinUtil a partir da raiz do repositório:
 
 ```powershell
 .\Compile.ps1 -Run
 ```
 
-With WinUtil still open, return to this directory in an elevated terminal and
-generate a test image:
+Com o WinUtil ainda aberto, retorne a este diretório em um terminal elevado e
+gere uma imagem de teste:
 
 ```powershell
 uv run --locked python automate_title_screen.py --output "$env:TEMP\winutil-title-screen.png"
 ```
 
-Open the resulting PNG and check that:
+Abra o PNG resultante e verifique se:
 
-- the Tweaks tab is shown,
-- the Light theme is on the upper-left side of the diagonal,
-- the Dark theme is on the lower-right side, and
-- no desktop background or other windows are visible.
+- a aba Ajustes está exibida,
+- o tema Claro está no lado superior esquerdo da diagonal,
+- o tema Escuro está no lado inferior direito, e
+- nenhum plano de fundo da área de trabalho ou outras janelas estão visíveis.
 
-The automation works whether WinUtil starts in Light or Dark mode. It leaves the
-window on the Tweaks tab in Light mode.
+A automação funciona tanto se o WinUtil iniciar no modo Claro quanto no modo
+Escuro. Ela deixa a janela na aba Ajustes no modo Claro.
 
-## Automation
+## Automação
 
-The title screen is updated through a manually triggered GitHub Actions workflow.
-When the generated image changes, the workflow opens or updates a pull request
-for review. It does not merge the pull request automatically.
+A tela de título é atualizada por meio de um fluxo de trabalho (workflow) do
+GitHub Actions acionado manualmente. Quando a imagem gerada muda, o fluxo abre
+ou atualiza um pull request para revisão; ele não o mescla automaticamente.
 
-Failed runs upload the capture log, UI Automation inspection, and available image
-as diagnostic artifacts for 14 days.
+Execuções com falha enviam o log de captura, a inspeção da Automação de Interface do Usuário (UI Automation) e a imagem disponível
+como artefatos de diagnóstico por 14 dias.
 
-## Tests
+## Testes
 
-The tests cover theme detection and composite image generation without opening
+Os testes cobrem a detecção de tema e a geração da imagem composta sem abrir o
 WinUtil:
 
 ```powershell
 uv run --locked python -m unittest discover
 ```
 
-## Troubleshooting
+## Solução de problemas
 
-If WinUtil cannot be found, make sure the compiled WPF window is open and that
-the terminal is elevated. The script deliberately ignores editors, terminals,
-and browser windows that merely contain "WinUtil" in their title.
+Se o WinUtil não for encontrado, verifique se a janela WPF compilada está aberta
+e se o terminal está elevado. O script ignora deliberadamente editores,
+terminais e janelas de navegador que apenas contêm "WinUtil" no título.
 
-If a tab or theme control cannot be found, capture the UI Automation tree while
-WinUtil is open:
+Se não for possível encontrar uma aba ou um controle de tema, capture a árvore
+de Automação de Interface do Usuário com o WinUtil aberto:
 
 ```powershell
 uv run --locked python inspect_winutil.py "$env:TEMP\winutil-inspect.txt"
 ```
 
-The inspector opens the theme menu before recording its controls. Attach the
-text file when reporting a failure. It contains window and control metadata, not
-the generated screenshots.
+O inspetor abre o menu de temas antes de registrar seus controles. Anexe o
+arquivo de texto ao relatar uma falha. Ele contém metadados de janelas e
+controles, não as capturas de tela geradas.

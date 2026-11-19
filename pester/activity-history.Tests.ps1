@@ -1,5 +1,5 @@
-Describe "Activity history config" {
-    It "disables activity publishing while preserving clipboard history" {
+Describe "Configuração do histórico de atividades" {
+    It "desativa a publicação de atividades preservando o histórico da área de transferência" {
         $configPath = Join-Path $PSScriptRoot "..\config\tweaks.json"
         $tweaks = Get-Content -Path $configPath -Raw | ConvertFrom-Json
         $activityRegistry = @($tweaks.WPFTweaksActivity.registry)

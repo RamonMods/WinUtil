@@ -1,11 +1,11 @@
 #===========================================================================
-# Tests - Generated control lifetime
+# Testes - Tempo de vida dos controles gerados
 
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     $script:xamlText = Get-Content -Path (Join-Path $script:repoRoot "xaml\inputXML.xaml") -Raw
 
-    # Names that exist only once a tab has been built from config
+    # Nomes que só existem depois que uma aba foi construída a partir da configuração
     $script:generatedNames = @(
         Get-ChildItem -Path (Join-Path $script:repoRoot "config") -Filter *.json | ForEach-Object {
             $config = Get-Content -Path $_.FullName -Raw | ConvertFrom-Json
@@ -14,11 +14,11 @@ BeforeAll {
     ) | Sort-Object -Unique | Where-Object { $script:xamlText -notmatch "Name=`"$([regex]::Escape($_))`"" }
 }
 
-Describe "Generated controls" {
-    # Tab content is built after first paint, so anything referencing a generated control from
-    # the interface build runs while that control is still $null. That produced three silent
-    # "You cannot call a method on a null-valued expression" errors.
-    It "are not touched while the interface is being built" {
+Describe "Controles gerados" {
+    # O conteúdo da aba é construído após a primeira renderização, então qualquer referência a um controle gerado
+    # feita durante a construção da interface ocorre enquanto o controle ainda é $null. Isso produziu três erros silenciosos
+    # "Não é possível chamar um método em uma expressão sem valor".
+    It "não são tocados enquanto a interface está sendo construída" {
         $uiScript = Get-Content -Path (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw
 
         $referenced = @(

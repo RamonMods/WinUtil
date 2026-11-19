@@ -7,7 +7,7 @@ winutil.ps1
 binary/
 testResults.xml
 
-# general software/os specific
+# geral de software/específico de sistema operacional
 desktop.ini
 .DS_Store
 __pycache__/

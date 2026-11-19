@@ -5,10 +5,10 @@ function Invoke-WinUtilISORefreshUSBDrives {
     $combo.Items.Clear()
 
     if ($removable.Count -eq 0) {
-        $combo.Items.Add("No USB drives detected.")
+        $combo.Items.Add("Nenhuma unidade USB detectada.")
         $combo.SelectedIndex = 0
         $sync["Win11ISOUSBDisks"] = @()
-        Write-WinUtilISOLog "No USB drives detected."
+        Write-WinUtilISOLog "Nenhuma unidade USB detectada."
         return
     }
 
@@ -17,14 +17,14 @@ function Invoke-WinUtilISORefreshUSBDrives {
         $combo.Items.Add("Disk $($disk.Number): $($disk.FriendlyName)  [$sizeGB GB] - $($disk.PartitionStyle)")
     }
     $combo.SelectedIndex = 0
-    Write-WinUtilISOLog "Found $($removable.Count) USB drive(s)."
+    Write-WinUtilISOLog "Encontrada(s) $($removable.Count) unidade(s) USB."
     $sync["Win11ISOUSBDisks"] = $removable
 }
 
 function Get-WinUtilFreeDriveLetter {
     <#
     .SYNOPSIS
-        Returns the first unused drive letter between D and Z, or $null when there is none.
+        Retorna a primeira letra de unidade n�o usada entre D e Z, ou $null quando n�o houver nenhuma.
     #>
 
     $used = (Get-PSDrive -PSProvider FileSystem).Name
@@ -39,7 +39,7 @@ function Invoke-WinUtilISOWriteUSB {
     $usbDisks    = $sync["Win11ISOUSBDisks"]
 
     if (-not $contentsDir -or -not (Test-Path $contentsDir)) {
-        Show-WinUtilMessage -Message "No modified ISO content found. Please run the modification step first." -Title "Not Ready" -Button "OK" -Icon "Warning" | Out-Null
+        Show-WinUtilMessage -Message "Nenhum conte�do de ISO modificado encontrado. Execute a etapa de modifica��o primeiro." -Title "N�o Pronto" -Button "OK" -Icon "Warning" | Out-Null
         return
     }
 
@@ -48,7 +48,7 @@ function Invoke-WinUtilISOWriteUSB {
         $esdSizeBytes = (Get-Item $installEsd).Length
         if ($esdSizeBytes -ge 4GB) {
             $esdSizeMB = [math]::Ceiling($esdSizeBytes / 1MB)
-            Show-WinUtilMessage -Message "This ISO uses an install.esd file that is $esdSizeMB MB. WinUtil's FAT32 USB format cannot store files larger than 4 GB.`n`nExport an ISO instead or use media with install.wim." -Title "USB Creation Not Supported" -Button "OK" -Icon "Warning" | Out-Null
+            Show-WinUtilMessage -Message "Esta ISO usa um arquivo install.esd de $esdSizeMB MB. O formato FAT32 para USB do WinUtil n�o comporta arquivos maiores que 4 GB.`n`nExporte uma ISO em vez disso ou use uma m�dia com install.wim." -Title "Cria��o de USB N�o Suportada" -Button "OK" -Icon "Warning" | Out-Null
             return
         }
     }
@@ -67,7 +67,7 @@ function Invoke-WinUtilISOWriteUSB {
     }
 
     if (-not $targetDisk) {
-        Show-WinUtilMessage -Message "Please select a USB drive from the dropdown." -Title "No Drive Selected" -Button "OK" -Icon "Warning" | Out-Null
+        Show-WinUtilMessage -Message "Selecione uma unidade USB na lista suspensa." -Title "Nenhuma Unidade Selecionada" -Button "OK" -Icon "Warning" | Out-Null
         return
     }
 
@@ -76,33 +76,33 @@ function Invoke-WinUtilISOWriteUSB {
 
     $confirm = Show-WinUtilMessage -Message "ALL data on Disk $diskNum ($($targetDisk.FriendlyName), $sizeGB GB) will be PERMANENTLY ERASED.`n`nAre you sure you want to continue?" -Title "Confirm USB Erase" -Button "YesNo" -Icon "Warning"
     if ($confirm -ne "Yes") {
-        Write-WinUtilISOLog "USB write cancelled by user."
+        Write-WinUtilISOLog "Gravação na USB cancelada pelo usuário."
         return
     }
 
-    Start-WinUtilJob -Name "USB write" -Description "Writing USB drive" -Parameters @{
+    Start-WinUtilJob -Name "USB write" -Description "Gravando a unidade USB" -Parameters @{
         DiskNumber  = $diskNum
         ContentsDir = $contentsDir
     } -ScriptBlock {
         param($DiskNumber, $contentsDir)
 
         Invoke-WPFUIThread -ScriptBlock { $sync["WPFWin11ISOWriteUSBButton"].IsEnabled = $false }
-        Set-WinUtilISOStep -Step "Working" -Label "Writing the USB drive"
+        Set-WinUtilISOStep -Step "Working" -Label "Gravando a unidade USB"
 
         try {
-            Write-WinUtilISOLog "Starting USB write to Disk $DiskNumber..."
+            Write-WinUtilISOLog "Iniciando a gravação na USB do Disco $DiskNumber..."
             Step-WinUtilJob -Status "Formatting USB drive..." -Percent 10
 
             # Phase 1: Clean disk via diskpart (retry once if the drive is not yet ready)
             $dpFile1 = Join-Path $env:TEMP "winutil_diskpart_$(Get-Random).txt"
             "select disk $DiskNumber`nclean`nexit" | Set-Content -Path $dpFile1 -Encoding ASCII
-            Write-WinUtilISOLog "Running diskpart clean on Disk $DiskNumber..."
+            Write-WinUtilISOLog "Executando diskpart clean no Disco $DiskNumber..."
             $dpCleanOut = diskpart /s $dpFile1
             $dpCleanOut | Where-Object { $_ -match '\S' } | ForEach-Object { Write-WinUtilISOLog "  diskpart: $_" }
             Remove-Item $dpFile1 -Force
 
             if (($dpCleanOut -join ' ') -match 'device is not ready') {
-                Write-WinUtilISOLog "Disk $DiskNumber was not ready; waiting 5 seconds and retrying clean..."
+                Write-WinUtilISOLog "O Disco $DiskNumber n�o estava pronto; aguardando 5 segundos e repetindo a limpeza..."
                 Start-Sleep -Seconds 5
                 Update-Disk -Number $DiskNumber
                 $dpFile1b = Join-Path $env:TEMP "winutil_diskpart_$(Get-Random).txt"
@@ -111,20 +111,20 @@ function Invoke-WinUtilISOWriteUSB {
                 Remove-Item $dpFile1b -Force
             }
 
-            # Phase 2: Initialize as GPT
+            # Fase 2: Inicializar como GPT
             Start-Sleep -Seconds 2
             Update-Disk -Number $DiskNumber
             $diskObj = Get-Disk -Number $DiskNumber
             if ($diskObj.PartitionStyle -eq 'RAW') {
                 Initialize-Disk -Number $DiskNumber -PartitionStyle GPT
-                Write-WinUtilISOLog "Disk $DiskNumber initialized as GPT."
+                Write-WinUtilISOLog "Disco $DiskNumber inicializado como GPT."
             } else {
                 Set-Disk -Number $DiskNumber -PartitionStyle GPT
-                Write-WinUtilISOLog "Disk $DiskNumber converted to GPT (was $($diskObj.PartitionStyle))."
+                Write-WinUtilISOLog "Disco $DiskNumber convertido para GPT (antes era $($diskObj.PartitionStyle))."
             }
 
-            # Phase 3: Create FAT32 partition via diskpart, then format with Format-Volume
-            # (diskpart's 'format' command can fail with "no volume selected" on fresh/never-formatted drives)
+            # Fase 3: Cria a parti��o FAT32 via diskpart e depois formata com Format-Volume
+            # (o comando 'format' do diskpart pode falhar com "no volume selected" em unidades novas/nunca formatadas)
             $volLabel = "W11-" + (Get-Date).ToString('yyMMdd')
             $dpFile2  = Join-Path $env:TEMP "winutil_diskpart2_$(Get-Random).txt"
             $maxFat32PartitionMB = 32768
@@ -132,7 +132,7 @@ function Invoke-WinUtilISOWriteUSB {
             $createPartitionCommand = "create partition primary"
             if ($diskSizeMB -gt $maxFat32PartitionMB) {
                 $createPartitionCommand = "create partition primary size=$maxFat32PartitionMB"
-                Write-WinUtilISOLog "Disk $DiskNumber is $diskSizeMB MB; creating FAT32 partition capped at $maxFat32PartitionMB MB (32 GB)."
+                Write-WinUtilISOLog "O Disco $DiskNumber tem $diskSizeMB MB; criando parti��o FAT32 limitada a $maxFat32PartitionMB MB (32 GB)."
             }
 
             @(
@@ -140,52 +140,52 @@ function Invoke-WinUtilISOWriteUSB {
                 $createPartitionCommand
                 "exit"
             ) | Set-Content -Path $dpFile2 -Encoding ASCII
-            Write-WinUtilISOLog "Creating partitions on Disk $DiskNumber..."
+            Write-WinUtilISOLog "Criando partições no Disco $DiskNumber..."
             diskpart /s $dpFile2 | Where-Object { $_ -match '\S' } | ForEach-Object { Write-WinUtilISOLog "  diskpart: $_" }
             Remove-Item $dpFile2 -Force
 
-            Step-WinUtilJob -Status "Formatting USB partition..." -Percent 25
+            Step-WinUtilJob -Status "Formatando a parti��o USB..." -Percent 25
             Start-Sleep -Seconds 3
             Update-Disk -Number $DiskNumber
 
             $partitions = Get-Partition -DiskNumber $DiskNumber
-            Write-WinUtilISOLog "Partitions on Disk $DiskNumber after creation: $($partitions.Count)"
+            Write-WinUtilISOLog "Partições no Disco $DiskNumber após a criação: $($partitions.Count)"
             foreach ($p in $partitions) {
                 Write-WinUtilISOLog "  Partition $($p.PartitionNumber)  Type=$($p.Type)  Letter=$($p.DriveLetter)  Size=$([math]::Round($p.Size/1MB))MB"
             }
 
             $winpePart = $partitions | Where-Object { $_.Type -eq "Basic" } | Select-Object -Last 1
             if (-not $winpePart) {
-                throw "Could not find the Basic partition on Disk $DiskNumber after creation."
+                throw "Não foi possível encontrar a partição Basic no Disco $DiskNumber após a criação."
             }
 
             # Format using Format-Volume (reliable on fresh drives; diskpart format fails
             # with 'no volume selected' when the partition has never been formatted before)
-            Write-WinUtilISOLog "Formatting Partition $($winpePart.PartitionNumber) as FAT32 (label: $volLabel)..."
+            Write-WinUtilISOLog "Formatando a Partição $($winpePart.PartitionNumber) como FAT32 (rótulo: $volLabel)..."
             Get-Partition -DiskNumber $DiskNumber -PartitionNumber $winpePart.PartitionNumber |
                 Format-Volume -FileSystem FAT32 -NewFileSystemLabel $volLabel -Force -Confirm:$false
-            Write-WinUtilISOLog "Partition $($winpePart.PartitionNumber) formatted as FAT32."
+            Write-WinUtilISOLog "Partição $($winpePart.PartitionNumber) formatada como FAT32."
 
             Step-WinUtilJob -Status "Assigning drive letters..." -Percent 30
             Start-Sleep -Seconds 2
             Update-Disk -Number $DiskNumber
 
-            try { Remove-PartitionAccessPath -DiskNumber $DiskNumber -PartitionNumber $winpePart.PartitionNumber -AccessPath "$($winpePart.DriveLetter):" } catch { Write-WinUtilISOLog -Level "WARN" -Message "Could not remove existing partition access path: $_" }
+            try { Remove-PartitionAccessPath -DiskNumber $DiskNumber -PartitionNumber $winpePart.PartitionNumber -AccessPath "$($winpePart.DriveLetter):" } catch { Write-WinUtilISOLog -Level "WARN" -Message "Não foi possível remover o caminho de acesso da partição existente: $_" }
             $usbLetter = Get-WinUtilFreeDriveLetter
-            if (-not $usbLetter) { throw "No free drive letters (D-Z) available to assign to the USB data partition." }
+            if (-not $usbLetter) { throw "Não há letras de unidade livres (D-Z) para atribuir à partição de dados da USB." }
             Set-Partition -DiskNumber $DiskNumber -PartitionNumber $winpePart.PartitionNumber -NewDriveLetter $usbLetter
-            Write-WinUtilISOLog "Assigned drive letter $usbLetter to WINPE partition (Partition $($winpePart.PartitionNumber))."
+            Write-WinUtilISOLog "Letra de unidade $usbLetter atribuída à partição WINPE (Partição $($winpePart.PartitionNumber))."
             Start-Sleep -Seconds 2
 
             $usbDrive = "${usbLetter}:"
             $retries = 0
             while (-not (Test-Path $usbDrive) -and $retries -lt 6) {
                 $retries++
-                Write-WinUtilISOLog "Waiting for $usbDrive to become accessible (attempt $retries/6)..."
+                Write-WinUtilISOLog "Aguardando $usbDrive ficar acessível (tentativa $retries/6)..."
                 Start-Sleep -Seconds 2
             }
-            if (-not (Test-Path $usbDrive)) { throw "Drive $usbDrive is not accessible after letter assignment." }
-            Write-WinUtilISOLog "USB data partition: $usbDrive"
+            if (-not (Test-Path $usbDrive)) { throw "A unidade $usbDrive não está acessível após a atribuição da letra." }
+            Write-WinUtilISOLog "Partição de dados da USB: $usbDrive"
 
             $contentSizeBytes = (Get-ChildItem -LiteralPath $contentsDir -File -Recurse -Force | Measure-Object -Property Length -Sum).Sum
             if (-not $contentSizeBytes) { $contentSizeBytes = 0 }
@@ -197,30 +197,30 @@ function Invoke-WinUtilISOWriteUSB {
             $partitionCapacityGB = [math]::Round($partitionCapacityBytes / 1GB, 2)
             $partitionFreeGB = [math]::Round($partitionFreeBytes / 1GB, 2)
 
-            Write-WinUtilISOLog "Source content size: $contentSizeGB GB. USB partition capacity: $partitionCapacityGB GB, free: $partitionFreeGB GB."
+            Write-WinUtilISOLog "Tamanho do conteúdo de origem: $contentSizeGB GB. Capacidade da partição da USB: $partitionCapacityGB GB, livre: $partitionFreeGB GB."
 
             if ($contentSizeBytes -gt $partitionCapacityBytes) {
-                throw "ISO content ($contentSizeGB GB) is larger than the USB partition capacity ($partitionCapacityGB GB). Use a larger USB drive or reduce image size."
+                throw "O conteúdo da ISO ($contentSizeGB GB) é maior que a capacidade da partição da USB ($partitionCapacityGB GB). Use uma USB maior ou reduza o tamanho da imagem."
             }
 
             if ($contentSizeBytes -gt $partitionFreeBytes) {
-                throw "Insufficient free space on USB partition. Required: $contentSizeGB GB, available: $partitionFreeGB GB."
+                throw "Espaço livre insuficiente na partição da USB. Necessário: $contentSizeGB GB, disponível: $partitionFreeGB GB."
             }
 
-            Step-WinUtilJob -Status "Copying Windows 11 files to USB..." -Percent 45
+            Step-WinUtilJob -Status "Copiando os arquivos do Windows 11 para a USB..." -Percent 45
 
-            # Copy files; split install.wim if > 4 GB (FAT32 limit)
+            # Copia os arquivos; divide o install.wim se ele tiver > 4 GB (limite do FAT32)
             $installWim = Join-Path $contentsDir "sources\install.wim"
             if (Test-Path $installWim) {
                 $wimSizeMB = [math]::Round((Get-Item $installWim).Length / 1MB)
                 if ($wimSizeMB -gt 3800) {
-                    Write-WinUtilISOLog "install.wim is $wimSizeMB MB - splitting for FAT32 compatibility... This will take several minutes."
+                    Write-WinUtilISOLog "O install.wim tem $wimSizeMB MB - dividindo para compatibilidade com FAT32... Isso pode levar vários minutos."
                     Set-ItemProperty -LiteralPath $installWim -Name IsReadOnly -Value $false
                     $splitDest = Join-Path $usbDrive "sources\install.swm"
                     New-Item -ItemType Directory -Path (Split-Path $splitDest) -Force | Out-Null
                     Split-WindowsImage -ImagePath $installWim -SplitImagePath $splitDest -FileSize 3800 -CheckIntegrity
-                    Write-WinUtilISOLog "install.wim split complete."
-                    Write-WinUtilISOLog "Copying remaining files to USB..."
+                    Write-WinUtilISOLog "Divisão do install.wim concluída."
+                    Write-WinUtilISOLog "Copiando os arquivos restantes para a USB..."
                     Invoke-WinUtilRobocopy -Source $contentsDir -Destination $usbDrive -Arguments @("/E","/XF","install.wim","/NFL","/NDL","/NJH","/NJS")
                 } else {
                     Invoke-WinUtilRobocopy -Source $contentsDir -Destination $usbDrive -Arguments @("/E","/NFL","/NDL","/NJH","/NJS")
@@ -230,29 +230,29 @@ function Invoke-WinUtilISOWriteUSB {
             }
 
             Step-WinUtilJob -Status "Finalising USB drive..." -Percent 90
-            Write-WinUtilISOLog "Files copied to USB."
+            Write-WinUtilISOLog "Arquivos copiados para a USB."
             Step-WinUtilJob -Status "USB write complete" -Percent 100
-            Write-WinUtilISOLog "USB drive is ready for use."
+            Write-WinUtilISOLog "A unidade USB está pronta para uso."
 
             Invoke-WPFUIThread -Parameters @{ DiskNumber = $DiskNumber } -ScriptBlock {
                 param($DiskNumber)
 
-                $sync["WPFWin11ISODoneLabel"].Text = "O disco $DiskNumber estÃ¡ pronto para inicializar."
+                $sync["WPFWin11ISODoneLabel"].Text = "O disco $DiskNumber está pronto para inicializar."
                 $sync["WPFWin11ISODonePanel"].Visibility = "Visible"
             }
             Set-WinUtilISOStep -Step "Output"
-            Show-WinUtilMessage -Message "USB drive created successfully!`n`nYou can now boot from this drive to install Windows 11." -Title "USB Ready" -Button "OK" -Icon "Info" | Out-Null
+            Show-WinUtilMessage -Message "Unidade USB criada com sucesso!`n`nAgora voc� pode inicializar por ela para instalar o Windows 11." -Title "USB Pronta" -Button "OK" -Icon "Info" | Out-Null
         } catch {
-            Write-WinUtilISOLog -Level "ERROR" -Message "USB write failed: $_"
+            Write-WinUtilISOLog -Level "ERROR" -Message "A gravação na USB falhou: $_"
             $_.Exception.Data["WinUtilErrorReported"] = $true
             Set-WinUtilISOStep -Step "Output"
-            Show-WinUtilMessage -Message "USB write failed:`n`n$_" -Title "USB Write Error" -Button "OK" -Icon "Error" | Out-Null
+            Show-WinUtilMessage -Message "Falha na grava��o da USB:`n`n$_" -Title "Erro de Grava��o na USB" -Button "OK" -Icon "Error" | Out-Null
             throw
         } finally {
             Invoke-WPFUIThread -ScriptBlock {
                 $sync["WPFWin11ISOWriteUSBButton"].IsEnabled = $true
 
-                # Cancellation skips catch, so the working page can still be up here
+                # O cancelamento ignora o catch, ent�o a p�gina de trabalho pode ainda estar ativa aqui
                 if ($sync["WPFWin11ISOWorkingSection"].IsSelected) {
                     Set-WinUtilISOStep -Step "Output"
                 }

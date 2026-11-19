@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - General Sanity
+# Testes - Sanidade Geral
 #===========================================================================
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -24,7 +24,7 @@ BeforeAll {
 
         $windowsPowerShell = Get-Command powershell.exe -ErrorAction SilentlyContinue
         if (-not $windowsPowerShell) {
-            Set-ItResult -Skipped -Because "powershell.exe is not available on this platform."
+            Set-ItResult -Skipped -Because "powershell.exe não está disponível nesta plataforma."
             return
         }
 
@@ -68,7 +68,7 @@ if ($failed.Count -gt 0) {
     }
 }
 
-Describe "PowerShell source sanity" {
+Describe "Sanidade do código-fonte do PowerShell" {
     $scriptCases = @(
         "Compile.ps1",
         "windev.ps1",
@@ -82,14 +82,14 @@ Describe "PowerShell source sanity" {
     }
 
     foreach ($scriptCase in $scriptCases) {
-        It "parses $($scriptCase.Name) with the current PowerShell parser" -TestCases $scriptCase {
+        It "analisa $($scriptCase.Name) com o analisador atual do PowerShell" -TestCases $scriptCase {
             param([string]$Path)
 
             Test-WinUtilParser -Path $Path
         }
     }
 
-    It "parses WinUtil source files with Windows PowerShell when available" {
+    It "analisa os arquivos de código-fonte do WinUtil com o Windows PowerShell quando disponível" {
         $sourcePaths = @(
             Join-Path $script:repoRoot "Compile.ps1"
             Join-Path $script:repoRoot "windev.ps1"
@@ -102,7 +102,7 @@ Describe "PowerShell source sanity" {
     }
 }
 
-Describe "Compiled WinUtil sanity" {
+Describe "Sanidade do WinUtil compilado" {
     BeforeAll {
         $script:compiledPath = Join-Path $script:repoRoot "winutil.ps1"
 
@@ -114,19 +114,19 @@ Describe "Compiled WinUtil sanity" {
         }
     }
 
-    It "generates winutil.ps1" {
+    It "gera winutil.ps1" {
         Test-Path -Path $script:compiledPath | Should -BeTrue
     }
 
-    It "parses compiled winutil.ps1 with the current PowerShell parser" {
+    It "analisa o winutil.ps1 compilado com o analisador atual do PowerShell" {
         Test-WinUtilParser -Path $script:compiledPath
     }
 
-    It "parses compiled winutil.ps1 with Windows PowerShell when available" {
+    It "analisa o winutil.ps1 compilado com o Windows PowerShell quando disponível" {
         Invoke-WindowsPowerShellParser -Path $script:compiledPath
     }
 
-    It "contains embedded configs, XAML, autounattend XML, and runspace bootstrap" {
+    It "contém configurações incorporadas, XAML, XML autounattend e inicialização de runspace" {
         $content = Get-Content -Path $script:compiledPath -Raw
         $requiredSnippets = @(
             ('$sync.configs.applications = @' + "'"),
@@ -147,7 +147,7 @@ Describe "Compiled WinUtil sanity" {
         }
     }
 
-    It "transforms applications config keys with WPFInstall prefixes" {
+    It "transforma as chaves de configuração de aplicativos com prefixos WPFInstall" {
         $content = Get-Content -Path $script:compiledPath -Raw
         $configMatch = [regex]::Match(
             $content,
@@ -172,7 +172,7 @@ Describe "Compiled WinUtil sanity" {
         }
     }
 
-    It "preserves compile source ordering" {
+    It "preserva a ordem das fontes de compilação" {
         $content = Get-Content -Path $script:compiledPath -Raw
         $orderedSnippets = @(
             '$sync.version =',
@@ -197,7 +197,7 @@ Describe "Compiled WinUtil sanity" {
         }
     }
 
-    It "replaces the generated build date placeholder" {
+    It "substitui o marcador de data de compilação gerado" {
         $content = Get-Content -Path $script:compiledPath -Raw
         $expectedBuildDate = Get-Date -Format "yy.MM.dd"
         $expectedLocalCompile = (-not [string]::Equals($env:GITHUB_ACTIONS, "true", [StringComparison]::OrdinalIgnoreCase)).ToString().ToLowerInvariant()
@@ -209,7 +209,7 @@ Describe "Compiled WinUtil sanity" {
     }
 }
 
-Describe "Runspace sanity" {
+Describe "Sanidade do runspace" {
     BeforeAll {
         . (Join-Path $script:repoRoot "functions\private\Get-WinUtilRunspacePoolLock.ps1")
         . (Join-Path $script:repoRoot "functions\private\Register-WinUtilRunspaceCleanup.ps1")
@@ -220,7 +220,7 @@ Describe "Runspace sanity" {
         . (Join-Path $script:repoRoot "functions\private\Initialize-WinUtilRunspacePool.ps1")
     }
 
-    It "returns a single async handle and runs a scriptblock with arguments in the shared runspace pool" {
+    It "retorna um único identificador assíncrono e executa um scriptblock com argumentos no pool de runspaces compartilhado" {
         $script:sync = [Hashtable]::Synchronized(@{ SmokeValue = "shared" })
         $initialSessionState = [System.Management.Automation.Runspaces.InitialSessionState]::CreateDefault()
         $syncVariable = New-Object System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList "sync", $script:sync, $null

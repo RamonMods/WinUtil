@@ -1,7 +1,7 @@
 #===========================================================================
-# Tests - Win11 Creator
+# Testes - Criador do Win11
 
-Describe "Win11 Creator setup media" {
+Describe "Mídia de configuração do Criador do Win11" {
     BeforeAll {
         $script:repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
         $script:isoWorkflowPath = Join-Path $script:repoRoot "functions\private\Invoke-WinUtilISO.ps1"
@@ -35,9 +35,9 @@ Describe "Win11 Creator setup media" {
             return $functionAst.Extent.Text
         }
 
-        # Root package folders the fixture below yields, once nested_pkg\x64 is folded into
-        # its parent. Written out rather than derived, so a broken dedup fails the assertions
-        # instead of quietly moving the expectation with it.
+        # Pastas de pacote raiz produzidas pela fixture abaixo, após nested_pkg\x64 ser incorporada à
+        # sua pasta pai. Escritas explicitamente em vez de derivadas, para que uma deduplicação quebrada falhe as asserções
+        # em vez de mover silenciosamente a expectativa junto com ela.
         $script:expectedRootPackages = 8
         $script:resilienceDriverFixtures = @(
             @{ Path = 'system_pkg'; Name = 'chipset.inf'; Class = 'System' },
@@ -51,11 +51,11 @@ Describe "Win11 Creator setup media" {
             @{ Path = 'net_pkg_v2'; Name = 'network2.inf'; Class = 'Net' }
         )
 
-        # Stands in for `dism /Online /Export-Driver`, which the ISO script now invokes
-        # through Invoke-WinUtilISODism rather than Start-Process. The two `duplicate` leaf
-        # names cover per-package failure logging, which must stay unambiguous; `nested_pkg`
-        # covers a package holding INFs at its root and in a subfolder; and `net_pkg_v2` is a
-        # sibling whose name starts with `net_pkg`, which the dedup must not swallow.
+        # Substitui `dism /Online /Export-Driver`, que o script ISO agora invoca
+        # por meio de Invoke-WinUtilISODism em vez de Start-Process. Os dois nomes-folha `duplicate`
+        # cobrem o registro de falhas por pacote, que deve permanecer inequívoco; `nested_pkg`
+        # cobre um pacote com INFs na raiz e em uma subpasta; e `net_pkg_v2` é um
+        # irmão cujo nome começa com `net_pkg`, que a deduplicação não deve engolir.
         function Export-WinUtilTestDriverPackage {
             param (
                 [Parameter(Mandatory)][string[]]$Arguments,
@@ -70,9 +70,9 @@ Describe "Win11 Creator setup media" {
             $exportRoot = $destination[0].Substring('/Destination:'.Length)
             $script:driverExportRoot = $exportRoot
 
-            # .NET file APIs rather than the cmdlets: Set-Content's -Encoding comes from the
-            # FileSystem provider, and a wildcard character in $exportRoot stops the provider
-            # resolving, so the parameter disappears.
+            # APIs de arquivo do .NET em vez dos cmdlets: o -Encoding de Set-Content vem do
+            # provedor FileSystem, e um caractere curinga em $exportRoot impede que o provedor
+            # resolva, então o parâmetro desaparece.
             foreach ($fixture in $fixtures) {
                 $fixturePath = Join-Path $exportRoot $fixture.Path
                 [void][System.IO.Directory]::CreateDirectory($fixturePath)
@@ -123,9 +123,9 @@ Describe "Win11 Creator setup media" {
                 } elseif ($Arguments -contains '/Export-Driver') {
                     Export-WinUtilTestDriverPackage -Arguments $Arguments -Fixtures $script:driverExportFixtures
                 } elseif ($Arguments -contains '/Add-Driver') {
-                    # Snapshot what's still on disk right as DISM would /Recurse over it: this is the
-                    # only point excluded folders are provably gone, since the SUT wipes the whole
-                    # export root in its own cleanup once Invoke-WinUtilISOScript returns.
+                    # Captura o que ainda está em disco exatamente quando o DISM faria /Recurse nele: este é o
+                    # único ponto em que se pode provar que as pastas excluídas sumiram, já que o SUT apaga toda a
+                    # raiz de exportação em sua própria limpeza assim que Invoke-WinUtilISOScript retorna.
                     $script:exportRootAtAddDriver = @(Get-ChildItem -LiteralPath $script:driverExportRoot -Directory -Recurse -ErrorAction SilentlyContinue | ForEach-Object FullName)
                     $script:exportedInfsAtAddDriver = @(Get-ChildItem -LiteralPath $script:driverExportRoot -Filter '*.inf' -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object FullName)
                     if ($script:failAllAddDrivers -or ($script:failedDriverPath -and @($Arguments | Where-Object { $_ -like "*$($script:failedDriverPath)" }).Count -gt 0)) {
@@ -150,7 +150,7 @@ Describe "Win11 Creator setup media" {
         $script:wimMetadataAssertionFunction = Get-WinUtilFunctionText -Path $script:isoScriptPath -FunctionName "Assert-WinUtilISOWimMetadata"
     }
 
-    It "autounattend template does not force a product key" {
+    It "o modelo autounattend não força uma chave de produto" {
         [xml]$xml = Get-Content -Path $script:autoUnattendPath -Raw
         $nsMgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
         $nsMgr.AddNamespace("u", "urn:schemas-microsoft-com:unattend")
@@ -161,7 +161,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "sets every hardware bypass before Windows Setup checks requirements" {
+    It "define todas as omissões de hardware antes de a Instalação do Windows verificar os requisitos" {
         [xml]$xml = Get-Content -Path $script:autoUnattendPath -Raw
         $nsMgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
         $nsMgr.AddNamespace("u", "urn:schemas-microsoft-com:unattend")
@@ -172,7 +172,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "sets OOBE-sensitive registry values before OOBE starts" {
+    It "define valores sensíveis do registro para o OOBE antes de ele começar" {
         [xml]$xml = Get-Content -Path $script:autoUnattendPath -Raw
         $nsMgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
         $nsMgr.AddNamespace("u", "urn:schemas-microsoft-com:unattend")
@@ -183,7 +183,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "ISO script accepts selected edition and driver-only WIM servicing metadata" {
+    It "o script ISO aceita a edição selecionada e metadados de manutenção do WIM apenas com drivers" {
         $isoScriptPath = Join-Path $PSScriptRoot "..\functions\private\Invoke-WinUtilISOScript.ps1"
         $content = Get-Content -Path $isoScriptPath -Raw
 
@@ -200,7 +200,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "starts each new ISO modification in a fresh working directory" {
+    It "inicia cada nova modificação do ISO em um diretório de trabalho novo" {
         foreach ($expectedText in @(
             '$workDir = Join-Path $env:TEMP "WinUtil_Win11ISO_$(Get-Date -Format ''yyyyMMdd_HHmmss'')"',
             '$workDir = "$($workDir)_$(([guid]::NewGuid()).ToString(''N'').Substring(0, 8))"'
@@ -211,11 +211,11 @@ Describe "Win11 Creator setup media" {
         $script:modifyFunction | Should -Not -Match ([regex]::Escape("Reusing existing temp directory"))
     }
 
-    It "turns ISO-script warning messages into job warnings" {
+    It "converte mensagens de aviso do script ISO em avisos do job" {
         $script:modifyFunction | Should -Match 'if \(\$m -like "Warning:\*"\)[\s\S]*Write-WinUtilISOLog -Level "WARN" -Message \$m -SkipSessionLog[\s\S]*Write-Warning \$m'
     }
 
-    It "keeps WIM servicing limited to DISM Add-Driver without image export or cleanup" {
+    It "mantém a manutenção do WIM limitada ao DISM Add-Driver, sem exportação ou limpeza de imagem" {
         $isoScriptContent = Get-Content -Path $script:isoScriptPath -Raw
 
         foreach ($expectedText in @(
@@ -242,7 +242,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "injects only SCSIAdapter or HDC storage drivers into boot.wim" {
+    It "injeta apenas drivers de armazenamento SCSIAdapter ou HDC no boot.wim" {
         $isoScriptContent = Get-Content -Path $script:isoScriptPath -Raw
 
         $isoScriptContent | Should -Match 'SCSIAdapter\|HDC'
@@ -253,7 +253,7 @@ Describe "Win11 Creator setup media" {
         $isoScriptContent | Should -Not -Match ([regex]::Escape('SetupComplete.cmd'))
     }
 
-    It "rejects invalid WIM metadata before and after driver injection" {
+    It "rejeita metadados inválidos do WIM antes e depois da injeção de drivers" {
         . ([scriptblock]::Create($script:wimMetadataAssertionFunction))
 
         $valid = @{ Languages = 'en-US'; Installation = 'Client'; Edition = 'Professional'; ProductSuite = 'Terminal Server'; ProductType = 'WinNT' }
@@ -266,7 +266,7 @@ Describe "Win11 Creator setup media" {
         { Assert-WinUtilISOWimMetadata -Before $valid -After $invalidAfter } | Should -Throw '*validation failed*'
     }
 
-    It "runs every background ISO workflow through the shared job layer" {
+    It "executa todos os fluxos de ISO em segundo plano pela camada de jobs compartilhada" {
         $jobNames = @{
             mountAndVerify = "ISO mount"
             modify         = "ISO modify"
@@ -283,7 +283,7 @@ Describe "Win11 Creator setup media" {
             @{ Text = $script:writeUsbFunction; Name = $jobNames.writeUsb }
         )) {
             $entry.Text | Should -Match ([regex]::Escape("Start-WinUtilJob -Name `"$($entry.Name)`""))
-            # The job layer owns the busy state, the progress bar, and the taskbar item
+            # A camada de jobs controla o estado de ocupação, a barra de progresso e o item da barra de tarefas
             $entry.Text | Should -Not -Match ([regex]::Escape('Win11ISOProcessRunning'))
             $entry.Text | Should -Not -Match ([regex]::Escape('RunspaceFactory]::CreateRunspace()'))
             $entry.Text | Should -Not -Match ([regex]::Escape('SessionStateProxy.SetVariable'))
@@ -291,7 +291,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "runs ISO mount and verification outside the UI thread" {
+    It "executa a montagem e a verificação do ISO fora da thread da interface" {
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('Start-WinUtilJob -Name "ISO mount"'))
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('IsoPath = $isoPath'))
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('Invoke-WPFUIThread -ScriptBlock {'))
@@ -305,7 +305,7 @@ Describe "Win11 Creator setup media" {
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('$sync["WPFWin11ISOModifyButton"].IsEnabled = [bool]$Verified'))
     }
 
-    It "dismounts an ISO and keeps modification disabled when verification fails" {
+    It "desmonta um ISO e mantém a modificação desativada quando a verificação falha" {
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('$verified = $false'))
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('$verified = $true'))
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('Dismount-DiskImage -ImagePath $isoPath -ErrorAction Stop'))
@@ -313,7 +313,7 @@ Describe "Win11 Creator setup media" {
         $script:mountAndVerifyFunction.IndexOf('Dismount-DiskImage -ImagePath $isoPath') | Should -BeGreaterThan $script:mountAndVerifyFunction.IndexOf('finally')
     }
 
-    It "dismounts a previously verified ISO before mounting a replacement" {
+    It "desmonta um ISO verificado anteriormente antes de montar um substituto" {
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('$previous = $sync["Win11ISOImagePath"]'))
         $script:mountAndVerifyFunction | Should -Match ([regex]::Escape('Dismount-DiskImage -ImagePath $previous -ErrorAction Stop'))
 
@@ -321,7 +321,7 @@ Describe "Win11 Creator setup media" {
             Should -BeLessThan $script:mountAndVerifyFunction.IndexOf('$sync["Win11ISOImagePath"] = $null')
     }
 
-    It "keeps the stored path and restores the interface when the previous ISO will not dismount" {
+    It "mantém o caminho armazenado e restaura a interface quando o ISO anterior não pode ser desmontado" {
         $dismountIndex = $script:mountAndVerifyFunction.IndexOf('Dismount-DiskImage -ImagePath $previous')
         $resetIndex    = $script:mountAndVerifyFunction.IndexOf('$sync["Win11ISOImagePath"] = $null')
 
@@ -332,7 +332,7 @@ Describe "Win11 Creator setup media" {
         $script:mountAndVerifyFunction.IndexOf('try {') | Should -BeLessThan $dismountIndex
     }
 
-    It "keeps ISO cleanup in finally so stopping modification cannot bypass it" {
+    It "mantém a limpeza do ISO no finally para que parar a modificação não a ignore" {
         $finallyIndex = $script:modifyFunction.IndexOf('finally')
 
         $finallyIndex | Should -BeGreaterThan -1
@@ -341,13 +341,13 @@ Describe "Win11 Creator setup media" {
         $script:modifyFunction.IndexOf('$sync["Win11ISOImagePath"] = $null', $finallyIndex) | Should -BeGreaterThan $finallyIndex
     }
 
-    It "retries existing-work discovery after the active job finishes" {
+    It "tenta novamente a descoberta de trabalho existente após o job ativo terminar" {
         $script:checkExistingWorkFunction | Should -Match ([regex]::Escape('Invoke-WinUtilWhenIdle -DelayMilliseconds 500'))
         $script:checkExistingWorkFunction | Should -Match ([regex]::Escape('Invoke-WinUtilISOCheckExistingWork'))
         $script:checkExistingWorkFunction | Should -Match ([regex]::Escape('$sync["Win11ISOExistingWorkRetryPending"] = $false'))
     }
 
-    It "reports ISO progress and logging through the shared helpers" {
+    It "relata o progresso e o log do ISO pelos auxiliares compartilhados" {
         $content = Get-Content -Path $script:isoWorkflowPath -Raw
         $usbContent = Get-Content -Path $script:isoUsbWorkflowPath -Raw
 
@@ -357,11 +357,11 @@ Describe "Win11 Creator setup media" {
             $source | Should -Not -Match ([regex]::Escape('$sync["WPFTweaksProgressLabel"]'))
         }
 
-        # Every status-log line also lands in the session log
+        # Toda linha de log de status também vai para o log da sessão
         $content | Should -Match ([regex]::Escape('Write-WinUtilLog -Level $Level -Component "Win11Creator" -Message $Message'))
     }
 
-    It "blocks oversized install.esd before USB erase confirmation" {
+    It "bloqueia um install.esd grande demais antes da confirmação de apagamento do USB" {
         $script:writeUsbFunction | Should -Match ([regex]::Escape('$installEsd = Join-Path $contentsDir "sources\install.esd"'))
         $script:writeUsbFunction | Should -Match ([regex]::Escape('$esdSizeBytes -ge 4GB'))
         $script:writeUsbFunction | Should -Match 'install\.esd file'
@@ -372,7 +372,7 @@ Describe "Win11 Creator setup media" {
         $confirmationIndex | Should -BeGreaterThan $guardIndex
     }
 
-    It "clears install.wim read-only attribute before FAT32 splitting" {
+    It "limpa o atributo somente leitura do install.wim antes da divisão FAT32" {
         $splitGuardIndex = $script:writeUsbFunction.IndexOf('$wimSizeMB -gt 3800')
         $readOnlyResetIndex = $script:writeUsbFunction.IndexOf(
             'Set-ItemProperty -LiteralPath $installWim -Name IsReadOnly -Value $false'
@@ -384,7 +384,7 @@ Describe "Win11 Creator setup media" {
         $splitCommandIndex | Should -BeGreaterThan $readOnlyResetIndex
     }
 
-    It "maps Windows edition names to setup edition IDs" {
+    It "mapeia nomes de edição do Windows para IDs de edição da instalação" {
         . ([scriptblock]::Create($script:editionIdFunction))
 
         $cases = @{
@@ -412,13 +412,13 @@ Describe "Win11 Creator setup media" {
         Get-WinUtilEditionIdFromName -EditionName "Windows 11 Unknown Edition" | Should -Be ""
     }
 
-    It "resolves setup edition IDs from image metadata regardless of display language" {
+    It "resolve IDs de edição da instalação a partir dos metadados da imagem, independentemente do idioma de exibição" {
         . ([scriptblock]::Create($script:editionIdFunction))
         . ([scriptblock]::Create($script:imageEditionIdFunction))
 
-        # French display names carry no English token, so only the metadata
-        # EditionId can resolve them. Index 9 has no metadata entry and falls
-        # through to the English display-name map.
+        # Nomes de exibição em francês não contêm tokens em inglês, então apenas os metadados
+        # EditionId pode resolvê-los. O índice 9 não tem entrada de metadados e recai
+        # no mapa de nomes de exibição em inglês.
         Set-Item -Path function:global:Get-WindowsImage -Value {
             [CmdletBinding()]
             param($ImagePath, $Index)
@@ -438,7 +438,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "falls back to English display names when image metadata is unavailable" {
+    It "usa nomes de exibição em inglês como fallback quando os metadados da imagem não estão disponíveis" {
         . ([scriptblock]::Create($script:editionIdFunction))
         . ([scriptblock]::Create($script:imageEditionIdFunction))
 
@@ -456,7 +456,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "writes ei.cfg and removes stale PID.txt for the selected edition" {
+    It "grava ei.cfg e remove o PID.txt obsoleto para a edição selecionada" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoConfig_$([guid]::NewGuid())"
         $sourcesDir = Join-Path $contentRoot "sources"
         $logs = [System.Collections.Generic.List[string]]::new()
@@ -483,7 +483,7 @@ Describe "Win11 Creator setup media" {
 
 
 
-    It "adds eligible drivers to one install.wim index and does not create `$WinpeDriver$" {
+    It "adiciona drivers elegíveis a um índice do install.wim e não cria `$WinpeDriver$" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoDrivers_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -523,8 +523,8 @@ Describe "Win11 Creator setup media" {
             ($script:dismCalls -join "`n") | Should -Not -Match '/Cleanup-Image|/Export-Image'
             ($logs -join '|') | Should -Match "Added 9 of 9 driver packages"
 
-            # nested_pkg holds INFs at its root and under x64. The root add already recurses
-            # into x64, so the subfolder must not get an /Add-Driver call of its own.
+            # nested_pkg contém INFs na raiz e em x64. A adição na raiz já recursa
+            # em x64, então a subpasta não deve receber uma chamada /Add-Driver própria.
             @($script:dismCalls | Where-Object { $_ -match '/Add-Driver' -and $_ -match ([regex]::Escape('nested_pkg')) }).Count | Should -Be 1
             ($script:dismCalls -join "`n") | Should -Not -Match ([regex]::Escape('nested_pkg\x64'))
 
@@ -549,7 +549,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "injects SCSIAdapter storage drivers into boot.wim index 2 and not `$WinpeDriver`$" {
+    It "injeta drivers de armazenamento SCSIAdapter no índice 2 do boot.wim e não `$WinpeDriver`$" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoBootWim_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $bootWim = Join-Path $contentRoot 'sources\boot.wim'
@@ -601,7 +601,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "injects only the newest duplicate storage package into boot.wim" {
+    It "injeta no boot.wim apenas o pacote de armazenamento duplicado mais recente" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoBootWimDedup_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $bootWim = Join-Path $contentRoot 'sources\boot.wim'
@@ -634,7 +634,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "injects Class=Extension driver packages like any other export" {
+    It "injeta pacotes de driver Class=Extension como qualquer outra exportação" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoExtensionInject_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -669,7 +669,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "keeps a stale duplicate folder that contains a retained nested package" {
+    It "mantém uma pasta duplicada obsoleta que contém um pacote aninhado retido" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoStaleNestedRetained_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -704,7 +704,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "removes a stale duplicate INF before recursively adding its retained ancestor" {
+    It "remove um INF duplicado obsoleto antes de adicionar recursivamente seu ancestral retido" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoStaleNestedExcluded_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -736,7 +736,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "keeps packages from different providers even when the INF name and architecture match" {
+    It "mantém pacotes de provedores diferentes mesmo quando o nome e a arquitetura do INF coincidem" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoProviderCollision_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -768,22 +768,22 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "drops stale duplicate driver versions and keeps only the highest DriverVer" {
+    It "descarta versões duplicadas obsoletas de drivers e mantém apenas o maior DriverVer" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoStaleDedup_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
         $logs = [System.Collections.Generic.List[string]]::new()
 
         New-WinUtilDriverExportHarness -Fixtures @(
-            # Three-way duplicate mirroring the real ntprint.inf report: only the newest DriverVer should survive.
+            # Duplicata tripla espelhando o relatório real de ntprint.inf: apenas o DriverVer mais recente deve sobreviver.
             @{ Path = 'ntprint.inf_x86_7426e1b60aa62272'; Name = 'ntprint.inf'; Class = 'Printer'; DriverVer = '1/1/2023,10.0.26100.8875' },
             @{ Path = 'ntprint.inf_x86_6688e7b66f8d9fb5'; Name = 'ntprint.inf'; Class = 'Printer'; DriverVer = '1/1/2024,10.0.26100.8972' },
             @{ Path = 'ntprint.inf_x86_58e7118cdecb935e'; Name = 'ntprint.inf'; Class = 'Printer'; DriverVer = '6/1/2024,10.0.26100.9168' },
-            # A duplicate pair where one package is missing DriverVer entirely: the parseable one must win.
+            # Um par duplicado em que um pacote não tem DriverVer: o que pode ser analisado deve vencer.
             @{ Path = 'sample.inf_amd64_11111111aaaaaaaa'; Name = 'sample.inf'; Class = 'Net' },
             @{ Path = 'sample.inf_amd64_22222222bbbbbbbb'; Name = 'sample.inf'; Class = 'Net'; DriverVer = '3/1/2024,1.2.3.4' },
-            # A duplicate pair keyed entirely on case-insensitive DriverVer parsing: the uppercase
-            # DRIVERVER on the newer package must still be read and win the comparison.
+            # Um par duplicado baseado inteiramente na análise de DriverVer sem diferenciar maiúsculas: o DRIVERVER
+            # em maiúsculas no pacote mais novo ainda deve ser lido e vencer a comparação.
             @{ Path = 'caps.inf_amd64_33333333cccccccc'; Name = 'caps.inf'; Class = 'Net'; DriverVer = '1/1/2020,1.0.0.0'; VersionKeyword = 'driverver' },
             @{ Path = 'caps.inf_amd64_44444444dddddddd'; Name = 'caps.inf'; Class = 'Net'; DriverVer = '1/1/2021,2.0.0.0'; VersionKeyword = 'DRIVERVER' }
         )
@@ -817,7 +817,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "discards partial changes and commits the remaining drivers when one package fails to add" {
+    It "descarta alterações parciais e confirma os demais drivers quando um pacote falha ao ser adicionado" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoDriverPartial_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -846,8 +846,8 @@ Describe "Win11 Creator setup media" {
 
             ($logs -join '|') | Should -Match "Added $($script:expectedRootPackages - 1) of $script:expectedRootPackages driver packages"
             ($logs -join '|') | Should -Match 'install.wim metadata validation passed'
-            # group_a and group_b share a leaf name, so the warning must name the failing
-            # package by its subpath; a leaf-only name would read 'duplicate' and be ambiguous.
+            # group_a e group_b compartilham um nome-folha, então o aviso deve identificar o pacote
+            # com falha por seu subcaminho; um nome só de folha apareceria como 'duplicate' e seria ambíguo.
             ($logs -join '|') | Should -Match ([regex]::Escape("failed to add driver package 'group_a\duplicate'"))
             ($logs -join '|') | Should -Match ([regex]::Escape('add-driver:group_b\duplicate completed'))
             $driversInjected.Value | Should -BeTrue
@@ -857,7 +857,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "discards the mount and keeps going when every driver package fails to add" {
+    It "descarta a montagem e continua quando todos os pacotes de driver falham ao ser adicionados" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoDriverAllFail_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -890,15 +890,15 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "finds exported drivers when the temp path contains wildcard characters" {
+    It "encontra drivers exportados quando o caminho temporário contém caracteres curinga" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoDriverGlob_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
         $logs = [System.Collections.Generic.List[string]]::new()
         New-WinUtilDriverExportHarness -Fixtures $script:resilienceDriverFixtures
 
-        # A Windows account named like "John [Work]" puts wildcard characters in %TEMP%.
-        # Get-ChildItem -Path would glob them, find nothing, and abort the whole ISO run.
+        # Uma conta do Windows chamada como "John [Work]" coloca caracteres curinga em %TEMP%.
+        # Get-ChildItem -Path os interpretaria como curinga, não encontraria nada e abortaria toda a execução do ISO.
         $originalTemp = $env:TEMP
         $bracketTemp = Join-Path ([IO.Path]::GetTempPath()) "WinUtil [Glob] $([guid]::NewGuid())"
 
@@ -924,7 +924,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "stops when a potentially partial mount cannot be discarded after a package fails" {
+    It "para quando uma montagem potencialmente parcial não pode ser descartada após a falha de um pacote" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoDriverDiscardFailure_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -946,7 +946,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "discards a partially mounted install.wim after mount failure" {
+    It "descarta um install.wim parcialmente montado após falha na montagem" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoMountFailure_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -995,7 +995,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "reports a friendly explanation when DISM fails with a known exit code" {
+    It "relata uma explicação amigável quando o DISM falha com um código de saída conhecido" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoMountFailureKnownCode_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -1044,7 +1044,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "falls back to the plain exit code for an unmapped DISM failure" {
+    It "usa o código de saída simples como fallback para uma falha do DISM não mapeada" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoMountFailureUnknownCode_$([guid]::NewGuid())"
         $installWim = Join-Path $contentRoot 'sources\install.wim'
         $template = Get-Content -Path $script:autoUnattendPath -Raw
@@ -1098,7 +1098,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "does not add driver setup artifacts when injection is disabled" {
+    It "não adiciona artefatos de configuração de drivers quando a injeção está desativada" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoNoDrivers_$([guid]::NewGuid())"
 
         try {
@@ -1116,7 +1116,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "enables configuration-set fallback when staging OEM setup scripts" {
+    It "habilita o fallback de configuration-set ao preparar scripts de configuração OEM" {
         $contentRoot = Join-Path ([IO.Path]::GetTempPath()) "WinUtilIsoFallback_$([guid]::NewGuid())"
 
         try {
@@ -1136,7 +1136,7 @@ Describe "Win11 Creator setup media" {
         }
     }
 
-    It "attempts winget oscdimg install and exits before export when fallback fails" {
+    It "tenta instalar o oscdimg pelo winget e sai antes da exportação quando o fallback falha" {
         $content = Get-Content -Path $script:isoWorkflowPath -Raw
 
         foreach ($expectedText in @(
@@ -1155,7 +1155,7 @@ Describe "Win11 Creator setup media" {
         ([regex]::Matches($content, 'function Get-WinUtilOscdimgPath', 'IgnoreCase')).Count | Should -Be 1
         $content | Should -Match ([regex]::Escape('Write-WinUtilISOLog -Level "WARN" -Message "oscdimg.exe still not found after install attempt."'))
 
-        # The export job stops at the dialog instead of running oscdimg without a binary
+        # O job de exportação para no diálogo em vez de executar oscdimg sem o binário
         $exportOscdimgIndex = $script:exportFunction.IndexOf('$oscdimg = Get-WinUtilOscdimgPath')
         $exportDialogIndex = $script:exportFunction.IndexOf('oscdimg Not Found', $exportOscdimgIndex)
         $exportRunIndex = $script:exportFunction.IndexOf('Running oscdimg...', $exportOscdimgIndex)
@@ -1166,7 +1166,7 @@ Describe "Win11 Creator setup media" {
         $script:exportFunction | Should -Match ([regex]::Escape('return'))
     }
 
-    Context "FirstLogon update service restoration" {
+    Context "Restauração dos serviços de atualização do FirstLogon" {
         BeforeAll {
             [xml]$unattend = Get-Content -LiteralPath $script:autoUnattendPath -Raw
             $firstLogon = $unattend.SelectSingleNode("//*[local-name()='File' and @path='C:\Windows\Setup\Scripts\FirstLogon.ps1']").InnerText
@@ -1184,7 +1184,7 @@ Describe "Win11 Creator setup media" {
                     }, $false)
             }, $true))
             if ($blocks.Count -ne 1) { throw 'Expected exactly one service restoration block.' }
-            # Never execute the surrounding FirstLogon cleanup, downloads, or installer.
+            # Nunca executar a limpeza, os downloads ou o instalador do FirstLogon ao redor.
             $commands = $blocks[0].ScriptBlock.FindAll({
                 param($node)
                 $node -is [System.Management.Automation.Language.CommandAst]
@@ -1204,7 +1204,7 @@ Describe "Win11 Creator setup media" {
             Mock Set-ItemProperty { }
         }
 
-        It "restores ordinary services and writes the protected Medic startup value directly" {
+        It "restaura serviços comuns e grava diretamente o valor de inicialização protegido do Medic" {
             & $script:restoreServices
 
             Should -Invoke Set-Service -Times 3 -Exactly
@@ -1219,7 +1219,7 @@ Describe "Win11 Creator setup media" {
             }
         }
 
-        It "keeps failures observable while attempting the remaining restoration work" {
+        It "mantém as falhas observáveis enquanto tenta o restante do trabalho de restauração" {
             $script:restorationCalls = [System.Collections.Generic.List[string]]::new()
             Mock Set-Service {
                 param($Name, $ErrorAction)

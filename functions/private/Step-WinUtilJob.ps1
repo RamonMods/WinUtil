@@ -1,35 +1,35 @@
 function Step-WinUtilJob {
     <#
         .SYNOPSIS
-            Advances a job to its next reportable point, honouring a pause or stop on the way
+            Avança um job para seu próximo ponto reportável, respeitando uma pausa ou parada no caminho
 
         .DESCRIPTION
-            Every loop calls this, so it is the one point a run reliably passes between steps and
-            therefore the only place it can be held or ended without cutting into a command in
-            flight. It blocks while the run is paused and throws OperationCanceledException once
-            a stop is asked for, so calling it from a finally, or from a catch already reporting
-            a failure, re-raises that stop. The job layer clears the flags before its own finish
-            reporting for that reason.
+            Todo laço chama isto, então é o único ponto por que uma execução passa com segurança entre etapas e
+            portanto o único lugar onde pode ser retida ou encerrada sem interromper um comando em
+            andamento. Ela bloqueia enquanto a execução está pausada e lança OperationCanceledException quando
+            uma parada é solicitada, então chamá-la de um finally, ou de um catch que já relata
+            uma falha, relança essa parada. A camada de job limpa as sinalizações antes de seu próprio
+            relatório de conclusão, por esse motivo.
 
-            Drives the progress bar and taskbar item together and does nothing without a window,
-            so job bodies need no UI checks. The update is posted rather than waited on: a job
-            reporting per item would otherwise stall on the interface thread each time.
+            Controla a barra de progresso e o item da barra de tarefas juntos e não faz nada sem janela,
+            então os corpos de job não precisam de verificações de interface. A atualização é postada em vez de
+            esperada: um job que reporta por item travaria na thread da interface a cada vez.
 
         .PARAMETER Status
-            Text for the progress label
+            Texto para o rótulo de progresso
 
         .PARAMETER Percent
-            Completion between 0 and 100
+            Conclusão entre 0 e 100
 
         .PARAMETER State
-            Taskbar state. Normal while working, Error on failure, None when finished.
+            Estado da barra de tarefas. Normal enquanto trabalha, Error em falha, None ao concluir.
 
         .PARAMETER Overlay
-            Taskbar overlay icon: logo, checkmark, warning or None
+            Ícone de sobreposição da barra de tarefas: logo, checkmark, warning ou None
 
         .PARAMETER Hide
-            Clears and hides the progress bar. Used when leaving a finished job behind rather
-            than while one is running.
+            Limpa e oculta a barra de progresso. Usado ao deixar um job concluído para trás, em vez de
+            durante a execução de um.
     #>
     param(
         [string]$Status,
@@ -40,8 +40,8 @@ function Step-WinUtilJob {
         [switch]$Hide
     )
 
-    # With no window every update is thrown away, and a window closed over running work counts
-    # as none: its dispatcher accepts posts and discards them. The console is what is left.
+    # Sem janela, toda atualização é descartada, e uma janela fechada sobre trabalho em execução conta
+    # como nenhuma: seu dispatcher aceita postagens e as descarta. O console é o que resta.
     if (-not (Test-WinUtilUIAlive)) {
         if (-not $Hide) {
             Write-WinUtilConsoleProgress -Status $Status -Percent $Percent
@@ -78,8 +78,8 @@ function Step-WinUtilJob {
             $sync.WPFTweaksProgressLabel.Text = $Status
             $sync.WPFTweaksProgressLabel.ToolTip = $Status
 
-            # Tab working views mirror the same status beneath their spinner while
-            # showing. Guarded: headless fixtures and other tabs have no panel.
+            # As visualizações de trabalho das abas espelham o mesmo status abaixo do girador enquanto
+            # exibidas. Com proteção: dispositivos de teste sem interface e outras abas não têm painel.
             foreach ($pair in @(
                 @("WPFInstallWorkingPanel", "WPFInstallWorkingLabel"),
                 @("WPFTweaksWorkingPanel", "WPFTweaksWorkingLabel")
@@ -96,11 +96,11 @@ function Step-WinUtilJob {
             $sync.Form.TaskbarItemInfo.ProgressValue = $Percent / 100
         }
         if ($HasState) {
-            # Pulse in place at whatever progress has been reached. IsIndeterminate would make
-            # WPF discard Value and fill the whole bar, which reads as finished.
+            # Pulsa no lugar no progresso já alcançado. IsIndeterminate faria o WPF
+            # descartar Value e preencher a barra inteira, o que pareceria conclusão.
             $sync.WPFTweaksProgressValue.Tag = if ($State -eq "Indeterminate") { "Pulse" } else { $null }
 
-            # By resource reference rather than a fixed brush, so switching theme repaints it
+            # Por referência de recurso em vez de um pincel fixo, para que a troca de tema o repinte
             $barColor = switch ($State) {
                 "Error"  { "ProgressBarErrorColor" }
                 "Paused" { "ProgressBarWarningColor" }

@@ -1,45 +1,45 @@
 function Start-WinUtilJob {
     <#
         .SYNOPSIS
-            Runs a long operation off the UI thread with the shared progress, taskbar, log and
-            error handling applied around it
+            Executa uma operação longa fora da thread da interface, com progresso, barra de tarefas, log e
+            tratamento de erros compartilhados aplicados ao redor dela
 
         .DESCRIPTION
-            One job at a time. Owns the busy flag, the progress bar, the taskbar item, the
-            console banner and the log lines for the job's lifetime. The body does the work and
-            calls Step-WinUtilJob; it must not print a banner or set the busy flag itself. A body
-            that throws is caught and the interface restored in a finally, so a failure cannot
-            leave the UI stuck busy.
+            Um job por vez. É dono da sinalização de ocupado, da barra de progresso, do item da barra de
+            tarefas, do banner do console e das linhas de log durante toda a vida do job. O corpo faz o
+            trabalho e chama Step-WinUtilJob; ele não deve imprimir banner nem definir a sinalização de
+            ocupado por conta própria. Um corpo que lança exceção é capturado e a interface é
+            restaurada em um finally, para que uma falha não deixe a interface presa como ocupada.
 
         .PARAMETER Name
-            Log component and progress text, for example Install.
+            Componente de log e texto de progresso, por exemplo Install.
 
         .PARAMETER ScriptBlock
-            The work. Receives Parameters as named parameters.
+            O trabalho. Recebe Parameters como parâmetros nomeados.
 
         .PARAMETER Parameters
-            Values passed to the body by name.
+            Valores passados ao corpo por nome.
 
         .PARAMETER Description
-            Progress text shown while the job starts. Defaults to the job name.
+            Texto de progresso exibido enquanto o job inicia. Por padrão, é o nome do job.
 
         .PARAMETER DisableAppList
-            Greys out the app list for the duration, for jobs that change what is installed.
+            Acinza a lista de aplicativos durante a execução, para jobs que alteram o que está instalado.
 
         .PARAMETER QueueIfBusy
-            Waits in $sync.JobQueue for its turn instead of being refused, for actions the user
-            starts. The parameters are held as they were when it was queued. A job with the same
-            name and parameters as the last queued job is ignored, so consecutive clicks do not repeat
-            the work.
+            Espera em $sync.JobQueue pela sua vez em vez de ser recusado, para ações iniciadas pelo
+            usuário. Os parâmetros são mantidos como estavam quando foi enfileirado. Um job com o mesmo
+            nome e parâmetros do último job enfileirado é ignorado, para que cliques consecutivos não repitam
+            o trabalho.
 
         .PARAMETER FromQueue
-            Internal to Start-WinUtilNextQueuedJob: this is the queued job taking its turn, so it
-            may claim the slot while $sync.JobHandoff holds it for the queue.
+            Interno de Start-WinUtilNextQueuedJob: este é o job enfileirado assumindo sua vez, então ele
+            pode tomar o slot enquanto $sync.JobHandoff o reserva para a fila.
 
         .EXAMPLE
             Start-WinUtilJob -Name "Install" -Parameters @{ Packages = $packages } -ScriptBlock {
                 param($Packages)
-                Step-WinUtilJob -Status "Installing" -Percent 10
+                Step-WinUtilJob -Status "Instalando" -Percent 10
             }
     #>
     param(
@@ -62,27 +62,27 @@ function Start-WinUtilJob {
 
     if ($sync.ShuttingDown -or $sync.FinishInConsole) {
         if ($FromQueue) { Reset-WinUtilJobHandoff }
-        Write-WinUtilLog -Level "WARN" -Component $Name -Message "Refused to start $Name, WinUtil is closing."
+        Write-WinUtilLog -Level "WARN" -Component $Name -Message "Recusado iniciar $Name, o WinUtil está fechando."
         return $null
     }
 
-    # A nested job runs inline: the outer already owns the slot and the reporting, so claiming
-    # again would refuse it and skip its work. Feature installs arrive twice, from feature.json
-    # and from Invoke-WPFFeatureInstall.
+    # Um job aninhado roda inline: o externo já é dono do slot e do relatório, então reivindicar
+    # novamente o recusaria e ignoraria seu trabalho. Instalações de recursos chegam duas vezes, de feature.json
+    # e de Invoke-WPFFeatureInstall.
     if ($global:WinUtilIsJobWorker) {
         & $ScriptBlock @Parameters
         return $null
     }
 
-    # Locked: a headless or scheduled caller is not serialised by the dispatcher, where
-    # test-then-assign lets two jobs both own the slot. The token identifies the run, so a worker
-    # still unwinding cannot release a slot the next job holds.
+    # Com bloqueio: um chamador sem interface ou agendado não é serializado pelo dispatcher, onde
+    # testar-e-atribuir permite que dois jobs sejam donos do slot. O token identifica a execução, para que um worker
+    # ainda em desconstrução não possa liberar um slot que o próximo job detém.
     $jobToken = [guid]::NewGuid().ToString()
     $blockedBy = $null
     $queuePosition = 0
     $duplicate = $false
 
-    # Built outside the lock. A value that cannot be serialised just leaves the job undeduplicated.
+    # Construído fora do bloqueio. Um valor que não pode ser serializado apenas deixa o job sem deduplicação.
     $signature = $null
     if ($QueueIfBusy) {
         try {
@@ -92,28 +92,28 @@ function Start-WinUtilJob {
             foreach ($key in $sortedKeys) { $ordered[$key] = $Parameters[$key] }
             $signature = "$Name|" + (ConvertTo-Json -InputObject $ordered -Compress -Depth 5 -WarningAction SilentlyContinue)
         } catch {
-            Write-WinUtilLog -Level "WARN" -Component $Name -Message "Could not compare $Name with the queue, so it will not be checked for duplicates: $($_.Exception.Message)"
+            Write-WinUtilLog -Level "WARN" -Component $Name -Message "Não foi possível comparar $Name com a fila, então ele não será verificado quanto a duplicatas: $($_.Exception.Message)"
         }
     }
 
     [System.Threading.Monitor]::Enter($sync.SyncRoot)
     try {
-        # Closing can win while the signature is built or this caller waits for the lock.
+        # O fechamento pode vencer enquanto a assinatura é construída ou este chamador espera pelo bloqueio.
         if ($sync.ShuttingDown -or $sync.FinishInConsole) {
             if ($FromQueue) { $sync.JobHandoff = $false }
-            Write-WinUtilLog -Level "WARN" -Component $Name -Message "Refused to start $Name, WinUtil is closing."
+            Write-WinUtilLog -Level "WARN" -Component $Name -Message "Recusado iniciar $Name, o WinUtil está fechando."
             return $null
         }
         if ($FromQueue) {
             $sync.JobHandoff = $false
         }
-        # A finished job's slot is promised to the queue until its head has started
+        # O slot de um job concluído fica prometido à fila até que seu primeiro item tenha iniciado
         if ($sync.ActiveJob -or $sync.JobHandoff) {
-            $blockedBy = if ($sync.ActiveJob) { $sync.ActiveJob } else { "Queued operations" }
-            # In the same lock as the busy test: a job finishing between the two would leave
-            # this one queued behind nothing
+            $blockedBy = if ($sync.ActiveJob) { $sync.ActiveJob } else { "Operações na fila" }
+            # No mesmo bloqueio do teste de ocupado: um job que terminasse entre os dois deixaria
+            # este enfileirado atrás de nada
             if ($QueueIfBusy -and $signature -and $sync.JobQueue.Count -gt 0) {
-                # An intervening action can change the state again; only collapse adjacent clicks.
+                # Uma ação interveniente pode mudar o estado novamente; agrupe apenas cliques adjacentes.
                 $duplicate = $sync.JobQueue[$sync.JobQueue.Count - 1].Signature -eq $signature
             }
             if ($QueueIfBusy -and -not $duplicate) {
@@ -138,18 +138,18 @@ function Start-WinUtilJob {
     }
 
     if ($duplicate) {
-        Write-WinUtilLog -Component $Name -Message "$Name is already queued, ignored."
+        Write-WinUtilLog -Component $Name -Message "$Name já está na fila, ignorado."
         return $null
     }
 
     if ($queuePosition -gt 0) {
-        Write-WinUtilLog -Component $Name -Message "$Name queued behind $blockedBy, position $queuePosition."
+        Write-WinUtilLog -Component $Name -Message "$Name enfileirado atrás de $blockedBy, posição $queuePosition."
         Invoke-WPFUIThread -Async -ScriptBlock { Update-WinUtilJobQueueUI }
         return $null
     }
 
     if ($blockedBy) {
-        Show-WinUtilMessage -Message "$blockedBy is still running. Wait for it to finish before starting another action." -Title "WinUtil" -Button "OK" -Icon "Warning" | Out-Null
+        Show-WinUtilMessage -Message "$blockedBy ainda está em execução. Aguarde-o terminar antes de iniciar outra ação." -Title "WinUtil" -Button "OK" -Icon "Warning" | Out-Null
         return $null
     }
 
@@ -157,13 +157,13 @@ function Start-WinUtilJob {
     try {
         $timingStartIndex = if ($sync.StepTimings) { $sync.StepTimings.Count } else { 0 }
 
-        Write-WinUtilLog -Component $Name -Message "$Name job started."
+        Write-WinUtilLog -Component $Name -Message "Job $Name iniciado."
         Invoke-WPFUIThread -Async -ScriptBlock { Update-WinUtilJobQueueUI }
         Write-WinUtilJobBanner -Message $label
         Step-WinUtilJob -Status "$label..." -Percent 0 -State "Normal" -Overlay "logo"
 
-        # Tabs with a working view (spinner + live status) swap to it while their
-        # jobs run. Adding a new one is a new XAML panel plus one entry here.
+        # Abas com uma visualização de trabalho (girador + status ao vivo) trocam para ela enquanto seus
+        # jobs rodam. Adicionar uma nova significa um novo painel XAML mais uma entrada aqui.
         $jobWorkingArea = switch ($Name) {
             "Install"     { "Install" }
             "Uninstall"   { "Install" }
@@ -183,9 +183,9 @@ function Start-WinUtilJob {
             }
         }
 
-        # Rebuilt from its text inside the runspace: a scriptblock carries the session state it was
-        # defined in, and recreating it there binds it to the worker. The handle is discarded,
-        # printing it puts an IAsyncResult table on the console on every button press.
+        # Reconstruído a partir de seu texto dentro do runspace: um scriptblock carrega o estado de sessão em que foi
+        # definido, e recriá-lo lá o vincula ao worker. O handle é descartado,
+        # imprimi-lo coloca uma tabela IAsyncResult no console a cada clique de botão.
         $null = Invoke-WPFRunspace -ParameterList @(
             ("JobName", $Name),
             ("JobLabel", $label),
@@ -198,8 +198,8 @@ function Start-WinUtilJob {
         ) -ScriptBlock {
         param($JobName, $JobLabel, $JobBody, $JobParameters, $JobRestoresAppList, $JobWorkingArea, $JobToken, $TimingStartIndex)
 
-        # Marks this runspace as the one doing the work, so a pause holds here and not in
-        # whoever asked for it
+        # Marca este runspace como o que faz o trabalho, para que uma pausa prenda aqui e não em
+        # quem quer que o tenha pedido
         $global:WinUtilIsJobWorker = $true
         $global:WinUtilJobErrorCount = 0
         $global:WinUtilJobWarningCount = 0
@@ -208,8 +208,8 @@ function Start-WinUtilJob {
         try {
             $body = [scriptblock]::Create($JobBody)
 
-            # A worker's warning, error and Write-Host output buffers on a PowerShell object
-            # nobody reads. Merging it into the output stream is what gets it to the log.
+            # Os buffers de aviso, erro e saída de Write-Host de um worker ficam em um objeto PowerShell
+            # que ninguém lê. Mesclá-lo ao fluxo de saída é o que o leva ao log.
             & $body @JobParameters 2>&1 3>&1 6>&1 | ForEach-Object {
                 if ($_ -is [System.Management.Automation.WarningRecord]) {
                     $global:WinUtilJobWarningCount++
@@ -219,32 +219,32 @@ function Start-WinUtilJob {
 
             $jobClock.Stop()
 
-            # A step can fail without throwing, for example a registry write refused by policy.
-            # The counter belongs to this worker runspace, so unrelated UI errors cannot change
-            # this job's result while it is running.
+            # Uma etapa pode falhar sem lançar exceção, por exemplo uma escrita no registro recusada por política.
+            # O contador pertence a este runspace do worker, então erros alheios da interface não podem alterar
+            # o resultado deste job enquanto ele está em execução.
             $newErrors = $global:WinUtilJobErrorCount
             $newWarnings = $global:WinUtilJobWarningCount
             if ($newErrors -gt 0) {
-                Write-WinUtilLog -Level "WARN" -Component $JobName -Message "$JobName job finished in $($jobClock.ElapsedMilliseconds) ms with $newErrors error(s)."
-                Write-WinUtilJobBanner -Message "$JobLabel finished with $newErrors error(s), see the log" -Level "ERROR"
-                Step-WinUtilJob -Status "$JobName finished with $newErrors error(s)" -Percent 100 -State "Paused" -Overlay "warning"
+                Write-WinUtilLog -Level "WARN" -Component $JobName -Message "Job $JobName concluído em $($jobClock.ElapsedMilliseconds) ms com $newErrors erro(s)."
+                Write-WinUtilJobBanner -Message "$JobLabel concluído com $newErrors erro(s), veja o log" -Level "ERROR"
+                Step-WinUtilJob -Status "$JobName concluído com $newErrors erro(s)" -Percent 100 -State "Paused" -Overlay "warning"
             } elseif ($newWarnings -gt 0) {
-                Write-WinUtilLog -Level "WARN" -Component $JobName -Message "$JobName job finished in $($jobClock.ElapsedMilliseconds) ms with $newWarnings warning(s)."
-                Write-WinUtilJobBanner -Message "$JobLabel finished with $newWarnings warning(s), see the log"
-                Step-WinUtilJob -Status "$JobName finished with $newWarnings warning(s)" -Percent 100 -State "Paused" -Overlay "warning"
+                Write-WinUtilLog -Level "WARN" -Component $JobName -Message "Job $JobName concluído em $($jobClock.ElapsedMilliseconds) ms com $newWarnings aviso(s)."
+                Write-WinUtilJobBanner -Message "$JobLabel concluído com $newWarnings aviso(s), veja o log"
+                Step-WinUtilJob -Status "$JobName concluído com $newWarnings aviso(s)" -Percent 100 -State "Paused" -Overlay "warning"
             } else {
-                Write-WinUtilLog -Component $JobName -Message "$JobName job finished in $($jobClock.ElapsedMilliseconds) ms."
-                Write-WinUtilJobBanner -Message "$JobLabel finished"
-                Step-WinUtilJob -Status "$JobName finished" -Percent 100 -State "None" -Overlay "checkmark"
+                Write-WinUtilLog -Component $JobName -Message "Job $JobName concluído em $($jobClock.ElapsedMilliseconds) ms."
+                Write-WinUtilJobBanner -Message "$JobLabel concluído"
+                Step-WinUtilJob -Status "$JobName concluído" -Percent 100 -State "None" -Overlay "checkmark"
             }
         } catch {
             $jobClock.Stop()
-            # A leaf that logs before rethrowing marks that exact exception. Preserve the outer
-            # context and stack without counting it twice; unrelated earlier errors do not qualify.
+            # Uma folha que registra em log antes de relançar marca aquela exceção exata. Preserve o contexto
+            # e a pilha externos sem contá-la duas vezes; erros anteriores alheios não contam.
             $errorAlreadyReported = $_.Exception.Data["WinUtilErrorReported"] -eq $true
-            Write-WinUtilErrorRecord -ErrorRecord $_ -Component $JobName -Context "$JobName failed after $($jobClock.ElapsedMilliseconds) ms" -DetailOnly:$errorAlreadyReported
-            Write-WinUtilJobBanner -Message "$JobLabel failed: $($_.Exception.Message)" -Level "ERROR"
-            Step-WinUtilJob -Status "$JobName failed" -Percent 100 -State "Error" -Overlay "warning"
+            Write-WinUtilErrorRecord -ErrorRecord $_ -Component $JobName -Context "$JobName falhou após $($jobClock.ElapsedMilliseconds) ms" -DetailOnly:$errorAlreadyReported
+            Write-WinUtilJobBanner -Message "$JobLabel falhou: $($_.Exception.Message)" -Level "ERROR"
+            Step-WinUtilJob -Status "$JobName falhou" -Percent 100 -State "Error" -Overlay "warning"
         } finally {
             $jobResult = [pscustomobject]@{
                 Token = $JobToken
@@ -252,16 +252,16 @@ function Start-WinUtilJob {
                 Warnings = $global:WinUtilJobWarningCount
             }
 
-            # Pool runspaces are reused, so leaving this set would make the next piece of
-            # background work on this runspace believe it is a job worker
+            # Os runspaces do pool são reutilizados, então deixar isto definido faria a próxima parte de
+            # trabalho em segundo plano neste runspace acreditar que é um worker de job
             $global:WinUtilIsJobWorker = $false
             $global:WinUtilJobErrorCount = 0
             $global:WinUtilJobWarningCount = 0
 
             Write-WinUtilTimingSummary -Scope $JobName -TotalMilliseconds $jobClock.ElapsedMilliseconds -StartIndex $TimingStartIndex
 
-            # A worker the watchdog cut off can reach here after the next job claimed the slot,
-            # and everything below releases shared state.
+            # Um worker interrompido pelo watchdog pode chegar aqui depois que o próximo job tomou o slot,
+            # e tudo abaixo libera o estado compartilhado.
             $stillOwns = $false
             [System.Threading.Monitor]::Enter($sync.SyncRoot)
             try {
@@ -274,9 +274,9 @@ function Start-WinUtilJob {
             }
 
             if ($stillOwns) {
-                # Each restoration is attempted on its own: a dispatcher failure
-                # while re-enabling the app list must not skip hiding the working
-                # view, which would otherwise keep covering the tab.
+                # Cada restauração é tentada por conta própria: uma falha no dispatcher
+                # ao reabilitar a lista de aplicativos não pode pular a ocultação da visualização
+                # de trabalho, que de outro modo continuaria cobrindo a aba.
                 try {
                     try {
                         if ($JobRestoresAppList -and (Test-WinUtilUIAlive)) {
@@ -285,34 +285,34 @@ function Start-WinUtilJob {
                             }
                         }
                     } catch {
-                        Write-WinUtilLog -Level "WARN" -Component $JobName -Message "Could not restore the app list after $JobName finished: $($_.Exception.Message)"
+                        Write-WinUtilLog -Level "WARN" -Component $JobName -Message "Não foi possível restaurar a lista de aplicativos após a conclusão de $($JobName): $($_.Exception.Message)"
                     }
                     try {
                         if ($JobWorkingArea) {
                             Set-WinUtilWorkingView -Area $JobWorkingArea -Working $false
                         }
                     } catch {
-                        Write-WinUtilLog -Level "WARN" -Component $JobName -Message "Could not hide the working view after $JobName finished: $($_.Exception.Message)"
+                        Write-WinUtilLog -Level "WARN" -Component $JobName -Message "Não foi possível ocultar a visualização de trabalho após a conclusão de $($JobName): $($_.Exception.Message)"
                     }
                 } finally {
-                    # Dispatcher shutdown can race the alive check and abort the restore call.
-                    # The worker is still finished, so its slot must always be released.
+                    # O desligamento do dispatcher pode competir com a verificação de atividade e abortar a chamada de restauração.
+                    # O worker terminou de qualquer forma, então seu slot sempre deve ser liberado.
                     $null = Clear-WinUtilActiveJob -Token $JobToken
                 }
             } else {
-                Write-WinUtilLog -Level "WARN" -Component $JobName -Message "$JobName unwound after another job had started; leaving its state alone."
+                Write-WinUtilLog -Level "WARN" -Component $JobName -Message "$JobName foi desenrolado depois que outro job havia iniciado; seu estado foi deixado como estava."
             }
         }
         }
     } catch {
         $scheduleError = $_
         try {
-            Write-WinUtilErrorRecord -ErrorRecord $scheduleError -Component $Name -Context "Could not schedule $Name"
+            Write-WinUtilErrorRecord -ErrorRecord $scheduleError -Component $Name -Context "Não foi possível agendar $Name"
             $sync.LastJobResult = [pscustomobject]@{ Token = $jobToken; Errors = 1; Warnings = 0 }
-            Write-WinUtilJobBanner -Message "$label could not start" -Level "ERROR"
-            Step-WinUtilJob -Status "$Name could not start" -Percent 100 -State "Error" -Overlay "warning"
+            Write-WinUtilJobBanner -Message "$label não pôde ser iniciado" -Level "ERROR"
+            Step-WinUtilJob -Status "$Name não pôde ser iniciado" -Percent 100 -State "Error" -Overlay "warning"
         } catch {
-            Write-WinUtilLog -Level "WARN" -Component $Name -Message "Could not report that $Name failed to start: $($_.Exception.Message)"
+            Write-WinUtilLog -Level "WARN" -Component $Name -Message "Não foi possível relatar que $Name falhou ao iniciar: $($_.Exception.Message)"
         } finally {
             try {
                 try {
@@ -322,14 +322,14 @@ function Start-WinUtilJob {
                         }
                     }
                 } catch {
-                    Write-WinUtilLog -Level "WARN" -Component $Name -Message "Could not restore the app list after $Name failed to start: $($_.Exception.Message)"
+                    Write-WinUtilLog -Level "WARN" -Component $Name -Message "Não foi possível restaurar a lista de aplicativos após a falha de $Name ao iniciar: $($_.Exception.Message)"
                 }
                 try {
                     if ($jobWorkingArea) {
                         Set-WinUtilWorkingView -Area $jobWorkingArea -Working $false
                     }
                 } catch {
-                    Write-WinUtilLog -Level "WARN" -Component $Name -Message "Could not hide the working view after $Name failed to start: $($_.Exception.Message)"
+                    Write-WinUtilLog -Level "WARN" -Component $Name -Message "Não foi possível ocultar a visualização de trabalho após a falha de $Name ao iniciar: $($_.Exception.Message)"
                 }
             } finally {
                 $null = Clear-WinUtilActiveJob -Token $jobToken
@@ -341,13 +341,13 @@ function Start-WinUtilJob {
 function Clear-WinUtilActiveJob {
     <#
         .SYNOPSIS
-            Releases the active job slot, clearing its name and its token together
+            Libera o slot do job ativo, limpando seu nome e seu token juntos
 
         .DESCRIPTION
-            A token left set still matches a later run and blocks new work.
+            Um token deixado definido ainda corresponde a uma execução posterior e bloqueia novos trabalhos.
 
         .PARAMETER Token
-            Release only if this run still owns the slot. Omit to release unconditionally.
+            Libera somente se esta execução ainda for dona do slot. Omita para liberar incondicionalmente.
     #>
     param([string]$Token)
 
@@ -358,8 +358,8 @@ function Clear-WinUtilActiveJob {
             $sync.ActiveJobToken = $null
             $sync.ActiveJob = $null
             $released = $true
-            # Between here and the posted dispatch the slot is free, and a new action must not
-            # take it ahead of the queue
+            # Entre aqui e a distribuição postada, o slot está livre, e uma nova ação não deve
+            # tomá-lo à frente da fila
             if ($Token -and $sync.JobQueue.Count -gt 0 -and -not $sync.ShuttingDown -and -not $sync.FinishInConsole) {
                 $sync.JobHandoff = $true
             }
@@ -368,14 +368,14 @@ function Clear-WinUtilActiveJob {
         [System.Threading.Monitor]::Exit($sync.SyncRoot)
     }
 
-    # A job that ended, however it ended, hands the slot to the next queued one. A release with no
-    # token is a forced reset, which must not start anything.
+    # Um job que terminou, de qualquer forma, passa o slot para o próximo da fila. Uma liberação sem
+    # token é uma redefinição forçada, que não deve iniciar nada.
     if ($released -and $Token) {
         try {
             Invoke-WPFUIThread -Async -ScriptBlock { Start-WinUtilNextQueuedJob }
         } catch {
             Reset-WinUtilJobHandoff
-            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Could not start the next queued job: $($_.Exception.Message)"
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "Não foi possível iniciar o próximo job enfileirado: $($_.Exception.Message)"
         }
     }
     return $released

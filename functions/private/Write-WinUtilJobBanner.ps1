@@ -1,18 +1,18 @@
 function Write-WinUtilJobBanner {
     <#
         .SYNOPSIS
-            Writes the boxed start, finish or failure line a job prints to the console
+            Escreve a linha em caixa de início, conclusão ou falha que um job imprime no console
 
         .DESCRIPTION
-            One place decides what a running operation looks like in the terminal, so every
-            workflow announces itself the same way instead of hand-drawing its own box. Called
-            by Start-WinUtilJob, not by job bodies.
+            Um único lugar decide como uma operação em execução aparece no terminal, para que cada
+            fluxo de trabalho se anuncie da mesma forma em vez de desenhar sua própria caixa.
+            Chamado por Start-WinUtilJob, não pelos corpos dos jobs.
 
         .PARAMETER Message
-            The line to box, for example "Installing apps".
+            A linha a colocar na caixa, por exemplo "Instalando aplicativos".
 
         .PARAMETER Level
-            INFO for a normal banner, ERROR to colour it as a failure.
+            INFO para um banner normal, ERROR para colori-lo como uma falha.
     #>
     param(
         [Parameter(Mandatory)]
@@ -22,11 +22,11 @@ function Write-WinUtilJobBanner {
         [string]$Level = "INFO"
     )
 
-    # A progress line is rewritten in place and left open, so the box would be drawn on top of it
+    # Uma linha de progresso é reescrita no mesmo lugar e deixada aberta, então a caixa seria desenhada sobre ela
     Complete-WinUtilConsoleProgress
 
-    # Wrapped, because a failure listing several packages would otherwise draw a box wider
-    # than the console
+    # Quebrada em linhas, porque uma falha que lista vários pacotes desenharia uma caixa mais
+    # larga que o console
     $width = 76
     $words = $Message -split '\s+'
     $lines = [System.Collections.Generic.List[string]]::new()

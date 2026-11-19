@@ -1,7 +1,7 @@
 function Invoke-WPFInstall {
     <#
     .SYNOPSIS
-        Installs the selected programs using winget, if one or more of the selected programs are already installed on the system, winget will try and perform an upgrade if there's a newer version to install.
+        Instala os programas selecionados usando o winget. Se um ou mais dos programas selecionados já estiverem instalados no sistema, o winget tentará realizar uma atualização caso exista uma versão mais recente para instalar.
     #>
     param(
         [Parameter(Mandatory = $false)]
@@ -9,17 +9,17 @@ function Invoke-WPFInstall {
     )
 
     if ($PackagesToInstall.Count -eq 0) {
-        $WarningMsg = "Please select the program(s) to install or upgrade."
+        $WarningMsg = "Selecione o(s) programa(s) a instalar ou atualizar."
         Show-WinUtilMessage -Message $WarningMsg -Title "WinUtil" -Button "OK" -Icon "Warning"
         return
     }
 
     $ManagerPreference = $sync.preferences.packagemanager
-    Write-WinUtilLog -Component "Install" -Message "Install requested for $(@($PackagesToInstall).Count) selected package(s) using preference: $ManagerPreference"
+    Write-WinUtilLog -Component "Install" -Message "Instalação solicitada para $(@($PackagesToInstall).Count) pacote(s) selecionado(s) usando a preferência: $ManagerPreference"
     $packageSummary = Get-WinUtilPackageLogSummary -Packages $PackagesToInstall -Preference $ManagerPreference
-    Write-WinUtilLog -Component "Install" -Message "Install selected package(s): $($packageSummary -join '; ')"
+    Write-WinUtilLog -Component "Install" -Message "Instalar pacote(s) selecionado(s): $($packageSummary -join '; ')"
 
-    Start-WinUtilJob -Name "Install" -Description "Installing apps" -DisableAppList -QueueIfBusy -Parameters @{
+    Start-WinUtilJob -Name "Install" -Description "Instalando aplicativos" -DisableAppList -QueueIfBusy -Parameters @{
         PackagesToInstall = $PackagesToInstall
         ManagerPreference = $ManagerPreference
     } -ScriptBlock {
@@ -30,7 +30,7 @@ function Invoke-WPFInstall {
         $packagesChoco = $packagesSorted['Choco']
         $totalPackages = @($packagesWinget).Count + @($packagesChoco).Count
         $completedPackages = 0
-        Write-WinUtilLog -Component "Install" -Message "Install package manager split: winget=$(@($packagesWinget).Count), choco=$(@($packagesChoco).Count)"
+        Write-WinUtilLog -Component "Install" -Message "Divisão dos pacotes por gerenciador: winget=$(@($packagesWinget).Count), choco=$(@($packagesChoco).Count)"
 
         $results = @()
 
@@ -38,19 +38,19 @@ function Invoke-WPFInstall {
             Install-WinUtilWinget
             foreach ($program in $packagesWinget) {
                 $position = $completedPackages + 1
-                Step-WinUtilJob -Status "Installing $program ($position/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
+                Step-WinUtilJob -Status "Instalando $program ($position/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
 
                 $results += Measure-WinUtilStep -Scope "Install" -Name "winget $program" -ScriptBlock {
                     Install-WinUtilProgramWinget -Action Install -Programs @($program)
                 }
                 $completedPackages++
-                Step-WinUtilJob -Status "Installed $program ($completedPackages/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
+                Step-WinUtilJob -Status "$program instalado ($completedPackages/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
             }
         }
 
         if ($packagesChoco.Count -gt 0) {
             $position = $completedPackages + 1
-            Step-WinUtilJob -Status "Installing Chocolatey packages ($position/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
+            Step-WinUtilJob -Status "Instalando pacotes do Chocolatey ($position/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
 
             Install-WinUtilChoco
             $chocoBase = [int](($completedPackages / $totalPackages) * 100)
@@ -59,7 +59,7 @@ function Invoke-WPFInstall {
                 Install-WinUtilProgramChoco -Action Install -Programs $packagesChoco -ProgressBase $chocoBase -ProgressSpan $chocoSpan
             }
             $completedPackages += @($packagesChoco).Count
-            Step-WinUtilJob -Status "Installed Chocolatey packages ($completedPackages/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
+            Step-WinUtilJob -Status "Pacotes do Chocolatey instalados ($completedPackages/$totalPackages)" -Percent ([int](($completedPackages / $totalPackages) * 100))
         }
 
         Complete-WinUtilPackageRun -Action "Install" -Results $results

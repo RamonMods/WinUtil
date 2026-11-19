@@ -16,14 +16,14 @@ export default function TableOfContents({ items }) {
 			if (link) setMarker({ top: link.offsetTop, height: link.offsetHeight });
 		};
 		place();
-		// Entries can rewrap when the window resizes, which moves the active one out from under the marker.
+		// As entradas podem quebrar linha quando a janela é redimensionada, tirando a ativa de baixo do marcador.
 		window.addEventListener('resize', place);
 		return () => window.removeEventListener('resize', place);
 	}, [active]);
 
 	return (
 		<nav className="docs-toc" aria-labelledby="docs-toc-heading">
-			<h2 id="docs-toc-heading">On this page</h2>
+			<h2 id="docs-toc-heading">Nesta página</h2>
 			<div className="docs-toc-track" ref={listRef}>
 				{marker && (
 					<span

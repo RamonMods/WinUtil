@@ -1,15 +1,15 @@
 ---
-// Overrides Starlight's default ThemeProvider: dark by default regardless of OS preference, unless the visitor has explicitly picked a theme before.
+// Substitui o ThemeProvider padrão do Starlight: escuro por padrão, independentemente da preferência do sistema, a menos que o visitante já tenha escolhido um tema explicitamente.
 ---
 
 <script is:inline>
-	// Apply the resolved theme to <html> immediately, before paint, to avoid a flash of the wrong theme.
+	// Aplica o tema resolvido a <html> imediatamente, antes da pintura, para evitar um lampejo do tema errado.
 	(() => {
 		let storedTheme = null;
 		try {
 			storedTheme = localStorage.getItem('starlight-theme');
 		} catch {
-			// Storage can be blocked; fall back to the dark default.
+			// O armazenamento pode estar bloqueado; usa-se então o padrão escuro.
 		}
 		document.documentElement.dataset.theme = storedTheme === 'light' ? 'light' : 'dark';
 	})();

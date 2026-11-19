@@ -1,7 +1,7 @@
 function Update-WinUtilWindowInsets {
     <#
     .SYNOPSIS
-        Keeps maximized client content inside the current monitor's work area.
+        Mantém o conteúdo do cliente maximizado dentro da área de trabalho do monitor atual.
     #>
     if (-not $sync.Form -or -not $sync.WPFMainGrid) { return }
     if ($sync.Form.WindowState -ne 'Maximized') {
@@ -49,8 +49,8 @@ namespace WinUtil {
 
 function Get-WinUtilWindowInsets {
     param($Bounds, $WorkArea, $FromDevice)
-    # Measure the actual overhang, including the padded border; twice the resize
-    # frame is only correct at some DPI settings. Convert physical pixels to WPF DIPs.
+    # Mede a saliência real, incluindo a borda com preenchimento; o dobro da moldura de
+    # redimensionamento só é correto em algumas configurações de DPI. Converte pixels físicos em DIPs do WPF.
     $topLeft = $FromDevice.Transform([Windows.Vector]::new(
         [Math]::Max(0, $WorkArea.Left - $Bounds.Left),
         [Math]::Max(0, $WorkArea.Top - $Bounds.Top)))
@@ -61,8 +61,8 @@ function Get-WinUtilWindowInsets {
 }
 
 function Request-WinUtilWindowInsets {
-    # Events can arrive before WPF has processed the native size/DPI change.
-    # Coalesce them and read the final HWND geometry on the interface dispatcher.
+    # Os eventos podem chegar antes de o WPF processar a mudança nativa de tamanho/DPI.
+    # Agrupe-os e leia a geometria final do HWND no dispatcher da interface.
     if ($sync.WindowInsetsPending -or -not (Test-WinUtilUIAlive)) { return }
     $sync.WindowInsetsPending = $true
     [void]$sync.Form.Dispatcher.BeginInvoke([Windows.Threading.DispatcherPriority]::Loaded, $sync.WindowInsetsUpdate)

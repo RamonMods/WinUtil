@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - Windows Update Profiles
+# Testes - Perfis do Windows Update
 #===========================================================================
 
 BeforeAll {
@@ -102,7 +102,7 @@ Describe "Invoke-WPFUpdatesdisable" {
         Mock Disable-ScheduledTask { }
     }
 
-    It "sets update disable registry policy values" {
+    It "define valores de política do registro para desativar atualizações" {
         Invoke-WPFUpdatesdisable
 
         Should -Invoke -CommandName New-Item -Times 1 -Exactly -ParameterFilter {
@@ -128,7 +128,7 @@ Describe "Invoke-WPFUpdatesdisable" {
         }
     }
 
-    It "keeps existing policy keys instead of recreating them" {
+    It "mantém chaves de política existentes em vez de recriá-las" {
         Mock Test-Path { $true }
 
         Invoke-WPFUpdatesdisable
@@ -141,7 +141,7 @@ Describe "Invoke-WPFUpdatesdisable" {
         }
     }
 
-    It "disables update services and clears the SoftwareDistribution folder" {
+    It "desativa serviços de atualização e limpa a pasta SoftwareDistribution" {
         Invoke-WPFUpdatesdisable
 
         foreach ($expectedServiceName in @("BITS", "wuauserv", "UsoSvc")) {
@@ -166,7 +166,7 @@ Describe "Invoke-WPFUpdatesdisable" {
         }
     }
 
-    It "disables update scheduled task paths" {
+    It "desativa os caminhos das tarefas agendadas de atualização" {
         Invoke-WPFUpdatesdisable
 
         foreach ($expectedTaskPath in $script:updateTaskPaths) {
@@ -178,7 +178,7 @@ Describe "Invoke-WPFUpdatesdisable" {
         Should -Invoke -CommandName Disable-ScheduledTask -Times $script:updateTaskPaths.Count -Exactly
     }
 
-    It "requires confirmation before disabling updates" {
+    It "exige confirmação antes de desativar atualizações" {
         Mock Show-WinUtilMessage { "No" }
 
         Invoke-WPFUpdatesdisable
@@ -219,7 +219,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         Mock secedit { }
     }
 
-    It "removes only registry values managed by WinUtil" {
+    It "remove apenas valores do registro gerenciados pelo WinUtil" {
         Invoke-WPFUpdatesdefault
 
         $expectedRegistryValues = @(
@@ -247,7 +247,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         }
     }
 
-    It "preserves unrelated Settings page visibility policy" {
+    It "preserva a política de visibilidade da página Settings não relacionada" {
         Mock Get-ItemProperty {
             [pscustomobject]@{
                 SettingsPageVisibility = "hide:privacy"
@@ -262,7 +262,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         }
     }
 
-    It "restores update service startup types" {
+    It "restaura os tipos de inicialização dos serviços de atualização" {
         Invoke-WPFUpdatesdefault
 
         Should -Invoke -CommandName Set-Service -Times 1 -Exactly -ParameterFilter {
@@ -282,7 +282,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         }
     }
 
-    It "restores WaaSMedicSvc through its registry start value" {
+    It "restaura o WaaSMedicSvc por meio de seu valor de inicialização no registro" {
         Invoke-WPFUpdatesdefault
 
         Should -Invoke -CommandName Set-ItemProperty -Times 1 -Exactly
@@ -294,7 +294,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         }
     }
 
-    It "leaves WaaSMedicSvc alone when it is already Manual" {
+    It "não altera o WaaSMedicSvc quando ele já está como Manual" {
         Mock Get-ItemProperty {
             [pscustomobject]@{ Start = 3 }
         } -ParameterFilter { $Name -eq "Start" }
@@ -304,7 +304,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         Should -Not -Invoke Set-ItemProperty
     }
 
-    It "warns and continues when WaaSMedicSvc cannot be restored" {
+    It "avisa e continua quando o WaaSMedicSvc não pode ser restaurado" {
         Mock Set-ItemProperty { throw "Requested registry access is not allowed." }
 
         { Invoke-WPFUpdatesdefault } | Should -Not -Throw
@@ -315,7 +315,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         Should -Invoke -CommandName Enable-ScheduledTask -Times $script:updateTaskPaths.Count -Exactly
     }
 
-    It "removes only SYSTEM deny rules from update service keys" {
+    It "remove apenas regras de negação de SYSTEM das chaves dos serviços de atualização" {
         Mock Get-Acl { Get-TestServiceKeyAcl -DenySid "S-1-5-18", "S-1-1-0" }
         $script:savedAcls = @{}
         Mock Set-Acl { $script:savedAcls["$Path"] = $AclObject }
@@ -333,7 +333,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         }
     }
 
-    It "clears SYSTEM deny rules before changing service startup types" {
+    It "limpa as regras de negação de SYSTEM antes de alterar os tipos de inicialização dos serviços" {
         Mock Get-Acl { Get-TestServiceKeyAcl -DenySid "S-1-5-18" }
         $script:restoreOrder = [System.Collections.Generic.List[string]]::new()
         Mock Set-Acl { $script:restoreOrder.Add("Set-Acl") }
@@ -347,7 +347,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         $lastAclWrite | Should -BeLessThan $script:restoreOrder.IndexOf("Set-ItemProperty")
     }
 
-    It "leaves service key permissions alone when SYSTEM is not denied" {
+    It "não altera as permissões das chaves de serviço quando SYSTEM não está negado" {
         Mock Get-Acl { Get-TestServiceKeyAcl -DenySid "S-1-1-0" }
 
         Invoke-WPFUpdatesdefault
@@ -355,7 +355,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         Should -Not -Invoke Set-Acl
     }
 
-    It "warns and continues when service key permissions cannot be changed" {
+    It "avisa e continua quando as permissões das chaves de serviço não podem ser alteradas" {
         Mock Get-Acl { Get-TestServiceKeyAcl -DenySid "S-1-5-18" }
         Mock Set-Acl { throw "Requested registry access is not allowed." }
 
@@ -372,7 +372,7 @@ Describe "Invoke-WPFUpdatesdefault" {
         }
     }
 
-    It "enables update scheduled task paths without resetting unrelated local security policy" {
+    It "habilita os caminhos das tarefas agendadas de atualização sem redefinir a política de segurança local não relacionada" {
         Invoke-WPFUpdatesdefault
 
         foreach ($expectedTaskPath in $script:updateTaskPaths) {
@@ -405,7 +405,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         Mock Enable-ScheduledTask { }
     }
 
-    It "restores update availability before applying recommended settings" {
+    It "restaura a disponibilidade de atualizações antes de aplicar as configurações recomendadas" {
         Invoke-WPFUpdatessecurity
 
         Should -Invoke -CommandName Remove-ItemProperty -Times 1 -Exactly -ParameterFilter {
@@ -437,7 +437,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         Should -Invoke -CommandName Enable-ScheduledTask -Times $script:updateTaskPaths.Count -Exactly
     }
 
-    It "disables driver metadata and Windows Update driver search" {
+    It "desativa metadados de driver e a busca de drivers do Windows Update" {
         Invoke-WPFUpdatessecurity
 
         Should -Invoke -CommandName New-Item -Times 1 -Exactly -ParameterFilter {
@@ -475,7 +475,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         }
     }
 
-    It "sets recommended update deferral and installation notification policy values" {
+    It "define valores de política recomendados de adiamento de atualizações e notificação de instalação" {
         Invoke-WPFUpdatessecurity
 
         Should -Invoke -CommandName Set-ItemProperty -Times 1 -Exactly -ParameterFilter {
@@ -520,7 +520,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         }
     }
 
-    It "keeps existing policy keys instead of recreating them" {
+    It "mantém chaves de política existentes em vez de recriá-las" {
         Mock Test-Path { $true }
 
         Invoke-WPFUpdatessecurity
@@ -538,7 +538,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         }
     }
 
-    It "clears a leftover Win11 Creator update block" {
+    It "limpa um bloqueio de atualização deixado pelo Criador do Win11" {
         Mock Get-ItemProperty {
             [pscustomobject]@{ WUServer = "http://localhost:8080" }
         } -ParameterFilter { $Name -eq "WUServer" }
@@ -558,7 +558,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         }
     }
 
-    It "keeps a real WSUS server" {
+    It "mantém um servidor WSUS real" {
         Mock Get-ItemProperty {
             [pscustomobject]@{ WUServer = "http://wsus.example.local:8530" }
         } -ParameterFilter { $Name -eq "WUServer" }
@@ -570,7 +570,7 @@ Describe "Invoke-WPFUpdatessecurity" {
         }
     }
 
-    It "removes legacy WinUtil deferral values from the unsupported UX settings path" {
+    It "remove valores de adiamento legados do WinUtil do caminho de configurações UX não suportado" {
         Invoke-WPFUpdatessecurity
 
         foreach ($expectedValueName in @("BranchReadinessLevel", "DeferFeatureUpdatesPeriodInDays", "DeferQualityUpdatesPeriodInDays")) {

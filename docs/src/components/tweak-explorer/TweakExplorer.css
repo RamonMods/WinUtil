@@ -110,7 +110,7 @@
 	color: inherit;
 	cursor: pointer;
 }
-/* The card's overflow: hidden would clip an outline drawn outside the button. */
+/* O overflow: hidden do cartão recortaria um contorno desenhado fora do botão. */
 .wu-explorer-summary:focus-visible {
 	outline-offset: -2px;
 }
@@ -222,7 +222,7 @@
 .wu-explorer-table em {
 	color: var(--sl-color-gray-3);
 }
-/* On phones each row becomes a small card, so the long registry path doesn't squeeze the value columns off screen. */
+/* Em celulares, cada linha vira um pequeno cartão, para que o longo caminho do registro não empurre as colunas de valores para fora da tela. */
 @media (max-width: 40em) {
 	.wu-explorer-table thead {
 		position: absolute;

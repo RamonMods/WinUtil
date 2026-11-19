@@ -1,5 +1,5 @@
 #===========================================================================
-# Tests - GitHub Issue Triage Workflow
+# Testes - Fluxo de triagem de issues do GitHub
 #===========================================================================
 
 BeforeAll {
@@ -10,8 +10,8 @@ BeforeAll {
     $script:guide = Get-Content -Path $script:guidePath -Raw
 }
 
-Describe "GitHub issue triage workflow" {
-    It "cannot run against pull requests" {
+Describe "Fluxo de triagem de issues do GitHub" {
+    It "não pode ser executado em pull requests" {
         $script:workflow | Should -Match '(?m)^\s+if:\s+\$\{\{\s*!github\.event\.issue\.pull_request\s*\}\}\s*$'
         $script:workflow | Should -Match 'if \(context\.payload\.issue\.pull_request\)'
         $script:workflow | Should -Match '(?m)^\s+issues:\s+write\s*$'
@@ -20,12 +20,12 @@ Describe "GitHub issue triage workflow" {
         $script:workflow | Should -Not -Match '(?m)^\s+pull-requests:\s+write\s*$'
     }
 
-    It "authorizes trusted users by immutable numeric ID" {
+    It "autoriza usuários confiáveis por ID numérico imutável" {
         $script:workflow | Should -Match 'trustedUsers\.includes\(commentAuthor\.id\)'
         $script:workflow | Should -Not -Match 'trustedUsers\.includes\(commentAuthor\.login\)'
     }
 
-    It "matches one complete command at a time" {
+    It "corresponde a um comando completo por vez" {
         $script:workflow.Contains('const command = comment.body.trim().toLowerCase();') | Should -BeTrue
         $script:workflow.Contains('const triageMatch = command.match(/^\/triage$/);') | Should -BeTrue
         $script:workflow.Contains('const triageOffMatch = command.match(/^\/triageoff$/);') | Should -BeTrue
@@ -36,7 +36,7 @@ Describe "GitHub issue triage workflow" {
         $script:workflow.Contains('} else if (duplicateMatch) {') | Should -BeTrue
     }
 
-    It "preserves existing labels for not-related closures" {
+    It "preserva rótulos existentes em fechamentos não relacionados" {
         $notRelatedBlock = [regex]::Match(
             $script:workflow,
             '(?s)reason === "notrelated".*?github\.rest\.issues\.addLabels\(\{.*?labels: \["not-related"\].*?github\.rest\.issues\.update'
@@ -46,7 +46,7 @@ Describe "GitHub issue triage workflow" {
         $notRelatedBlock.Value | Should -Not -Match 'issues\.update\(\{.*?labels:'
     }
 
-    It "validates duplicate targets before closing the issue" {
+    It "valida alvos duplicados antes de fechar a issue" {
         $script:workflow.Contains('const duplicateIssueNumber = Number(duplicateMatch[1]);') | Should -BeTrue
         $script:workflow | Should -Match 'Number\.isSafeInteger\(duplicateIssueNumber\)'
         $script:workflow | Should -Match 'duplicateIssueNumber === issueNumber'
@@ -57,7 +57,7 @@ Describe "GitHub issue triage workflow" {
         $script:workflow | Should -Match 'duplicate_issue_id: duplicateIssue\.id'
     }
 
-    It "keeps the maintainer guide in the documentation site" {
+    It "mantém o guia do mantenedor no site de documentação" {
         Test-Path -Path (Join-Path $script:repoRoot ".github\TRIAGE_TOOLS.md") | Should -BeFalse
         $script:guide | Should -Match 'These commands work only on issues\.'
         $script:guide | Should -Match '`not-related` label without replacing existing labels'
