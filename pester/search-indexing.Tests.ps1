@@ -1,4 +1,4 @@
-# Executa os scripts configurados pelo orquestrador real de ajustes. Todas as operações de serviço
+﻿# Executa os scripts configurados pelo orquestrador real de ajustes. Todas as operações de serviço
 # são simuladas para que estes testes nunca alterem o indexador da máquina.
 BeforeAll {
     $repoRoot = Split-Path $PSScriptRoot -Parent

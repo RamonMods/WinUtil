@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $tweaks = Get-Content (Join-Path $PSScriptRoot '../config/tweaks.json') -Raw | ConvertFrom-Json
     $script:oneDrive = $tweaks.WPFTweaksRemoveOneDrive
     # Isole apenas a proteção do modelo, nunca o script destrutivo do OneDrive ao redor dela.

@@ -1,4 +1,4 @@
-function Start-WinUtilAssetRendering {
+﻿function Start-WinUtilAssetRendering {
     <#
         .SYNOPSIS
             Renderiza os bitmaps de sobreposição da barra de tarefas em uma thread própria

@@ -1,4 +1,4 @@
-function Test-WinUtilUIAlive {
+﻿function Test-WinUtilUIAlive {
     <#
         .SYNOPSIS
             Se existe uma janela na qual ainda é possível postar

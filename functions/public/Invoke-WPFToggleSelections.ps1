@@ -1,4 +1,4 @@
-function Invoke-WPFToggleSelections {
+﻿function Invoke-WPFToggleSelections {
     <#
 
     .SYNOPSIS

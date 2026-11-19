@@ -1,4 +1,4 @@
-function Invoke-WinUtilAppCategoryChip {
+﻿function Invoke-WinUtilAppCategoryChip {
     <#
         .SYNOPSIS
             Trata um clique em um chip de categoria da aba Instalar

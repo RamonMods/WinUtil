@@ -1,4 +1,4 @@
-function Get-WinUtilAppIcon {
+﻿function Get-WinUtilAppIcon {
     <#
         .SYNOPSIS
             Retorna o ícone embutido de um app na aba Instalar

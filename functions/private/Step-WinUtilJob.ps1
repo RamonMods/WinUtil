@@ -1,4 +1,4 @@
-function Step-WinUtilJob {
+﻿function Step-WinUtilJob {
     <#
         .SYNOPSIS
             Avança um job para seu próximo ponto reportável, respeitando uma pausa ou parada no caminho

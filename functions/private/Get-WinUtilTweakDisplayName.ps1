@@ -1,4 +1,4 @@
-function Get-WinUtilTweakDisplayName {
+﻿function Get-WinUtilTweakDisplayName {
     <#
         .SYNOPSIS
             Retorna o rótulo voltado ao usuário para uma chave de ajuste

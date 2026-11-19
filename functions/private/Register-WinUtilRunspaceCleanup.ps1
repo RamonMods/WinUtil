@@ -1,4 +1,4 @@
-function Register-WinUtilRunspaceCleanup {
+﻿function Register-WinUtilRunspaceCleanup {
     <#
         .SYNOPSIS
             Descarta uma instância do PowerShell e qualquer runspace de sua propriedade quando seu trabalho termina

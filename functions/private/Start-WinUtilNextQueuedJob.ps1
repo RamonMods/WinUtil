@@ -1,4 +1,4 @@
-function Start-WinUtilNextQueuedJob {
+﻿function Start-WinUtilNextQueuedJob {
     <#
         .SYNOPSIS
             Inicia o job enfileirado mais antigo se o slot estiver livre

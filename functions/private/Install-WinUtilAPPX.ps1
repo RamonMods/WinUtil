@@ -1,4 +1,4 @@
-function Install-WinUtilAPPX {
+﻿function Install-WinUtilAPPX {
     <#
 
     .SYNOPSIS

@@ -1,4 +1,4 @@
-function Register-WinUtilInputWatch {
+﻿function Register-WinUtilInputWatch {
     <#
         .SYNOPSIS
             Registra quando o usuário fez algo pela última vez, para que o trabalho em segundo plano possa sair da frente

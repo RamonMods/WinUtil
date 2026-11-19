@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     Add-Type -AssemblyName WindowsBase, PresentationFramework
     . (Join-Path $PSScriptRoot '../functions/private/Update-WinUtilWindowInsets.ps1')
 }

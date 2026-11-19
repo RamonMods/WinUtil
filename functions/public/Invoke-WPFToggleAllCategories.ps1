@@ -1,4 +1,4 @@
-function Invoke-WPFToggleAllCategories {
+﻿function Invoke-WPFToggleAllCategories {
     <#
         .SYNOPSIS
             Expande ou recolhe todas as categorias na aba Instalar

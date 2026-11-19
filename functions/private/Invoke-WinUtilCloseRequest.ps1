@@ -1,4 +1,4 @@
-function Invoke-WinUtilCloseRequest {
+﻿function Invoke-WinUtilCloseRequest {
     <#
         .SYNOPSIS
             Pergunta o que fazer com o trabalho que ainda está em execução quando a janela é fechada

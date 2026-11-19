@@ -1,4 +1,4 @@
-function Save-WinUtilFile {
+﻿function Save-WinUtilFile {
     <#
     .SYNOPSIS
         Baixa um arquivo e relata o progresso da transferência.

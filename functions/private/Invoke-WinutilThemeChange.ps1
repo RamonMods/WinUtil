@@ -1,4 +1,4 @@
-function Invoke-WinutilThemeChange {
+﻿function Invoke-WinutilThemeChange {
     <#
     .SYNOPSIS
         Alterna entre os temas claro e escuro de um aplicativo utilitário do Windows.

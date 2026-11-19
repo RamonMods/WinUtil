@@ -1,4 +1,4 @@
-function Get-WinUtilEntryToolTip {
+﻿function Get-WinUtilEntryToolTip {
     <#
         .SYNOPSIS
             Monta o texto da dica de uma entrada de app/ajuste/recurso: sua descrição mais sua chave JSON de predefinição

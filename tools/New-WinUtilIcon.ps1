@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Adiciona ou substitui o ícone de um aplicativo em config/icons
 

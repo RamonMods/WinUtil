@@ -1,4 +1,4 @@
-function Set-WinUtilRegistryComboState {
+﻿function Set-WinUtilRegistryComboState {
     <#
     .SYNOPSIS
         Aplica e verifica um estado de caixa de combinação de registro definido na configuração.

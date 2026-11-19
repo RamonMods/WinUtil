@@ -1,4 +1,4 @@
-function Invoke-WinUtilRobocopy {
+﻿function Invoke-WinUtilRobocopy {
     <#
         .SYNOPSIS
             Executa o robocopy e falha a tarefa quando algum arquivo não foi copiado

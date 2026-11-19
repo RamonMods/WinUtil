@@ -1,4 +1,4 @@
-function Write-WinUtilLog {
+﻿function Write-WinUtilLog {
     param (
         [Parameter(Mandatory = $true)]
         [string]$Message,

@@ -1,4 +1,4 @@
-function Invoke-WPFAppxRemoval {
+﻿function Invoke-WPFAppxRemoval {
     <#
 
     .SYNOPSIS

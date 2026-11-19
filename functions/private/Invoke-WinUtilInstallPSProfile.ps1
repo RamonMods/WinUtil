@@ -1,4 +1,4 @@
-function Get-WinUtilPowerShell7Path {
+﻿function Get-WinUtilPowerShell7Path {
     $command = Get-Command pwsh -CommandType Application -ErrorAction SilentlyContinue
     if ($command) { return $command.Source }
 

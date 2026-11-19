@@ -1,4 +1,4 @@
-function Invoke-WinUtilISOScript {
+﻿function Invoke-WinUtilISOScript {
     <#
     .SYNOPSIS
         Prepara a mídia de instalação do Windows copiada sem modificar sua imagem de instalação.

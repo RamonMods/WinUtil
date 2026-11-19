@@ -1,4 +1,4 @@
-function Start-WinUtilBackgroundQueue {
+﻿function Start-WinUtilBackgroundQueue {
     <#
         .SYNOPSIS
             Esvazia uma fila de trabalho da interface, um item por vez, entre as ações do usuário

@@ -1,4 +1,4 @@
-# Executa os scripts configurados pelo orquestrador de ajustes real. Cada cmdlet de registro
+﻿# Executa os scripts configurados pelo orquestrador de ajustes real. Cada cmdlet de registro
 # é mockado para que estes testes nunca toquem o banco de dados de exibição do Explorer da máquina.
 BeforeAll {
     $repoRoot = Split-Path $PSScriptRoot -Parent

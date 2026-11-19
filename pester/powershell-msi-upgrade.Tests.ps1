@@ -1,4 +1,4 @@
-Describe "Atualização MSI do PowerShell" {
+﻿Describe "Atualização MSI do PowerShell" {
     BeforeAll {
         . "$PSScriptRoot/../functions/private/Install-WinUtilProgramWinget.ps1"
         . "$PSScriptRoot/../functions/private/Write-WinUtilLog.ps1"

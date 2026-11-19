@@ -1,4 +1,4 @@
-function Invoke-WPFExportEnvironmentReport {
+﻿function Invoke-WPFExportEnvironmentReport {
     <#
     .SYNOPSIS
         Exporta como JSON um relatório de ambiente somente leitura e com lista de permissões, com um

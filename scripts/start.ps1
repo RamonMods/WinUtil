@@ -1,4 +1,4 @@
-<#
+﻿<#
 .NOTES
     Author         : Ramon @RamonMods
     Runspace Author: @DeveloperDurp

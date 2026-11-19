@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $repoRoot = Split-Path $PSScriptRoot -Parent
     . (Join-Path $repoRoot 'functions/private/Set-WinUtilClassicContextMenu.ps1')
     . (Join-Path $repoRoot 'functions/private/Invoke-WinUtilScript.ps1')

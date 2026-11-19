@@ -1,4 +1,4 @@
-function Write-WinUtilConsoleProgress {
+﻿function Write-WinUtilConsoleProgress {
     <#
         .SYNOPSIS
             Relata o progresso do job no console para execuções que não têm janela

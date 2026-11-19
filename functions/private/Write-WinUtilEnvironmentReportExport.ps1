@@ -1,4 +1,4 @@
-function Copy-WinUtilEnvironmentReportExportFile {
+﻿function Copy-WinUtilEnvironmentReportExportFile {
     param(
         [Parameter(Mandatory)]
         [string]$SourcePath,

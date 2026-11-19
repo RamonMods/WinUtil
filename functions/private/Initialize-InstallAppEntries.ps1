@@ -1,4 +1,4 @@
-function Initialize-InstallAppEntries {
+﻿function Initialize-InstallAppEntries {
     <#
         .SYNOPSIS
             Cria as entradas de app para um conjunto de apps e as coloca na aba Instalar

@@ -1,4 +1,4 @@
-function Get-WinUtilRecentLogs {
+﻿function Get-WinUtilRecentLogs {
     <#
     .SYNOPSIS
         Concatena os logs de sessão do WinUtil dos últimos N dias em um único bloco de texto.

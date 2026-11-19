@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     $tweaks = Get-Content (Join-Path $repoRoot "config/tweaks.json") -Raw | ConvertFrom-Json
     $script:applySplitting = [scriptblock]::Create($tweaks.WPFTweaksSvcHostSplitting.InvokeScript -join "`n")

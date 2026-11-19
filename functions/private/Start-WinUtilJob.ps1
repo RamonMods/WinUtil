@@ -1,4 +1,4 @@
-function Start-WinUtilJob {
+﻿function Start-WinUtilJob {
     <#
         .SYNOPSIS
             Executa uma operação longa fora da thread da interface, com progresso, barra de tarefas, log e

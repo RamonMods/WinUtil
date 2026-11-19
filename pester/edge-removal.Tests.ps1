@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $tweaks = Get-Content (Join-Path $PSScriptRoot '..\config\tweaks.json') -Raw | ConvertFrom-Json
     $script:removeEdge = [scriptblock]::Create($tweaks.WPFTweaksRemoveEdge.InvokeScript -join "`n")
     $script:edgeDirectory = "$Env:ProgramFiles (x86)\Microsoft\Edge\Application"

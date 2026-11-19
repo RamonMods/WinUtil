@@ -1,4 +1,4 @@
-# Verificações de layout da fila WPF nativa e de eventos roteados. Nenhum trabalho que altere o sistema é executado aqui.
+﻿# Verificações de layout da fila WPF nativa e de eventos roteados. Nenhum trabalho que altere o sistema é executado aqui.
 BeforeAll {
     Add-Type -AssemblyName PresentationFramework
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path

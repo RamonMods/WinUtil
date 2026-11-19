@@ -1,4 +1,4 @@
-@{
+﻿@{
     # Somente registros de diagnóstico da severidade especificada serão gerados.
     # Descomente a linha a seguir se quiser apenas erros e avisos, mas não
     # registros de diagnóstico informativos.

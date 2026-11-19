@@ -1,4 +1,4 @@
-function Invoke-WPFGetInstalled {
+﻿function Invoke-WPFGetInstalled {
     <#
     .SYNOPSIS
         Detecta o que já está instalado ou aplicado e marca as caixas correspondentes

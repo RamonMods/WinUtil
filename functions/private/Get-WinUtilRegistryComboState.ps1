@@ -1,4 +1,4 @@
-function Get-WinUtilRegistryComboState {
+﻿function Get-WinUtilRegistryComboState {
     <#
     .SYNOPSIS
         Encontra o estado de lista suspensa configurado que corresponde aos valores atuais do registro.

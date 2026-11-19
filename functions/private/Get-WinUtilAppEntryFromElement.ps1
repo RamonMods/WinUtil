@@ -1,4 +1,4 @@
-function Get-WinUtilAppEntryFromElement {
+﻿function Get-WinUtilAppEntryFromElement {
     <#
         .SYNOPSIS
             Encontra a entrada (cartão) de app à qual um elemento da aba Instalar pertence

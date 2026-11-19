@@ -1,4 +1,4 @@
-function Initialize-InstallCategoryAppList {
+﻿function Initialize-InstallCategoryAppList {
     <#
         .SYNOPSIS
             Limpa o Elemento de Destino e configura uma mensagem de "Carregando". Isso é feito porque carregar todos os apps pode levar um tempo em alguns cenários

@@ -1,4 +1,4 @@
-#====================================================================# Testes - Arquivos de configuração
+﻿#====================================================================# Testes - Arquivos de configuração
 #====================================================================
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $configRoot = Join-Path $PSScriptRoot "..\config"

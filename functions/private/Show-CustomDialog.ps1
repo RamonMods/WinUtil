@@ -1,4 +1,4 @@
-function Show-CustomDialog {
+﻿function Show-CustomDialog {
     <#
     .SYNOPSIS
     Exibe uma caixa de diálogo personalizada com uma imagem, título, mensagem e um botão OK.

@@ -1,4 +1,4 @@
-function Invoke-WPFAppxInstall {
+﻿function Invoke-WPFAppxInstall {
     if ($null -eq $sync.selectedAppx -or $sync.selectedAppx.Count -eq 0) {
         Show-WinUtilMessage -Message "Nenhum pacote AppX selecionado" -Title "Erro" -Button "OK" -Icon "Error"
         return

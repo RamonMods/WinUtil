@@ -1,4 +1,4 @@
-function Invoke-WinUtilSSHServer {
+﻿function Invoke-WinUtilSSHServer {
     <#
     .SYNOPSIS
         Habilita o servidor OpenSSH para acessar remotamente seu dispositivo Windows

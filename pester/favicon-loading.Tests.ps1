@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     foreach ($file in @(

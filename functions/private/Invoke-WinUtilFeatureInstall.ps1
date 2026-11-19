@@ -1,4 +1,4 @@
-function Invoke-WinUtilFeatureInstall ($CheckBox) {
+﻿function Invoke-WinUtilFeatureInstall ($CheckBox) {
     Write-WinUtilLog -Component "Feature" -Message "Aplicando ação de recurso: $CheckBox"
 
     $featureFailed = $false

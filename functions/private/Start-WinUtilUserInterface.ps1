@@ -1,4 +1,4 @@
-function Start-WinUtilUserInterface {
+﻿function Start-WinUtilUserInterface {
     <#
         .SYNOPSIS
             Monta a janela do WinUtil, conecta seus manipuladores de evento e a executa até o fim

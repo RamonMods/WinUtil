@@ -1,4 +1,4 @@
-function Set-WinUtilAppCategoryFilter {
+﻿function Set-WinUtilAppCategoryFilter {
     <#
         .SYNOPSIS
             Aplica o filtro de categoria da aba Instalar e sincroniza o estado dos chips com ele

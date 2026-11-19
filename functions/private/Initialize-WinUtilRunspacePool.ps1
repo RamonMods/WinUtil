@@ -1,4 +1,4 @@
-function Initialize-WinUtilRunspacePool {
+﻿function Initialize-WinUtilRunspacePool {
     <#
         .SYNOPSIS
             Abre o pool de workers compartilhado em que Start-WinUtilJob executa os corpos dos jobs

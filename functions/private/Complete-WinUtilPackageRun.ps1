@@ -1,4 +1,4 @@
-function Complete-WinUtilPackageRun {
+﻿function Complete-WinUtilPackageRun {
     <#
         .SYNOPSIS
             Relata o que uma execução de pacotes realmente fez e falha o job em erros inesperados

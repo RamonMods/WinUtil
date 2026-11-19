@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Testes - Compatibilidade do catálogo WinOneShot
 #===========================================================================
 # O WinOneShot baixa estes arquivos das URLs brutas do GitHub em main/config do WinUtil.

@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $tweaks = Get-Content (Join-Path $PSScriptRoot '..\config\tweaks.json') -Raw | ConvertFrom-Json
     $script:windowsAI = [scriptblock]::Create($tweaks.WPFTweaksWindowsAI.InvokeScript -join "`n")
     $commandAssignment = $script:windowsAI.Ast.Find({

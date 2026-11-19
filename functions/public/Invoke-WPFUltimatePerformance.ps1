@@ -1,4 +1,4 @@
-function Invoke-WPFUltimatePerformance ([switch]$Enable) {
+﻿function Invoke-WPFUltimatePerformance ([switch]$Enable) {
     <#
 
     .SYNOPSIS

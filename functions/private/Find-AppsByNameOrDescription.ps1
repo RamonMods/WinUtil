@@ -1,4 +1,4 @@
-function Find-AppsByNameOrDescription {
+﻿function Find-AppsByNameOrDescription {
     <#
         .SYNOPSIS
             Filtra as entradas da aba Instalar por texto de busca e por categoria

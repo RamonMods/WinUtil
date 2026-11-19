@@ -1,4 +1,4 @@
-function Write-WinUtilJobBanner {
+﻿function Write-WinUtilJobBanner {
     <#
         .SYNOPSIS
             Escreve a linha em caixa de início, conclusão ou falha que um job imprime no console

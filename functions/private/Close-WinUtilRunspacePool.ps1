@@ -1,4 +1,4 @@
-function Close-WinUtilRunspacePool {
+﻿function Close-WinUtilRunspacePool {
     <#
         .SYNOPSIS
             Para o que ainda estiver em execução e fecha o pool de workers

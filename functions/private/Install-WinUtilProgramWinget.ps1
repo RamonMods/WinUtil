@@ -1,4 +1,4 @@
-Function Get-WinUtilPowerShellVersion {
+﻿Function Get-WinUtilPowerShellVersion {
     param ([string]$Path)
     & $Path -NoLogo -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
 }

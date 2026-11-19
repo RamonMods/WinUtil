@@ -1,4 +1,4 @@
-function Get-WinUtilAppEntryHandlers {
+﻿function Get-WinUtilAppEntryHandlers {
     <#
         .SYNOPSIS
             Os tratadores de evento compartilhados por toda entrada de app na aba Instalar

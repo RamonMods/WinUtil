@@ -1,4 +1,4 @@
-function Test-WinUtilPackageManager {
+﻿function Test-WinUtilPackageManager {
     <#
     .SYNOPSIS
         Verifica se o WinGet e/ou o Choco estão instalados.

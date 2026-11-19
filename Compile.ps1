@@ -51,7 +51,9 @@ $script += "`$WinUtilAutounattendXml = @'`r`n$autounattendXml`r`n'@"
 
 $script += Get-Content -Path scripts\main.ps1 -Raw
 
-Set-Content -Path winutil.ps1 -Value $script
+# O script compilado precisa sair em UTF-8 com BOM: o Windows PowerShell 5.1 le arquivos sem BOM
+# usando a pagina de codigo ANSI do sistema, o que corrompe os acentos de todo o texto em portugues.
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) "winutil.ps1"), $script, (New-Object System.Text.UTF8Encoding($true)))
 
 if ($Run) {
     .\Winutil.ps1

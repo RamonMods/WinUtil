@@ -1,4 +1,4 @@
-function Add-SelectedAppsMenuItem {
+﻿function Add-SelectedAppsMenuItem {
     <#
     .SYNOPSIS
         Função auxiliar que gera e adiciona os itens de menu ao popup de Apps Selecionados.

@@ -1,4 +1,4 @@
-function New-WinUtilSessionState {
+﻿function New-WinUtilSessionState {
     <#
         .SYNOPSIS
             Cria o InitialSessionState a partir do qual todo runspace do WinUtil é criado

@@ -1,4 +1,4 @@
-function Test-WinUtilShellRunning {
+﻿function Test-WinUtilShellRunning {
     <#
         .SYNOPSIS
             Se uma instância ainda está em execução, tratando uma descartada como concluída

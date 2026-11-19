@@ -1,4 +1,4 @@
-function Invoke-WinUtilUninstallPSProfile {
+﻿function Invoke-WinUtilUninstallPSProfile {
     <#
     .SYNOPSIS
         Restaura o perfil do PowerShell 7 que o perfil do RamonMods substituiu

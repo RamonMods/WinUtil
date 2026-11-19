@@ -1,4 +1,4 @@
-function Get-WinUtilRegistryComboValue {
+﻿function Get-WinUtilRegistryComboValue {
     <#
     .SYNOPSIS
         Lê um valor de registro para um estado de lista suspensa baseado no registro.

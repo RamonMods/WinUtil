@@ -1,4 +1,4 @@
-function New-WinUtilFossBadge {
+﻿function New-WinUtilFossBadge {
     <#
         .SYNOPSIS
             Cria o marcador FOSS: o buraco de fechadura de código aberto sobre um fundo verde

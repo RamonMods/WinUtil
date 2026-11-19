@@ -1,4 +1,4 @@
-function Invoke-WPFTab {
+﻿function Invoke-WPFTab {
 
     <#
 
@@ -33,7 +33,17 @@ function Invoke-WPFTab {
                 $sync["$ClickedTab"].IsChecked = $true
             }
         }
-        $sync.currentTab = $sync.WPFTabNav.Items[$tabNumber].Header
+        # O cabecalho da aba e o texto exibido, que esta em portugues; o identificador usado pelo
+        # conteudo, pela busca e pelo trabalho em segundo plano continua sendo o nome fixo em ingles.
+        $sync.currentTab = switch ($sync.WPFTabNav.Items[$tabNumber].Name) {
+            "WPFTab1" { "Install" }
+            "WPFTab2" { "Tweaks" }
+            "WPFTab3" { "Config" }
+            "WPFTab4" { "Updates" }
+            "WPFTab5" { "Win11ISO" }
+            "WPFTab6" { "AppX" }
+            default { $sync.WPFTabNav.Items[$tabNumber].Name }
+        }
     }
 
     Measure-WinUtilStep -Scope "Tab" -Name "$ClickedTab content" -ScriptBlock {

@@ -1,4 +1,4 @@
-function Set-WinUtilClassicContextMenu {
+﻿function Set-WinUtilClassicContextMenu {
     param([switch]$Undo)
 
     $clsidPath = 'HKCU:\Software\Classes\CLSID'

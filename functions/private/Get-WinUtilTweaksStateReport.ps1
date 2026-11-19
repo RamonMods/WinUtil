@@ -1,4 +1,4 @@
-function Get-WinUtilTweaksStateReport {
+﻿function Get-WinUtilTweaksStateReport {
     <#
     .SYNOPSIS
         Agrupa o estado aplicado real de cada entrada de config/tweaks.json por categoria, reutilizando a mesma

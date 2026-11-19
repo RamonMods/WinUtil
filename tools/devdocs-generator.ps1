@@ -1,4 +1,4 @@
-<#
+﻿<#
     .DESCRIPTION
     Gera a documentação em markdown do Astro/Starlight a partir de config/tweaks.json e config/feature.json.
     Executado pelo workflow de docs do GitHub Actions antes do build do Astro.

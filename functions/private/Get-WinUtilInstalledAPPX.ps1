@@ -1,4 +1,4 @@
-function Get-WinUtilInstalledAPPX {
+﻿function Get-WinUtilInstalledAPPX {
     <#
 
     .SYNOPSIS

@@ -1,4 +1,4 @@
-function Measure-WinUtilStep {
+﻿function Measure-WinUtilStep {
     <#
         .SYNOPSIS
             Cronometra uma etapa de um pipeline e a registra para o resumo de tempos

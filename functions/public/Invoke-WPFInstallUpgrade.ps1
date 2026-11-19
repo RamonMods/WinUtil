@@ -1,4 +1,4 @@
-function Invoke-WPFInstallUpgrade {
+﻿function Invoke-WPFInstallUpgrade {
     <#
 
     .SYNOPSIS

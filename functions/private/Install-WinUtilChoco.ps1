@@ -1,4 +1,4 @@
-function Install-WinUtilChoco {
+﻿function Install-WinUtilChoco {
     <#
     .SYNOPSIS
         Instala o Chocolatey se ele ainda não estiver presente

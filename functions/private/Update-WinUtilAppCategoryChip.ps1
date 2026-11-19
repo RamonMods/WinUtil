@@ -1,4 +1,4 @@
-function Update-WinUtilAppCategoryChip {
+﻿function Update-WinUtilAppCategoryChip {
     <#
         .SYNOPSIS
             Aplica a seleção de categoria atual aos chips de filtro da aba Instalar

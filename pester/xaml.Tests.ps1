@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Testes - Conexão dos controles XAML
 
 BeforeAll {
@@ -325,7 +325,7 @@ Describe "Documento XAML" {
 
 
     It "centraliza verticalmente os controles da barra superior" {
-        $navPanel = $script:xaml.SelectSingleNode('//*[local-name()="StackPanel"][@Name="NavDockPanel"]')
+        $navPanel = $script:xaml.SelectSingleNode('//*[@Name="NavDockPanel"]')
         $minimizeButton = $script:xaml.SelectSingleNode('//*[local-name()="Button"][@Name="WPFMinimizeButton"]')
         $actionPanel = $minimizeButton.ParentNode
         $topBarButtonNames = @(
@@ -384,7 +384,7 @@ Describe "Documento XAML" {
         $comboStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@TargetType="ComboBox"]')
         $comboToggle = $comboStyle.SelectSingleNode('.//*[local-name()="ToggleButton"][@Name="ToggleButton"]')
         $comboItemStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@TargetType="ComboBoxItem"]')
-        $navButtons = @($script:xaml.SelectNodes('//*[local-name()="StackPanel"][@Name="NavDockPanel"]/*[local-name()="ToggleButton"]'))
+        $navButtons = @($script:xaml.SelectNodes('//*[@Name="NavDockPanel"]/*[local-name()="ToggleButton"]'))
 
         $implicitToggleStyles | Should -BeNullOrEmpty
         $tabStyle | Should -Not -BeNullOrEmpty

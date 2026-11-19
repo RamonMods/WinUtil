@@ -1,4 +1,4 @@
-function Update-WinUtilWindowInsets {
+﻿function Update-WinUtilWindowInsets {
     <#
     .SYNOPSIS
         Mantém o conteúdo do cliente maximizado dentro da área de trabalho do monitor atual.

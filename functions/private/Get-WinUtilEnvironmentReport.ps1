@@ -1,4 +1,4 @@
-function Get-WinUtilEnvironmentReport {
+﻿function Get-WinUtilEnvironmentReport {
     <#
     .SYNOPSIS
         Coleta os dados permitidos usados pelo relatório de ambiente do WinUtil.

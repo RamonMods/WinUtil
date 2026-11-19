@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Testes - InvokeScript do ajuste de desabilitação do BitLocker
 #===========================================================================
 # Cobre WPFTweaksDisableBitLocker (config/tweaks.json): o script de aplicação deve

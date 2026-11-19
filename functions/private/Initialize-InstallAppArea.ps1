@@ -1,4 +1,4 @@
-    function Initialize-InstallAppArea {
+﻿    function Initialize-InstallAppArea {
         <#
             .SYNOPSIS
                 Cria um [Windows.Controls.ScrollViewer] contendo um [Windows.Controls.ItemsControl] que é configurado para usar Virtualização e carregar apenas os elementos visíveis, por motivos de desempenho.

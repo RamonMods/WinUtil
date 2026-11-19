@@ -1,4 +1,4 @@
-function Get-WinUtilRunspacePoolLock {
+﻿function Get-WinUtilRunspacePoolLock {
     <#
         .SYNOPSIS
             Retorna o lock que serializa a inicialização e o encerramento do pool de workers

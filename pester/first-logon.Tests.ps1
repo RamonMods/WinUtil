@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     [xml]$unattend = Get-Content -LiteralPath (Join-Path $PSScriptRoot '../tools/autounattend.xml') -Raw
     function Get-CompletionTail {
         param([string]$Name, [string]$Variable)

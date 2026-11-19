@@ -1,4 +1,4 @@
-function Update-WinUtilAppEntryWidth {
+﻿function Update-WinUtilAppEntryWidth {
     <#
         .SYNOPSIS
             Estica os cartões de aplicativos para que cada linha da aba Instalar preencha a largura disponível

@@ -1,4 +1,4 @@
-function Set-WinUtilWorkingView {
+﻿function Set-WinUtilWorkingView {
     <#
         .SYNOPSIS
             Mostra ou oculta a visão de trabalho de uma aba (spinner + status ao vivo)

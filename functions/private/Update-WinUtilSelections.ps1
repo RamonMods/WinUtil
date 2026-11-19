@@ -1,4 +1,4 @@
-function Update-WinUtilSelections {
+﻿function Update-WinUtilSelections {
     param(
         [Parameter(Mandatory)]
         [string[]]$flatJson,

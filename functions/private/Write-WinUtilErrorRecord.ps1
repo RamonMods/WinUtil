@@ -1,4 +1,4 @@
-function Write-WinUtilErrorRecord {
+﻿function Write-WinUtilErrorRecord {
     <#
         .SYNOPSIS
             Registra uma falha com contexto suficiente para agir sobre ela

@@ -1,4 +1,4 @@
-function Start-WinUtilTabWarmup {
+﻿function Start-WinUtilTabWarmup {
     <#
         .SYNOPSIS
             Constrói as abas que o usuário ainda não abriu, enquanto a interface está ociosa

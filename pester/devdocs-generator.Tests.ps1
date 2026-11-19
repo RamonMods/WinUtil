@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     $script:fixtureRoot = Join-Path $TestDrive "repo"
     foreach ($directory in @("tools", "config", "functions/public", "functions/private")) {

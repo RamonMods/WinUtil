@@ -33,10 +33,14 @@ async function latestRelease() {
 // ConvertFrom-Json accepts raw line breaks inside strings, which the multi-line InvokeScript blocks rely on, and
 // JSON.parse doesn't, so they're escaped first.
 function parseConfig(text) {
+	// Os arquivos de config são gerados em UTF-8 com BOM para o Windows PowerShell 5.1; a marca precisa sair
+	// antes do JSON.parse, que rejeita BOM no começo do documento.
 	return JSON.parse(
-		text.replace(/"(?:[^"\\]|\\.)*"/g, (literal) =>
-			literal.replace(/[\u0000-\u001f]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
-		)
+		String(text)
+			.replace(/^\uFEFF/, '')
+			.replace(/"(?:[^"\\]|\\.)*"/g, (literal) =>
+				literal.replace(/[\u0000-\u001f]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
+			)
 	);
 }
 

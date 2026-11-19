@@ -1,4 +1,4 @@
-function Install-WinUtilProgramChoco {
+﻿function Install-WinUtilProgramChoco {
     <#
 
     .SYNOPSIS

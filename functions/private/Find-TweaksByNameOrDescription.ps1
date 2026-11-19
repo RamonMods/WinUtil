@@ -1,4 +1,4 @@
-function Find-TweaksByNameOrDescription {
+﻿function Find-TweaksByNameOrDescription {
     <#
     .SYNOPSIS
         Filtra entradas de ajustes/appx por nome ou descrição usando correspondência literal de texto.

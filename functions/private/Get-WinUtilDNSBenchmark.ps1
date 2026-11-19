@@ -1,4 +1,4 @@
-function Get-WinUtilDNSBenchmark {
+﻿function Get-WinUtilDNSBenchmark {
     <#
 
     .SYNOPSIS

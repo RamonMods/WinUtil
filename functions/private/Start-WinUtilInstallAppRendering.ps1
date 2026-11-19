@@ -1,4 +1,4 @@
-function Invoke-WinUtilInstallAppRenderBatch {
+﻿function Invoke-WinUtilInstallAppRenderBatch {
     param(
         [Parameter(Mandatory = $true)]
         $CategoryBatch,

@@ -1,4 +1,4 @@
-function Initialize-WinUtilInstallTabControls {
+﻿function Initialize-WinUtilInstallTabControls {
     <#
         .SYNOPSIS
             Conecta os controles da aba Instalar que são gerados a partir da configuração em vez de

@@ -1,4 +1,4 @@
-function Show-WinUtilMessage {
+﻿function Show-WinUtilMessage {
     <#
     .SYNOPSIS
         Exibe uma caixa de mensagem do WinUtil e retorna o resultado selecionado.

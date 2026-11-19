@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $tweaks = Get-Content (Join-Path $PSScriptRoot '..\config\tweaks.json') -Raw | ConvertFrom-Json
     $invokeText = $tweaks.WPFTweaksRemoveOneDrive.InvokeScript -join "`n"
     # Intercepta a gravação persistente no ambiente; os artefatos do sistema de arquivos ficam no TestDrive.

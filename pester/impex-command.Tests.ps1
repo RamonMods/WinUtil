@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     . (Join-Path $repoRoot "functions\public\Invoke-WPFImpex.ps1")
 }

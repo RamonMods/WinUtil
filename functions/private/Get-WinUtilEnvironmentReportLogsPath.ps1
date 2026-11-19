@@ -1,4 +1,4 @@
-function Get-WinUtilEnvironmentReportLogsPath {
+﻿function Get-WinUtilEnvironmentReportLogsPath {
     <#
     .SYNOPSIS
         Deriva o caminho do .txt de logs companheiro a partir do caminho de salvamento do JSON do relatório de ambiente.
