@@ -1,15 +1,15 @@
 function Show-WinUtilMessage {
     <#
     .SYNOPSIS
-        Shows a WinUtil message box and returns the selected result.
+        Exibe uma caixa de mensagem do WinUtil e retorna o resultado selecionado.
 
     .DESCRIPTION
-        Message boxes need the interface thread, so this marshals onto it and can therefore be
-        called from a job body as well as from an event handler. Every prompt is also written to
-        the session log so the log shows what the user was asked and not just what happened next.
+        Caixas de mensagem precisam da thread da interface, então esta função faz o marshalling para ela
+        e por isso pode ser chamada tanto de um corpo de job quanto de um manipulador de eventos. Todo prompt também é gravado
+        no log da sessão, para que o log mostre o que foi perguntado ao usuário e não apenas o que aconteceu depois.
 
-        With no window there is nobody to click, so nothing is shown. A modal put up in that
-        state never returns and takes the worker with it.
+        Sem uma janela não há ninguém para clicar, então nada é exibido. Um modal aberto nesse
+        estado nunca retorna e leva o worker junto.
     #>
     param (
         [string]$Message,
@@ -21,10 +21,10 @@ function Show-WinUtilMessage {
     Write-WinUtilLog -Component "Dialog" -Message "$Title : $($Message -replace '\r?\n', ' ')"
 
     if (-not (Test-WinUtilUIAlive)) {
-        # Anything with a choice is answered with the one that does not go ahead, so a prompt
-        # nobody saw can never stand in for consent
+        # Qualquer coisa com escolha é respondida com a opção que não prossegue, para que um prompt
+        # que ninguém viu nunca valha como consentimento
         $unattended = if ("$Button" -eq "OK") { "OK" } else { "No" }
-        Write-WinUtilLog -Level "WARN" -Component "Dialog" -Message "No window to ask on, answering '$unattended' for: $Title"
+        Write-WinUtilLog -Level "WARN" -Component "Dialog" -Message "Sem janela para perguntar, respondendo '$unattended' para: $Title"
         return $unattended
     }
 

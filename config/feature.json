@@ -1,7 +1,7 @@
 {
   "WPFFeaturesdotnet": {
-    "Content": ".NET Framework (Versions 2, 3, 4) - Enable",
-    "Description": ".NET and .NET Framework is a developer platform made up of tools, programming languages, and libraries for building many different types of applications.",
+    "Content": ".NET Framework (Versões 2, 3, 4) - Ativar",
+    "Description": "O .NET e o .NET Framework são uma plataforma de desenvolvimento composta por ferramentas, linguagens de programação e bibliotecas para criar muitos tipos diferentes de aplicativos.",
     "category": "Features",
     "panel": "1",
     "feature": [
@@ -9,31 +9,31 @@
       "NetFx3"
     ],
     "InvokeScript": [],
-    "link": "https://winutil.christitus.com/code-reference/features/features/dotnet"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/dotnet"
   },
   "WPFFixesNTPPool": {
-    "Content": "NTP Server - Enable",
-    "Description": "Replaces the default Windows NTP server (time.windows.com) with pool.ntp.org for improved time synchronization accuracy and reliability.",
+    "Content": "Servidor NTP - Ativar",
+    "Description": "Substitui o servidor NTP padrão do Windows (time.windows.com) pelo pool.ntp.org para melhorar a precisão e a confiabilidade da sincronização de horário.",
     "category": "Fixes",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFFixesNTPPool",
-    "link": "https://winutil.christitus.com/code-reference/features/fixes/ntppool"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/fixes/ntppool"
   },
   "WPFFeatureshyperv": {
-    "Content": "Hyper-V - Enable",
-    "Description": "Hyper-V is a hardware virtualization product developed by Microsoft that allows users to create and manage virtual machines.",
+    "Content": "Hyper-V - Ativar",
+    "Description": "O Hyper-V é um produto de virtualização por hardware desenvolvido pela Microsoft que permite criar e gerenciar máquinas virtuais.",
     "category": "Features",
     "panel": "1",
     "feature": [
       "Microsoft-Hyper-V-All"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/features/hyperv"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/hyperv"
   },
   "WPFFeatureslegacymedia": {
-    "Content": "Legacy Media Components (WMP, DirectPlay) - Enable",
-    "Description": "Enables legacy programs from previous versions of Windows.",
+    "Content": "Componentes de mídia legados (WMP, DirectPlay) - Ativar",
+    "Description": "Ativa programas legados de versões anteriores do Windows.",
     "category": "Features",
     "panel": "1",
     "feature": [
@@ -43,11 +43,11 @@
       "LegacyComponents"
     ],
     "InvokeScript": [],
-    "link": "https://winutil.christitus.com/code-reference/features/features/legacymedia"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/legacymedia"
   },
   "WPFFeaturewsl": {
-    "Content": "Windows Subsystem for Linux (WSL) - Enable",
-    "Description": "Windows Subsystem for Linux is an optional feature of Windows that allows Linux programs to run natively on Windows without the need for a separate virtual machine or dual booting.",
+    "Content": "Subsistema do Windows para Linux (WSL) - Ativar",
+    "Description": "O Subsistema do Windows para Linux é um recurso opcional do Windows que permite executar programas Linux nativamente no Windows, sem precisar de uma máquina virtual separada ou de inicialização dupla.",
     "category": "Features",
     "panel": "1",
     "feature": [
@@ -55,11 +55,11 @@
       "Microsoft-Windows-Subsystem-Linux"
     ],
     "InvokeScript": [],
-    "link": "https://winutil.christitus.com/code-reference/features/features/wsl"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/wsl"
   },
   "WPFFeaturenfs": {
-    "Content": "Network File System (NFS) - Enable",
-    "Description": "Network File System (NFS) is a mechanism for storing files on a network.",
+    "Content": "Sistema de Arquivos em Rede (NFS) - Ativar",
+    "Description": "O Sistema de Arquivos em Rede (NFS) é um mecanismo para armazenar arquivos em uma rede.",
     "category": "Features",
     "panel": "1",
     "feature": [
@@ -74,11 +74,11 @@
       "nfsadmin client start",
       "nfsadmin client localhost config fileaccess=755 SecFlavors=+sys -krb5 -krb5i"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/features/nfs"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/nfs"
   },
   "WPFFeatureRegBackup": {
-    "Content": "Registry Backup (Daily Task 12:30am) - Enable",
-    "Description": "Enables daily registry backup, previously disabled by Microsoft in Windows 10 1803.",
+    "Content": "Backup do Registro (tarefa diária às 00:30) - Ativar",
+    "Description": "Ativa o backup diário do Registro, que a Microsoft havia desativado no Windows 10 1803.",
     "category": "Features",
     "panel": "1",
     "feature": [],
@@ -91,96 +91,96 @@
       Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'AutoRegBackup' -Description 'Create System Registry Backups' -User 'System'
       "
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/features/regbackup"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/regbackup"
   },
   "WPFFeatureEnableLegacyRecovery": {
-    "Content": "Legacy F8 Boot Recovery - Enable",
-    "Description": "Enables Advanced Boot Options screen that lets you start Windows in advanced troubleshooting modes.",
+    "Content": "Recuperação de inicialização F8 legada - Ativar",
+    "Description": "Ativa a tela de Opções de Inicialização Avançadas, que permite iniciar o Windows em modos avançados de solução de problemas.",
     "category": "Features",
     "panel": "1",
     "feature": [],
     "InvokeScript": [
       "bcdedit /set bootmenupolicy legacy"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/features/enablelegacyrecovery"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/enablelegacyrecovery"
   },
   "WPFFeatureDisableLegacyRecovery": {
-    "Content": "Legacy F8 Boot Recovery - Disable",
-    "Description": "Disables Advanced Boot Options screen that lets you start Windows in advanced troubleshooting modes.",
+    "Content": "Recuperação de inicialização F8 legada - Desativar",
+    "Description": "Desativa a tela de Opções de Inicialização Avançadas, que permite iniciar o Windows em modos avançados de solução de problemas.",
     "category": "Features",
     "panel": "1",
     "feature": [],
     "InvokeScript": [
       "bcdedit /set bootmenupolicy standard"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/features/disablelegacyrecovery"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/disablelegacyrecovery"
   },
   "WPFFeaturesSandbox": {
-    "Content": "Windows Sandbox - Enable",
-    "Description": "Windows Sandbox is a lightweight virtual machine that provides a temporary desktop environment to safely run applications and programs in isolation.",
+    "Content": "Windows Sandbox - Ativar",
+    "Description": "O Windows Sandbox é uma máquina virtual leve que oferece um ambiente de área de trabalho temporário para executar aplicativos e programas com segurança, de forma isolada.",
     "category": "Features",
     "panel": "1",
     "feature": [
       "Containers-DisposableClientVM"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/features/sandbox"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/sandbox"
   },
   "WPFFeatureInstall": {
-    "Content": "Install Features",
+    "Content": "Instalar recursos",
     "category": "Features",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFFeatureInstall",
-    "link": "https://winutil.christitus.com/code-reference/features/features/install"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/features/install"
   },
   "WPFPanelAutologin": {
-    "Content": "AutoLogon - Run",
+    "Content": "AutoLogon - Executar",
     "category": "Fixes",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFPanelAutologin",
-    "link": "https://winutil.christitus.com/code-reference/features/fixes/autologin"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/fixes/autologin"
   },
   "WPFFixesUpdate": {
-    "Content": "Windows Update - Reset",
+    "Content": "Windows Update - Redefinir",
     "category": "Fixes",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFFixesUpdate",
-    "link": "https://winutil.christitus.com/code-reference/features/fixes/update"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/fixes/update"
   },
   "WPFFixesNetwork": {
-    "Content": "Network - Reset",
+    "Content": "Rede - Redefinir",
     "category": "Fixes",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFFixesNetwork",
-    "link": "https://winutil.christitus.com/code-reference/features/fixes/network"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/fixes/network"
   },
   "WPFPanelDISM": {
-    "Content": "System Corruption Scan - Run",
+    "Content": "Verificação de corrupção do sistema - Executar",
     "category": "Fixes",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFSystemRepair",
-    "link": "https://winutil.christitus.com/code-reference/features/fixes/dism"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/fixes/dism"
   },
   "WPFFixesWinget": {
-    "Content": "WinGet - Reinstall",
+    "Content": "WinGet - Reinstalar",
     "category": "Fixes",
     "panel": "1",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFFixesWinget",
-    "link": "https://winutil.christitus.com/code-reference/features/fixes/winget"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/fixes/winget"
   },
   "WPFPanelComputer": {
-    "Content": "Computer Management",
+    "Content": "Gerenciamento do Computador",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -188,10 +188,10 @@
     "InvokeScript": [
       "compmgmt.msc"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/computer"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/computer"
   },
   "WPFPanelControl": {
-    "Content": "Control Panel",
+    "Content": "Painel de Controle",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -199,10 +199,10 @@
     "InvokeScript": [
       "control"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/control"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/control"
   },
   "WPFPanelMouse": {
-    "Content": "Mouse Properties",
+    "Content": "Propriedades do Mouse",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -210,10 +210,10 @@
     "InvokeScript": [
       "main.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/mouse"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/mouse"
   },
   "WPFPanelNetwork": {
-    "Content": "Network Connections",
+    "Content": "Conexões de Rede",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -221,10 +221,10 @@
     "InvokeScript": [
       "ncpa.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/network"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/network"
   },
   "WPFPanelPower": {
-    "Content": "Power Panel",
+    "Content": "Painel de Energia",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -232,10 +232,10 @@
     "InvokeScript": [
       "powercfg.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/power"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/power"
   },
   "WPFPanelPrinter": {
-    "Content": "Printer Panel",
+    "Content": "Painel de Impressoras",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -243,10 +243,10 @@
     "InvokeScript": [
       "Start-Process 'shell:::{A8A91A66-3A7D-4424-8D24-04E180695C7A}'"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/printer"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/printer"
   },
   "WPFPanelPrograms": {
-    "Content": "Programs and Features",
+    "Content": "Programas e Recursos",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -254,10 +254,10 @@
     "InvokeScript": [
       "appwiz.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/programs"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/programs"
   },
   "WPFPanelRegion": {
-    "Content": "Region",
+    "Content": "Região",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -265,10 +265,10 @@
     "InvokeScript": [
       "intl.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/region"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/region"
   },
   "WPFPanelSecurity": {
-    "Content": "Security and Maintenance",
+    "Content": "Segurança e Manutenção",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -276,10 +276,10 @@
     "InvokeScript": [
       "wscui.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/security"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/security"
   },
   "WPFPanelSound": {
-    "Content": "Sound Settings",
+    "Content": "Configurações de Som",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -287,10 +287,10 @@
     "InvokeScript": [
       "mmsys.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/sound"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/sound"
   },
   "WPFPanelSystem": {
-    "Content": "System Properties",
+    "Content": "Propriedades do Sistema",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -298,10 +298,10 @@
     "InvokeScript": [
       "sysdm.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/system"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/system"
   },
   "WPFPanelTimedate": {
-    "Content": "Time and Date",
+    "Content": "Data e Hora",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -309,10 +309,10 @@
     "InvokeScript": [
       "timedate.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/timedate"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/timedate"
   },
   "WPFPanelFirewall": {
-    "Content": "Windows Defender Firewall",
+    "Content": "Firewall do Windows Defender",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -320,10 +320,10 @@
     "InvokeScript": [
       "firewall.cpl"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/firewall"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/firewall"
   },
   "WPFPanelRestore": {
-    "Content": "Windows Restore",
+    "Content": "Restauração do Windows",
     "category": "Legacy Windows Panels",
     "panel": "2",
     "Type": "Button",
@@ -331,33 +331,33 @@
     "InvokeScript": [
       "rstrui.exe"
     ],
-    "link": "https://winutil.christitus.com/code-reference/features/legacy-windows-panels/restore"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/legacy-windows-panels/restore"
   },
   "WPFWinUtilInstallPSProfile": {
-    "Content": "CTT PowerShell Profile - Install",
+    "Content": "Perfil PowerShell do RamonMods - Instalar",
     "category": "Powershell Profile Powershell 7+ Only",
     "panel": "2",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WinUtilInstallPSProfile",
-    "link": "https://winutil.christitus.com/code-reference/features/powershell-profile-powershell-7--only/installpsprofile"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/powershell-profile-powershell-7--only/installpsprofile"
   },
   "WPFWinUtilUninstallPSProfile": {
-    "Content": "CTT PowerShell Profile - Remove",
+    "Content": "Perfil PowerShell do RamonMods - Remover",
     "category": "Powershell Profile Powershell 7+ Only",
     "panel": "2",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WinUtilUninstallPSProfile",
-    "link": "https://winutil.christitus.com/code-reference/features/powershell-profile-powershell-7--only/uninstallpsprofile"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/powershell-profile-powershell-7--only/uninstallpsprofile"
   },
   "WPFWinUtilSSHServer": {
-    "Content": "OpenSSH Server - Enable",
+    "Content": "Servidor OpenSSH - Ativar",
     "category": "Remote Access",
     "panel": "2",
     "Type": "Button",
     "ButtonWidth": "300",
     "function": "Invoke-WPFSSHServer",
-    "link": "https://winutil.christitus.com/code-reference/features/remote-access/sshserver"
+    "link": "https://github.com/RamonMods/WinUtil/code-reference/features/remote-access/sshserver"
   }
 }

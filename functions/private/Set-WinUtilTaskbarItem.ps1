@@ -2,39 +2,39 @@ function Set-WinUtilTaskbaritem {
     <#
 
     .SYNOPSIS
-        Modifies the Taskbaritem of the WPF Form
+        Modifica o item da barra de tarefas do formulário WPF
 
     .PARAMETER value
-        Value can be between 0 and 1, 0 being no progress done yet and 1 being fully completed
-        Value does not affect item without setting the state to 'Normal', 'Error' or 'Paused'
+        O valor pode ser entre 0 e 1, sendo 0 nenhum progresso feito ainda e 1 totalmente concluído
+        O valor não afeta o item sem definir o estado como 'Normal', 'Error' ou 'Paused'
         Set-WinUtilTaskbaritem -value 0.5
 
     .PARAMETER state
-        State can be 'None' > No progress, 'Indeterminate' > inf. loading gray, 'Normal' > Gray, 'Error' > Red, 'Paused' > Yellow
-        no value needed:
+        O estado pode ser 'None' > Sem progresso, 'Indeterminate' > carregamento infinito cinza, 'Normal' > Cinza, 'Error' > Vermelho, 'Paused' > Amarelo
+        não precisa de valor:
         - Set-WinUtilTaskbaritem -state "None"
         - Set-WinUtilTaskbaritem -state "Indeterminate"
-        value needed:
+        precisa de valor:
         - Set-WinUtilTaskbaritem -state "Error"
         - Set-WinUtilTaskbaritem -state "Normal"
         - Set-WinUtilTaskbaritem -state "Paused"
 
     .PARAMETER overlay
-        Overlay icon to display on the taskbar item, there are the presets 'None', 'logo' and 'checkmark' or you can specify a path/link to an image file.
-        CTT logo preset:
+        Ícone de sobreposição a exibir no item da barra de tarefas; existem as predefinições 'None', 'logo' e 'checkmark' ou você pode especificar um caminho/link para um arquivo de imagem.
+        Predefinição do logo do Ramon:
         - Set-WinUtilTaskbaritem -overlay "logo"
-        Checkmark preset:
+        Predefinição de marca de verificação:
         - Set-WinUtilTaskbaritem -overlay "checkmark"
-        Warning preset:
+        Predefinição de aviso:
         - Set-WinUtilTaskbaritem -overlay "warning"
-        No overlay:
+        Sem sobreposição:
         - Set-WinUtilTaskbaritem -overlay "None"
-        Custom icon (needs to be supported by WPF):
+        Ícone personalizado (precisa ser suportado pelo WPF):
         - Set-WinUtilTaskbaritem -overlay "C:\path\to\icon.png"
 
     .PARAMETER description
-        Description to display on the taskbar item preview
-        Set-WinUtilTaskbaritem -description "This is a description"
+        Descrição a exibir na visualização do item da barra de tarefas
+        Set-WinUtilTaskbaritem -description "Isto é uma descrição"
     #>
     param (
         [string]$state,
@@ -54,7 +54,7 @@ function Set-WinUtilTaskbaritem {
             'Normal' { $sync["Form"].taskbarItemInfo.ProgressState = "Normal" }
             'Error' { $sync["Form"].taskbarItemInfo.ProgressState = "Error" }
             'Paused' { $sync["Form"].taskbarItemInfo.ProgressState = "Paused" }
-            default { throw "[Set-WinUtilTaskbarItem] Invalid state" }
+            default { throw "[Set-WinUtilTaskbarItem] Estado inválido" }
         }
     }
 

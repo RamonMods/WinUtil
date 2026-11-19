@@ -2,13 +2,13 @@ function Install-WinUtilAPPX {
     <#
 
     .SYNOPSIS
-        Registers a local AppX package or installs it from the Microsoft Store
+        Registra um pacote AppX local ou o instala pela Microsoft Store
 
     .PARAMETER Name
-        The AppX package name to install
+        O nome do pacote AppX a instalar
 
     .PARAMETER StoreId
-        The optional Microsoft Store product ID used when no local manifest is available
+        O ID de produto opcional da Microsoft Store usado quando não há manifesto local disponível
 
     #>
     param (
@@ -18,10 +18,10 @@ function Install-WinUtilAPPX {
         [string]$StoreId
     )
 
-    Write-WinUtilLog -Component "AppX" -Message "Installing AppX package: $Name"
+    Write-WinUtilLog -Component "AppX" -Message "Instalando pacote AppX: $Name"
 
-    # AppX and DISM cmdlets are more reliable in Windows PowerShell 5.1. Query both installed and
-    # provisioned package metadata because either can expose a local manifest that can be registered.
+    # Os cmdlets AppX e DISM são mais confiáveis no Windows PowerShell 5.1. Consulte os metadados
+    # dos pacotes instalados e provisionados, pois qualquer um dos dois pode expor um manifesto local que pode ser registrado.
     $ps5Command = {
         $packageName = $args[0]
         $manifestPaths = [System.Collections.Generic.List[string]]::new()
@@ -57,28 +57,28 @@ function Install-WinUtilAPPX {
     if ($LASTEXITCODE -eq 0 -and $null -ne $manifestOutput) {
         $manifestPath = ($manifestOutput | Select-Object -Last 1).ToString().Trim()
         if (-not [string]::IsNullOrWhiteSpace($manifestPath)) {
-            Write-WinUtilLog -Component "AppX" -Message "Registered local AppX manifest for $Name`: $manifestPath"
+            Write-WinUtilLog -Component "AppX" -Message "Manifesto AppX local registrado para $Name`: $manifestPath"
             return [pscustomobject]@{
                 Package = $Name
                 Manager = "appx"
                 Action = "Install"
                 ExitCode = 0
                 Outcome = "Succeeded"
-                Detail = "registered local manifest"
+                Detail = "manifesto local registrado"
             }
         }
     }
 
     if ($LASTEXITCODE -ne 0) {
         $failureDetails = ($manifestOutput | Out-String).Trim()
-        Write-WinUtilLog -Level "WARN" -Component "AppX" -Message "Local AppX registration failed for $Name`: $failureDetails"
+        Write-WinUtilLog -Level "WARN" -Component "AppX" -Message "Falha no registro do AppX local para $Name`: $failureDetails"
     }
 
     if ([string]::IsNullOrWhiteSpace($StoreId)) {
-        # A package with no local manifest and no Store ID cannot be installed. Report it as a
-        # result rather than throwing so the remaining selected packages still run and the job
-        # summary names this one; Complete-WinUtilPackageRun fails the job on the Failed outcome.
-        $errorMessage = "Unable to install $Name because no local manifest or Microsoft Store ID is available."
+        # Um pacote sem manifesto local e sem ID da Store não pode ser instalado. Reporte como
+        # resultado em vez de lançar exceção, para que os demais pacotes selecionados ainda sejam
+        # executados e o resumo da tarefa cite este; Complete-WinUtilPackageRun falha a tarefa com o resultado Failed.
+        $errorMessage = "Não foi possível instalar $Name porque não há manifesto local nem ID da Microsoft Store disponível."
         Write-WinUtilLog -Level "ERROR" -Component "AppX" -Message $errorMessage
         return [pscustomobject]@{
             Package  = $Name
@@ -90,7 +90,7 @@ function Install-WinUtilAPPX {
         }
     }
 
-    Write-WinUtilLog -Component "AppX" -Message "No usable local manifest found for $Name. Installing Microsoft Store product $StoreId."
+    Write-WinUtilLog -Component "AppX" -Message "Nenhum manifesto local utilizável encontrado para $Name. Instalando o produto $StoreId da Microsoft Store."
     $null = Install-WinUtilWinget
     Install-WinUtilProgramWinget -Action Install -Programs @("msstore:$StoreId")
 }

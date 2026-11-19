@@ -1,77 +1,77 @@
 function Show-CustomDialog {
     <#
     .SYNOPSIS
-    Displays a custom dialog box with an image, heading, message, and an OK button.
+    Exibe uma caixa de diálogo personalizada com uma imagem, título, mensagem e um botão OK.
 
     .DESCRIPTION
-    This function creates a custom dialog box with the specified message and additional elements such as an image, heading, and an OK button. The dialog box is designed with a green border, rounded corners, and a black background.
+    Esta função cria uma caixa de diálogo personalizada com a mensagem especificada e elementos adicionais como imagem, título e um botão OK. A caixa de diálogo é projetada com borda verde, cantos arredondados e fundo preto.
 
     .PARAMETER Title
-    The Title to use for the dialog window's Title Bar, this will not be visible by the user, as window styling is set to None.
+    O título a ser usado na barra de título da janela do diálogo; não será visível ao usuário, já que o estilo da janela é None.
 
     .PARAMETER Message
-    The message to be displayed in the dialog box.
+    A mensagem a ser exibida na caixa de diálogo.
 
     .PARAMETER Width
-    The width of the custom dialog window.
+    A largura da janela do diálogo personalizado.
 
     .PARAMETER Height
-    The height of the custom dialog window.
+    A altura da janela do diálogo personalizado.
 
     .PARAMETER FontSize
-    The Font Size of message shown inside custom dialog window.
+    O tamanho da fonte da mensagem exibida dentro da janela do diálogo personalizado.
 
     .PARAMETER HeaderFontSize
-    The Font Size for the Header of custom dialog window.
+    O tamanho da fonte do cabeçalho da janela do diálogo personalizado.
 
     .PARAMETER LogoSize
-    The Size of the Logo used inside the custom dialog window.
+    O tamanho do logo usado dentro da janela do diálogo personalizado.
 
     .PARAMETER ForegroundColor
-    The Foreground Color of dialog window title & message.
+    A cor de primeiro plano do título e da mensagem da janela do diálogo.
 
     .PARAMETER BackgroundColor
-    The Background Color of dialog window.
+    A cor de fundo da janela do diálogo.
 
     .PARAMETER BorderColor
-    The Color for dialog window border.
+    A cor da borda da janela do diálogo.
 
     .PARAMETER ButtonBackgroundColor
-    The Background Color for Buttons in dialog window.
+    A cor de fundo dos botões da janela do diálogo.
 
     .PARAMETER ButtonForegroundColor
-    The Foreground Color for Buttons in dialog window.
+    A cor de primeiro plano dos botões da janela do diálogo.
 
     .PARAMETER ShadowColor
-    The Color used when creating the Drop-down Shadow effect for dialog window.
+    A cor usada ao criar o efeito de sombra projetada da janela do diálogo.
 
     .PARAMETER LogoColor
-    The Color of WinUtil Text found next to WinUtil's Logo inside dialog window.
+    A cor do texto WinUtil exibido ao lado do logo do WinUtil dentro da janela do diálogo.
 
     .PARAMETER LinkForegroundColor
-    The Foreground Color for Links inside dialog window.
+    A cor de primeiro plano dos links dentro da janela do diálogo.
 
     .PARAMETER LinkHoverForegroundColor
-    The Foreground Color for Links when the mouse pointer hovers over them inside dialog window.
+    A cor de primeiro plano dos links quando o ponteiro do mouse passa sobre eles dentro da janela do diálogo.
 
     .PARAMETER EnableScroll
-    A flag indicating whether to enable scrolling if the content exceeds the window size.
+    Um sinalizador indicando se a rolagem deve ser habilitada quando o conteúdo exceder o tamanho da janela.
 
     .EXAMPLE
-    Show-CustomDialog -Title "My Custom Dialog" -Message "This is a custom dialog with a message and an image above." -Width 300 -Height 200
+    Show-CustomDialog -Title "Meu diálogo personalizado" -Message "Este é um diálogo personalizado com uma mensagem e uma imagem acima." -Width 300 -Height 200
 
-    Makes a new Custom Dialog with the title 'My Custom Dialog' and a message 'This is a custom dialog with a message and an image above.', with dimensions of 300 by 200 pixels.
-    Other styling options are grabbed from '$sync.Form.Resources' global variable.
+    Cria um novo diálogo personalizado com o título 'Meu diálogo personalizado' e a mensagem 'Este é um diálogo personalizado com uma mensagem e uma imagem acima.', com dimensões de 300 por 200 pixels.
+    As demais opções de estilo são obtidas da variável global '$sync.Form.Resources'.
 
     .EXAMPLE
     $foregroundColor = New-Object System.Windows.Media.SolidColorBrush("#0088e5")
     $backgroundColor = New-Object System.Windows.Media.SolidColorBrush("#1e1e1e")
     $linkForegroundColor = New-Object System.Windows.Media.SolidColorBrush("#0088e5")
     $linkHoverForegroundColor = New-Object System.Windows.Media.SolidColorBrush("#005289")
-    Show-CustomDialog -Title "My Custom Dialog" -Message "This is a custom dialog with a message and an image above." -Width 300 -Height 200 -ForegroundColor $foregroundColor -BackgroundColor $backgroundColor -LinkForegroundColor $linkForegroundColor -LinkHoverForegroundColor $linkHoverForegroundColor
+    Show-CustomDialog -Title "Meu diálogo personalizado" -Message "Este é um diálogo personalizado com uma mensagem e uma imagem acima." -Width 300 -Height 200 -ForegroundColor $foregroundColor -BackgroundColor $backgroundColor -LinkForegroundColor $linkForegroundColor -LinkHoverForegroundColor $linkHoverForegroundColor
 
-    Makes a new Custom Dialog with the title 'My Custom Dialog' and a message 'This is a custom dialog with a message and an image above.', with dimensions of 300 by 200 pixels, with a link foreground (and general foreground) colors of '#0088e5', background color of '#1e1e1e', and Link Color on Hover of '005289', all of which are in Hexadecimal (the '#' Symbol is required by SolidColorBrush Constructor).
-    Other styling options are grabbed from '$sync.Form.Resources' global variable.
+    Cria um novo diálogo personalizado com o título 'Meu diálogo personalizado' e a mensagem 'Este é um diálogo personalizado com uma mensagem e uma imagem acima.', com dimensões de 300 por 200 pixels, com cor de primeiro plano do link (e geral) '#0088e5', cor de fundo '#1e1e1e' e cor do link ao passar o mouse '005289', todos em hexadecimal (o símbolo '#' é exigido pelo construtor de SolidColorBrush).
+    As demais opções de estilo são obtidas da variável global '$sync.Form.Resources'.
 
     #>
     param(
@@ -98,34 +98,34 @@ function Show-CustomDialog {
         [bool]$EnableScroll = $false
     )
 
-    # Create a custom dialog window
+    # Cria uma janela de diálogo personalizada
     $dialog = New-Object Windows.Window
     $dialog.Title = $Title
     $dialog.Height = $Height
     $dialog.Width = $Width
-    $dialog.Margin = New-Object Windows.Thickness(10)  # Add margin to the entire dialog box
-    $dialog.WindowStyle = [Windows.WindowStyle]::None  # Remove title bar and window controls
-    $dialog.ResizeMode = [Windows.ResizeMode]::NoResize  # Disable resizing
-    $dialog.WindowStartupLocation = [Windows.WindowStartupLocation]::CenterScreen  # Center the window
+    $dialog.Margin = New-Object Windows.Thickness(10)  # Adiciona margem a toda a caixa de diálogo
+    $dialog.WindowStyle = [Windows.WindowStyle]::None  # Remove a barra de título e os controles da janela
+    $dialog.ResizeMode = [Windows.ResizeMode]::NoResize  # Desabilita o redimensionamento
+    $dialog.WindowStartupLocation = [Windows.WindowStartupLocation]::CenterScreen  # Centraliza a janela
     $dialog.Foreground = $ForegroundColor
     $dialog.Background = $BackgroundColor
     $dialog.FontFamily = $FontFamily
     $dialog.FontSize = $FontSize
 
-    # Create a Border for the green edge with rounded corners
+    # Cria uma borda para a aresta verde com cantos arredondados
     $border = New-Object Windows.Controls.Border
     $border.BorderBrush = $BorderColor
-    $border.BorderThickness = New-Object Windows.Thickness(1)  # Adjust border thickness as needed
-    $border.CornerRadius = New-Object Windows.CornerRadius(10)  # Adjust the radius for rounded corners
+    $border.BorderThickness = New-Object Windows.Thickness(1)  # Ajusta a espessura da borda conforme necessário
+    $border.CornerRadius = New-Object Windows.CornerRadius(10)  # Ajusta o raio para cantos arredondados
 
-    # Create a drop shadow effect
+    # Cria um efeito de sombra projetada
     $dropShadow = New-Object Windows.Media.Effects.DropShadowEffect
     $dropShadow.Color = $shadowColor
     $dropShadow.Direction = 270
     $dropShadow.ShadowDepth = 5
     $dropShadow.BlurRadius = 10
 
-    # Apply drop shadow effect to the border
+    # Aplica o efeito de sombra projetada à borda
     $dialog.Effect = $dropShadow
 
     $dialog.Content = $border
@@ -161,32 +161,32 @@ function Show-CustomDialog {
     $winutilTextBlock.Foreground = $LogoColor
     $winutilTextBlock.Margin = New-Object Windows.Thickness(10, 10, 10, 5)
     $stackPanel.Children.Add($winutilTextBlock)
-    # Add TextBlock for information with text wrapping and margins
+    # Adiciona um TextBlock para as informações com quebra de texto e margens
     $messageTextBlock = New-Object Windows.Controls.TextBlock
     $messageTextBlock.FontSize = $FontSize
-    $messageTextBlock.TextWrapping = [Windows.TextWrapping]::Wrap  # Enable text wrapping
+    $messageTextBlock.TextWrapping = [Windows.TextWrapping]::Wrap  # Habilita a quebra de texto
     $messageTextBlock.HorizontalAlignment = [Windows.HorizontalAlignment]::Left
     $messageTextBlock.VerticalAlignment = [Windows.VerticalAlignment]::Top
-    $messageTextBlock.Margin = New-Object Windows.Thickness(10)  # Add margins around the text block
+    $messageTextBlock.Margin = New-Object Windows.Thickness(10)  # Adiciona margens ao redor do bloco de texto
 
-    # Define the Regex to find hyperlinks formatted as HTML <a> tags
+    # Define a expressão regular para encontrar hiperlinks formatados como tags HTML <a>
     $regex = [regex]::new('<a href="([^"]+)">([^<]+)</a>')
     $lastPos = 0
     $linkHoverBrush = $LinkHoverForegroundColor
 
-    # Iterate through each match and add regular text and hyperlinks
+    # Percorre cada correspondência e adiciona o texto normal e os hiperlinks
     foreach ($match in $regex.Matches($Message)) {
-        # Add the text before the hyperlink, if any
+        # Adiciona o texto anterior ao hiperlink, se houver
         $textBefore = $Message.Substring($lastPos, $match.Index - $lastPos)
         if ($textBefore.Length -gt 0) {
             $messageTextBlock.Inlines.Add((New-Object Windows.Documents.Run($textBefore)))
         }
 
-        # Create and add the hyperlink
+        # Cria e adiciona o hiperlink
         $hyperlink = New-Object Windows.Documents.Hyperlink
         $hyperlink.NavigateUri = New-Object System.Uri($match.Groups[1].Value)
         $hyperlink.Inlines.Add($match.Groups[2].Value)
-        $hyperlink.TextDecorations = [Windows.TextDecorations]::None  # Remove underline
+        $hyperlink.TextDecorations = [Windows.TextDecorations]::None  # Remove o sublinhado
         $hyperlink.Foreground = $LinkForegroundColor
 
         $hyperlink.Add_Click({
@@ -211,35 +211,35 @@ function Show-CustomDialog {
 
         $messageTextBlock.Inlines.Add($hyperlink)
 
-        # Update the last position
+        # Atualiza a última posição
         $lastPos = $match.Index + $match.Length
     }
 
-    # Add any remaining text after the last hyperlink
+    # Adiciona qualquer texto restante após o último hiperlink
     if ($lastPos -lt $Message.Length) {
         $textAfter = $Message.Substring($lastPos)
         $messageTextBlock.Inlines.Add((New-Object Windows.Documents.Run($textAfter)))
     }
 
-    # If no matches, add the entire message as a run
+    # Se não houver correspondências, adiciona a mensagem inteira como um run
     if ($regex.Matches($Message).Count -eq 0) {
         $messageTextBlock.Inlines.Add((New-Object Windows.Documents.Run($Message)))
     }
 
-    # Create a ScrollViewer if EnableScroll is true
+    # Cria um ScrollViewer se EnableScroll for verdadeiro
     if ($EnableScroll) {
         $scrollViewer = New-Object System.Windows.Controls.ScrollViewer
         $scrollViewer.VerticalScrollBarVisibility = 'Auto'
         $scrollViewer.HorizontalScrollBarVisibility = 'Disabled'
         $scrollViewer.Content = $messageTextBlock
         $grid.Children.Add($scrollViewer)
-        [Windows.Controls.Grid]::SetRow($scrollViewer, 1)  # Set the row to the second row (0-based index)
+        [Windows.Controls.Grid]::SetRow($scrollViewer, 1)  # Define a linha como a segunda (índice baseado em 0)
     } else {
         $grid.Children.Add($messageTextBlock)
-        [Windows.Controls.Grid]::SetRow($messageTextBlock, 1)  # Set the row to the second row (0-based index)
+        [Windows.Controls.Grid]::SetRow($messageTextBlock, 1)  # Define a linha como a segunda (índice baseado em 0)
     }
 
-    # Add OK button
+    # Adiciona o botão OK
     $okButton = New-Object Windows.Controls.Button
     $okButton.Content = "OK"
     $okButton.FontSize = $FontSize
@@ -255,18 +255,18 @@ function Show-CustomDialog {
         $dialog.Close()
     })
     $grid.Children.Add($okButton)
-    [Windows.Controls.Grid]::SetRow($okButton, 2)  # Set the row to the third row (0-based index)
+    [Windows.Controls.Grid]::SetRow($okButton, 2)  # Define a linha como a terceira (índice baseado em 0)
 
-    # Handle Escape key press to close the dialog
+    # Trata o pressionamento da tecla Escape para fechar o diálogo
     $dialog.Add_KeyDown({
         if ($_.Key -eq 'Escape') {
             $dialog.Close()
         }
     })
 
-    # Set the OK button as the default button (activated on Enter)
+    # Define o botão OK como botão padrão (ativado com Enter)
     $okButton.IsDefault = $true
 
-    # Show the custom dialog
+    # Exibe o diálogo personalizado
     $dialog.ShowDialog()
 }

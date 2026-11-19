@@ -1,25 +1,25 @@
 function Install-WinUtilChoco {
     <#
     .SYNOPSIS
-        Installs Chocolatey if it is not already present
+        Instala o Chocolatey se ele ainda não estiver presente
     #>
 
     if (Get-Command -Name choco -ErrorAction SilentlyContinue) {
         return
     }
 
-    Write-WinUtilLog -Component "Package" -Message "Chocolatey is not installed, installing it now."
-    Step-WinUtilJob -Status "Installing Chocolatey" -State "Indeterminate"
+    Write-WinUtilLog -Component "Package" -Message "O Chocolatey não está instalado; instalando agora."
+    Step-WinUtilJob -Status "Instalando o Chocolatey" -State "Indeterminate"
 
-    # Windows PowerShell 5.1 can negotiate a protocol the site refuses, which the official
-    # bootstrap sets explicitly for the same reason
+    # O Windows PowerShell 5.1 pode negociar um protocolo que o site recusa, por isso o
+    # bootstrap oficial define o protocolo explicitamente pelo mesmo motivo
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
     $installScript = Invoke-WebRequest -Uri https://community.chocolatey.org/install.ps1 -UseBasicParsing -TimeoutSec 60
     Invoke-Command -ScriptBlock ([scriptblock]::Create($installScript.Content))
 
-    # The installer extends PATH for new processes, which this one is not. Appended rather than
-    # replaced: overwriting drops whatever this process added earlier in the session, and a
-    # later step looking for that tool would no longer find it.
+    # O instalador estende o PATH para novos processos, e este processo não é novo. Anexado em vez de
+    # substituído: sobrescrever descarta o que este processo adicionou antes na sessão, e uma
+    # etapa posterior que procurasse aquela ferramenta não a encontraria mais.
     $existing = $env:PATH -split ';' | Where-Object { $_ }
     $persisted = @(
         [System.Environment]::GetEnvironmentVariable("Path", "Machine")
@@ -32,8 +32,8 @@ function Install-WinUtilChoco {
     }
 
     if (-not (Get-Command -Name choco -ErrorAction SilentlyContinue)) {
-        throw "Chocolatey was installed but choco is still not on PATH."
+        throw "O Chocolatey foi instalado, mas o choco ainda não está no PATH."
     }
 
-    Write-WinUtilLog -Component "Package" -Message "Chocolatey installed."
+    Write-WinUtilLog -Component "Package" -Message "Chocolatey instalado."
 }

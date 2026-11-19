@@ -9,14 +9,14 @@ function Initialize-WPFUI {
         "appscategory"{
             Invoke-WPFUIElements -configVariable $sync.configs.appnavigation -targetGridName "appscategory" -columncount 1
 
-            # Create and configure a popup for displaying selected apps
+            # Cria e configura um popup para exibir os aplicativos selecionados
             $selectedAppsPopup = New-Object Windows.Controls.Primitives.Popup
             $selectedAppsPopup.IsOpen = $false
             $selectedAppsPopup.PlacementTarget = $sync.WPFselectedAppsButton
             $selectedAppsPopup.Placement = [System.Windows.Controls.Primitives.PlacementMode]::Bottom
             $selectedAppsPopup.AllowsTransparency = $true
 
-            # Style the popup with a border and background
+            # Estiliza o popup com uma borda e um fundo
             $selectedAppsBorder = New-Object Windows.Controls.Border
             $selectedAppsBorder.SetResourceReference([Windows.Controls.Control]::BackgroundProperty, "MainBackgroundColor")
             $selectedAppsBorder.SetResourceReference([Windows.Controls.Control]::BorderBrushProperty, "MainForegroundColor")
@@ -26,11 +26,11 @@ function Initialize-WPFUI {
             $selectedAppsPopup.Child = $selectedAppsBorder
             $sync.selectedAppsPopup = $selectedAppsPopup
 
-            # Add a stack panel inside the popup's border to organize its child elements
+            # Adiciona um painel de pilha dentro da borda do popup para organizar seus elementos filhos
             $sync.selectedAppsstackPanel = New-Object Windows.Controls.StackPanel
             $selectedAppsBorder.Child = $sync.selectedAppsstackPanel
 
-            # Close selectedAppsPopup when mouse leaves both button and selectedAppsPopup
+            # Fecha o selectedAppsPopup quando o mouse sai tanto do botão quanto do selectedAppsPopup
             $sync.WPFselectedAppsButton.Add_MouseLeave({
                 if (-not $sync.selectedAppsPopup.IsMouseOver) {
                     $sync.selectedAppsPopup.IsOpen = $false
@@ -42,14 +42,14 @@ function Initialize-WPFUI {
                 }
             })
 
-            # Creates the popup that is displayed when the user right-clicks on an app entry
-            # This popup contains buttons for installing, uninstalling, and viewing app information
+            # Cria o popup exibido quando o usuário clica com o botão direito em uma entrada de aplicativo
+            # Este popup contém botões para instalar, desinstalar e ver informações do aplicativo
 
             $appPopup = New-Object Windows.Controls.Primitives.Popup
             $appPopup.StaysOpen = $false
             $appPopup.Placement = [System.Windows.Controls.Primitives.PlacementMode]::Bottom
             $appPopup.AllowsTransparency = $true
-            # Store the popup globally so the position can be set later
+            # Armazena o popup globalmente para que a posição possa ser definida depois
             $sync.appPopup = $appPopup
 
             $appPopupStackPanel = New-Object Windows.Controls.StackPanel
@@ -70,12 +70,12 @@ function Initialize-WPFUI {
                 $newButton.Content = $button.Icon
                 $appPopupStackPanel.Children.Add($newButton) | Out-Null
 
-                # Dynamically load the selected app object so the buttons can be reused and do not need to be created for each app
+                # Carrega dinamicamente o objeto do aplicativo selecionado para que os botões possam ser reutilizados sem precisar ser criados para cada aplicativo
                 switch ($button.Name) {
                     "Install" {
                         $newButton.Add_MouseEnter({
                             $appObject = $sync.configs.applicationsHashtable.$($sync.appPopupSelectedApp)
-                            $this.ToolTip = "Install or Upgrade $($appObject.content)"
+                            $this.ToolTip = "Instalar ou atualizar $($appObject.content)"
                         })
                         $newButton.Add_Click({
                             $appObject = $sync.configs.applicationsHashtable.$($sync.appPopupSelectedApp)
@@ -85,7 +85,7 @@ function Initialize-WPFUI {
                     "Uninstall" {
                         $newButton.Add_MouseEnter({
                             $appObject = $sync.configs.applicationsHashtable.$($sync.appPopupSelectedApp)
-                            $this.ToolTip = "Uninstall $($appObject.content)"
+                            $this.ToolTip = "Desinstalar $($appObject.content)"
                         })
                         $newButton.Add_Click({
                             $appObject = $sync.configs.applicationsHashtable.$($sync.appPopupSelectedApp)
@@ -95,7 +95,7 @@ function Initialize-WPFUI {
                     "Info" {
                         $newButton.Add_MouseEnter({
                             $appObject = $sync.configs.applicationsHashtable.$($sync.appPopupSelectedApp)
-                            $this.ToolTip = "Open the application's website in your default browser`n$($appObject.link)"
+                            $this.ToolTip = "Abre o site do aplicativo no seu navegador padrão`n$($appObject.link)"
                         })
                         $newButton.Add_Click({
                             $appObject = $sync.configs.applicationsHashtable.$($sync.appPopupSelectedApp)
@@ -110,7 +110,7 @@ function Initialize-WPFUI {
             Initialize-InstallCategoryAppList -TargetElement $sync.ItemsControl -Apps $sync.configs.applicationsHashtable
         }
         default {
-            Write-Output "$TargetGridName not yet implemented"
+            Write-Output "$TargetGridName ainda não implementado"
         }
     }
 }

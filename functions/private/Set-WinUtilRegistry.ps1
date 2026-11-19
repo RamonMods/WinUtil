@@ -2,19 +2,19 @@ function Set-WinUtilRegistry {
     <#
 
     .SYNOPSIS
-        Modifies the registry based on the given inputs
+        Modifica o registro com base nos valores informados
 
     .PARAMETER Name
-        The name of the key to modify
+        O nome do valor a modificar
 
     .PARAMETER Path
-        The path to the key
+        O caminho da chave
 
     .PARAMETER Type
-        The type of value to set the key to
+        O tipo de valor a ser definido na chave
 
     .PARAMETER Value
-        The value to set the key to
+        O valor a ser definido na chave
 
     .EXAMPLE
         Set-WinUtilRegistry -Name "PublishUserActivities" -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Type "DWord" -Value "0"
@@ -31,55 +31,56 @@ function Set-WinUtilRegistry {
         if(!(Test-Path 'HKU:\')) {New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS | Out-Null}
 
         if ($Value -eq "<RemoveEntry>") {
-            # A value that is not there is already in the requested state. Reporting it as an
-            # error made undoing a tweak that was never applied fail, and the key would otherwise
-            # be created below only to have nothing removed from it. Only a missing key or value
-            # counts as absent; an access or provider failure still reaches the handlers below.
+            # Um valor que não existe já está no estado solicitado. Reportá-lo como
+            # erro fazia falhar o desfazer de um ajuste que nunca foi aplicado, e a chave acabaria
+            # sendo criada abaixo apenas para que nada fosse removido dela. Apenas uma chave ou valor
+            # ausente conta como inexistente; uma falha de acesso ou do provedor ainda chega aos
+            # tratadores abaixo.
             $valueExists = $true
             try {
                 Get-ItemProperty -Path $Path -Name $Name -ErrorAction Stop | Out-Null
             } catch [System.Management.Automation.PSArgumentException] {
-                # The registry provider uses PSArgumentException when a named value is absent
+                # O provedor de registro usa PSArgumentException quando um valor nomeado está ausente
                 $valueExists = $false
             } catch [System.Management.Automation.ItemNotFoundException] {
                 $valueExists = $false
             }
 
             if (-not $valueExists) {
-                Write-Host "$Path\$Name is already absent"
-                Write-WinUtilLog -Component "Registry" -Message "Registry value $Path\$Name is already absent; nothing to remove"
+                Write-Host "$Path\$Name já está ausente"
+                Write-WinUtilLog -Component "Registry" -Message "O valor de registro $Path\$Name já está ausente; nada a remover"
                 return
             }
         }
 
         If (!(Test-Path $Path)) {
-            Write-Host "$Path was not found. Creating..."
-            Write-WinUtilLog -Component "Registry" -Message "Creating registry path: $Path"
+            Write-Host "$Path não foi encontrado. Criando..."
+            Write-WinUtilLog -Component "Registry" -Message "Criando o caminho de registro: $Path"
             New-Item -Path $Path -Force -ErrorAction Stop | Out-Null
         }
 
         if ($Value -ne "<RemoveEntry>") {
-            Write-Host "Set $Path\$Name to $Value"
-            Write-WinUtilLog -Component "Registry" -Message "Setting $Path\$Name ($Type) to $Value"
+            Write-Host "Definindo $Path\$Name como $Value"
+            Write-WinUtilLog -Component "Registry" -Message "Definindo $Path\$Name ($Type) como $Value"
             Set-ItemProperty -Path $Path -Name $Name -Type $Type -Value $Value -Force -ErrorAction Stop | Out-Null
         }
         else{
-            Write-Host "Remove $Path\$Name"
-            Write-WinUtilLog -Component "Registry" -Message "Removing $Path\$Name"
+            Write-Host "Remover $Path\$Name"
+            Write-WinUtilLog -Component "Registry" -Message "Removendo $Path\$Name"
             Remove-ItemProperty -Path $Path -Name $Name -Force -ErrorAction Stop | Out-Null
         }
     } catch [System.Security.SecurityException] {
-        Write-Warning "Unable to set $Path\$Name to $Value due to a Security Exception."
-        Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Security exception while changing $Path\$Name to $Value`: $($psitem.Exception.Message)"
+        Write-Warning "Não foi possível definir $Path\$Name como $Value devido a uma exceção de segurança."
+        Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Exceção de segurança ao alterar $Path\$Name para $Value`: $($psitem.Exception.Message)"
     } catch [System.Management.Automation.ItemNotFoundException] {
         Write-Warning $psitem.Exception.ErrorRecord
-        Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Registry item not found while changing $Path\$Name`: $($psitem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Item de registro não encontrado ao alterar $Path\$Name`: $($psitem.Exception.Message)"
     } catch [System.UnauthorizedAccessException] {
        Write-Warning $psitem.Exception.Message
-       Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Unauthorized while changing $Path\$Name`: $($psitem.Exception.Message)"
+       Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Sem autorização ao alterar $Path\$Name`: $($psitem.Exception.Message)"
     } catch {
-        Write-Warning "Unable to set $Name due to unhandled exception."
+        Write-Warning "Não foi possível definir $Name devido a uma exceção não tratada."
         Write-Warning $psitem.Exception.StackTrace
-        Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Unhandled exception while changing $Path\$Name`: $($psitem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "Registry" -Message "Exceção não tratada ao alterar $Path\$Name`: $($psitem.Exception.Message)"
     }
 }

@@ -5,7 +5,7 @@ editUrl: false
 ---
 
 :::note
-This page is generated from [`functions/private/Invoke-WinUtilInstallPSProfile.ps1`](https://github.com/ChrisTitusTech/winutil/blob/main/functions/private/Invoke-WinUtilInstallPSProfile.ps1). Do not edit this page directly.
+This page is generated from [`functions/private/Invoke-WinUtilInstallPSProfile.ps1`](https://github.com/RamonMods/WinUtil/blob/main/functions/private/Invoke-WinUtilInstallPSProfile.ps1). Do not edit this page directly.
 :::
 
 ```powershell title="functions/private/Invoke-WinUtilInstallPSProfile.ps1"
@@ -51,7 +51,7 @@ function Invoke-WinUtilInstallPSProfile {
 
     Step-WinUtilJob -Status "Running the profile setup" -State "Indeterminate"
 
-    $setupUrl = "https://github.com/ChrisTitusTech/powershell-profile/raw/main/setup.ps1"
+    $setupUrl = "https://github.com/RamonMods/powershell-profile/raw/main/setup.ps1"
     # Stop in the child, so a setup failure is a nonzero exit rather than a logged error and a
     # exit code of zero
     $output = & $pwshPath -NoProfile -NonInteractive -Command "`$ErrorActionPreference = 'Stop'; irm '$setupUrl' | iex" 2>&1

@@ -1,14 +1,14 @@
 function Invoke-WinUtilAppCategoryChip {
     <#
         .SYNOPSIS
-            Handles a click on an Install tab category chip
+            Trata um clique em um chip de categoria da aba Instalar
 
         .DESCRIPTION
-            The chip carries its category in Tag, so every chip shares this handler. Holding ctrl
-            adds the category to the current selection instead of replacing it.
+            O chip carrega sua categoria em Tag, então todos os chips compartilham este manipulador. Manter o Ctrl
+            pressionado adiciona a categoria à seleção atual em vez de substituí-la.
 
         .PARAMETER Chip
-            The chip that was clicked
+            O chip que foi clicado
     #>
     param(
         [Parameter(Mandatory)]

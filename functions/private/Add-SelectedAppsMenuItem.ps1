@@ -1,14 +1,14 @@
 function Add-SelectedAppsMenuItem {
     <#
     .SYNOPSIS
-        This is a helper function that generates and adds the Menu Items to the Selected Apps Popup.
+        Função auxiliar que gera e adiciona os itens de menu ao popup de Apps Selecionados.
 
     .Parameter name
-        The actual Name of an App like "Chrome" or "Brave"
-        This name is contained in the "Content" property inside the applications.json
+        O nome real de um app, como "Chrome" ou "Brave"
+        Esse nome fica na propriedade "Content" dentro do applications.json
     .PARAMETER key
-        The key which identifies an app object in applications.json
-        For Chrome this would be "WPFInstallchrome" because "WPFInstall" is prepended automatically for each key in applications.json
+        A chave que identifica um objeto de app em applications.json
+        Para o Chrome seria "WPFInstallchrome", pois "WPFInstall" é prefixado automaticamente em cada chave do applications.json
     #>
 
     param ([string]$name, [string]$key)

@@ -2,25 +2,25 @@ function Install-WinUtilWinget {
     <#
 
     .SYNOPSIS
-        Installs WinGet if not already installed.
+        Instala o WinGet se ele ainda não estiver instalado.
 
     .DESCRIPTION
-        installs winGet if needed
+        instala o WinGet caso necessário
     #>
     param(
         [switch]$Force
     )
 
-    # The repair action needs Repair-WinGetPackageManager to run even when winget is detected,
-    # which is the case a broken installation presents
+    # A ação de reparo precisa executar Repair-WinGetPackageManager mesmo quando o winget é detectado,
+    # que é exatamente o caso de uma instalação quebrada
     if (-not $Force -and (Test-WinUtilPackageManager -winget) -eq "installed") {
         return
     }
 
     if ($Force) {
-        Write-Host "Repairing the WinGet installation..." -ForegroundColor Yellow
+        Write-Host "Reparando a instalação do WinGet..." -ForegroundColor Yellow
     } else {
-        Write-Host "WinGet is not installed. Installing now..." -ForegroundColor Red
+        Write-Host "O WinGet não está instalado. Instalando agora..." -ForegroundColor Red
     }
 
     Install-PackageProvider -Name NuGet -Force

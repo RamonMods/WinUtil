@@ -23,4 +23,4 @@ Retitling a PR removes mapped labels that no longer match; an unrecognized title
 
 ## PR human checks
 - [ ] This PR is not a blind result of a prompt 'make this project better, no mistakes'
-- [ ] I've read the [contributing guidelines](https://winutil.christitus.com/contributing/)
+- [ ] I've read the [contributing guidelines](https://github.com/RamonMods/WinUtil/contributing/)

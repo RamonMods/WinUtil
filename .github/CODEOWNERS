@@ -1,9 +1,9 @@
-# Chris rules EVERYTHING (including paths listed below)
-*          @ChrisTitusTech
+# Dono do projeto: qualquer arquivo do repositório
+*          @RamonMods
 
-# Seanh1917 (ANGRYxScotsmans) is the docs guy
-docs/      @ChrisTitusTech @seanh1995
-tools/devdocs-generator.*  @ChrisTitusTech @seanh1995
+# Documentação e gerador de docs
+docs/      @RamonMods
+tools/devdocs-generator.*  @RamonMods
 
-# Title screen generation
-tools/title-screen/  @ChrisTitusTech @mewclouds
+# Geração da tela inicial
+tools/title-screen/  @RamonMods

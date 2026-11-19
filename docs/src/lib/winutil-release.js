@@ -1,5 +1,5 @@
-// Reads config files from the latest stable release, which is what https://christitus.com/win runs.
-const REPO = 'ChrisTitusTech/winutil';
+// Reads config files from the latest stable release, which is what https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1 runs.
+const REPO = 'RamonMods/winutil';
 export const RATE_LIMITED = 'GitHub rate limit has been reached. Please try again later.';
 const RELEASE_KEY = 'winutil-latest-release';
 

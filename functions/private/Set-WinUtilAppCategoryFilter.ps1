@@ -1,20 +1,20 @@
 function Set-WinUtilAppCategoryFilter {
     <#
         .SYNOPSIS
-            Applies the Install tab category filter and syncs the chip states to it
+            Aplica o filtro de categoria da aba Instalar e sincroniza o estado dos chips com ele
 
         .DESCRIPTION
-            The selection lives in $sync.SelectedAppCategories. An empty selection means every
-            category is shown, which is what the All chip represents. The category filter and the
-            search box are independent: this only touches categories, and the current search text
-            is reapplied on top.
+            A seleção fica em $sync.SelectedAppCategories. Uma seleção vazia significa que todas
+            as categorias são exibidas, que é o que o chip Todas representa. O filtro de categoria e a
+            caixa de busca são independentes: isto mexe apenas nas categorias, e o texto de busca
+            atual é reaplicado por cima.
 
         .PARAMETER Category
-            The category to act on. An empty value clears the filter back to All.
+            A categoria sobre a qual agir. Um valor vazio limpa o filtro e volta para Todas.
 
         .PARAMETER Additive
-            Toggles this category in or out of the current selection instead of replacing it.
-            Bound to ctrl click.
+            Alterna esta categoria dentro ou fora da seleção atual em vez de substituí-la.
+            Ligado ao clique com ctrl.
     #>
     param(
         [Parameter(Mandatory = $false)]
@@ -38,7 +38,7 @@ function Set-WinUtilAppCategoryFilter {
             $selected.Add($Category)
         }
     } elseif ($selected.Count -eq 1 -and $selected.Contains($Category)) {
-        # Clicking the only active category again clears the filter
+        # Clicar novamente na única categoria ativa limpa o filtro
         $selected.Clear()
     } else {
         $selected.Clear()

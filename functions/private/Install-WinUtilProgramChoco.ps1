@@ -2,24 +2,24 @@ function Install-WinUtilProgramChoco {
     <#
 
     .SYNOPSIS
-        Installs, upgrades or uninstalls packages with Chocolatey and reports each outcome
+        Instala, atualiza ou desinstala pacotes com o Chocolatey e reporta cada resultado
 
     .DESCRIPTION
-        One package per call to choco, so the progress bar moves through the list and a failure
-        names the package that failed rather than the whole batch. Choco's own output goes to the
-        log instead of the console, the way the WinGet path reports.
+        Um pacote por chamada ao choco, para que a barra de progresso avance pela lista e uma falha
+        identifique o pacote que falhou em vez do lote inteiro. A saída do próprio choco vai para o
+        log em vez do console, do mesmo modo que o caminho do WinGet reporta.
 
     .PARAMETER Action
-        Install, Upgrade or Uninstall.
+        Install, Upgrade ou Uninstall.
 
     .PARAMETER Programs
-        The package names. For Upgrade, the single entry "all" upgrades everything.
+        Os nomes dos pacotes. Para Upgrade, a entrada única "all" atualiza tudo.
 
     .PARAMETER ProgressBase
-        Where this call starts within the job's overall progress bar.
+        Onde esta chamada começa dentro da barra de progresso geral da tarefa.
 
     .PARAMETER ProgressSpan
-        How much of the overall bar these packages account for. Zero reports nothing.
+        Quanto da barra geral estes pacotes representam. Zero não reporta nada.
 
     #>
     param (
@@ -35,14 +35,14 @@ function Install-WinUtilProgramChoco {
         [int]$ProgressSpan = 0
     )
 
-    # Chocolatey reports "nothing needed doing" and "it worked, now reboot" through exit codes
-    # rather than as failures
+    # O Chocolatey reporta "nada precisava ser feito" e "funcionou, agora reinicie" por códigos de saída
+    # em vez de como falhas
     $rebootCodes = @{
-        1641 = "installed, the installer started a restart"
-        3010 = "installed, a restart is needed to finish"
+        1641 = "instalado, o instalador iniciou uma reinicialização"
+        3010 = "instalado, é preciso reiniciar para concluir"
     }
     $nothingToDo = @{
-        2 = "nothing to do"
+        2 = "nada a fazer"
     }
     $verb = $Action.ToLowerInvariant()
     $chocoAvailable = $null -ne (Get-Command choco -ErrorAction SilentlyContinue)
@@ -58,16 +58,16 @@ function Install-WinUtilProgramChoco {
             Step-WinUtilJob -Status "$Action $program ($index/$total)" -Percent $percent
         }
 
-        Write-WinUtilLog -Component "Package" -Message "$Action choco package: $program"
+        Write-WinUtilLog -Component "Package" -Message "Pacote choco ($Action): $program"
 
-        # --no-progress stops choco redrawing a percentage line that only makes sense on a
-        # console nobody is watching
+        # --no-progress evita que o choco redesenhe uma linha de porcentagem que só faz sentido em um
+        # console que ninguém está observando
         $arguments = @($verb, $program, "-y", "--no-progress")
-        # Each worker runspace has its own global scope. Reset the native-command result there so
-        # command-not-found cannot inherit a successful code from earlier work in the same pool.
+        # Cada runspace de trabalho tem seu próprio escopo global. Redefina ali o resultado do comando
+        # nativo para que "comando não encontrado" não herde um código bem-sucedido do trabalho anterior no mesmo pool.
         $global:LASTEXITCODE = $null
         if (-not $chocoAvailable) {
-            $output = "Chocolatey is not installed or is not available on PATH."
+            $output = "O Chocolatey não está instalado ou não está disponível no PATH."
             $exitCode = -1
         } else {
             $output = & choco @arguments 2>&1
@@ -76,7 +76,7 @@ function Install-WinUtilProgramChoco {
 
         if ($exitCode -eq 0) {
             $outcome = "Succeeded"
-            $detail = "exit code 0"
+            $detail = "código de saída 0"
         } elseif ($rebootCodes.ContainsKey($exitCode)) {
             $outcome = "Succeeded"
             $detail = $rebootCodes[$exitCode]
@@ -85,15 +85,15 @@ function Install-WinUtilProgramChoco {
             $detail = $nothingToDo[$exitCode]
         } else {
             $outcome = "Failed"
-            $detail = if ($exitCode -eq -1) { "Chocolatey command did not start" } else { "exit code $exitCode" }
+            $detail = if ($exitCode -eq -1) { "O comando do Chocolatey não iniciou" } else { "código de saída $exitCode" }
         }
 
         $level = if ($outcome -eq "Failed") { "ERROR" } else { "INFO" }
-        Write-WinUtilLog -Level $level -Component "Package" -Message "$Action choco package $($outcome.ToLowerInvariant()): $program ($detail)"
+        Write-WinUtilLog -Level $level -Component "Package" -Message "Pacote choco ($Action) $($outcome.ToLowerInvariant()): $program ($detail)"
 
         if ($outcome -eq "Failed") {
-            # The reason is somewhere in choco's output, and without it the log says only that
-            # a number came back
+            # O motivo está em algum lugar da saída do choco, e sem ele o log diz apenas que
+            # um número retornou
             foreach ($line in @($output | Select-Object -Last 15)) {
                 $text = ([string]$line).Trim()
                 if ($text) { Write-WinUtilLog -Level "WARN" -Component "Package" -Detail -Message $text }

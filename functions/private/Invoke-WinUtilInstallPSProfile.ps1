@@ -40,7 +40,7 @@ function Invoke-WinUtilInstallPSProfile {
 
     Step-WinUtilJob -Status "Running the profile setup" -State "Indeterminate"
 
-    $setupUrl = "https://github.com/ChrisTitusTech/powershell-profile/raw/main/setup.ps1"
+    $setupUrl = "https://github.com/RamonMods/powershell-profile/raw/main/setup.ps1"
     # Stop in the child, so a setup failure is a nonzero exit rather than a logged error and a
     # exit code of zero
     $output = & $pwshPath -NoProfile -NonInteractive -Command "`$ErrorActionPreference = 'Stop'; irm '$setupUrl' | iex" 2>&1

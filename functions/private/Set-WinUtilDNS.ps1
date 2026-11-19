@@ -2,10 +2,10 @@ function Set-WinUtilDNS {
     <#
 
     .SYNOPSIS
-        Sets the DNS of all interfaces that are in the "Up" state. It will lookup the values from the DNS.Json file
+        Define o DNS de todas as interfaces que estão no estado "Up". Os valores são obtidos do arquivo DNS.Json
 
     .PARAMETER DNSProvider
-        The DNS provider to set the DNS server to
+        O provedor de DNS a ser definido no servidor DNS
 
     .EXAMPLE
         Set-WinUtilDNS -DNSProvider "google"
@@ -14,44 +14,44 @@ function Set-WinUtilDNS {
     param($DNSProvider)
 
     if($DNSProvider -eq "Default") {
-        Write-WinUtilLog -Component "DNS" -Message "DNS provider is Default; no DNS changes applied."
+        Write-WinUtilLog -Component "DNS" -Message "O provedor de DNS é Default; nenhuma alteração de DNS aplicada."
         return $true
     }
 
     if($DNSProvider -eq "Fastest") {
-        Write-WinUtilLog -Component "DNS" -Message "Auto-detecting fastest DNS provider via latency benchmark..."
+        Write-WinUtilLog -Component "DNS" -Message "Detectando automaticamente o provedor de DNS mais rápido via teste de latência..."
         $benchmark = Get-WinUtilDNSBenchmark
         $validFastest = $benchmark | Where-Object { $_.LatencyMs -lt 9999 } | Select-Object -First 1
         if ($validFastest) {
             $DNSProvider = $validFastest.Provider
-            Write-Host "Auto-selected fastest DNS provider: $DNSProvider ($($validFastest.LatencyMs) ms)"
-            Write-WinUtilLog -Component "DNS" -Message "Auto-selected fastest DNS provider: $DNSProvider ($($validFastest.LatencyMs) ms)"
+            Write-Host "Provedor de DNS mais rápido selecionado automaticamente: $DNSProvider ($($validFastest.LatencyMs) ms)"
+            Write-WinUtilLog -Component "DNS" -Message "Provedor de DNS mais rápido selecionado automaticamente: $DNSProvider ($($validFastest.LatencyMs) ms)"
         } else {
-            Write-Warning "Could not measure DNS latency to any provider; keeping current network adapter DNS settings."
-            Write-WinUtilLog -Component "DNS" -Message "Benchmark timeout or all probes failed; aborting DNS change to preserve existing settings."
+            Write-Warning "Não foi possível medir a latência de DNS para nenhum provedor; mantendo as configurações de DNS atuais do adaptador de rede."
+            Write-WinUtilLog -Component "DNS" -Message "Tempo esgotado no teste ou todas as sondagens falharam; abortando a alteração de DNS para preservar as configurações existentes."
             return $false
         }
     }
 
     try {
         $Adapters = Get-NetAdapter | Where-Object {$_.Status -eq "Up"}
-        Write-Host "Ensuring DNS is set to $DNSProvider on the following interfaces:"
+        Write-Host "Garantindo que o DNS seja definido como $DNSProvider nas seguintes interfaces:"
         Write-Host $($Adapters | Out-String)
-        Write-WinUtilLog -Component "DNS" -Message "Setting DNS provider to $DNSProvider for $(@($Adapters).Count) active adapter(s)."
+        Write-WinUtilLog -Component "DNS" -Message "Definindo o provedor de DNS como $DNSProvider para $(@($Adapters).Count) adaptador(es) ativo(s)."
 
         if($DNSProvider -ne "DHCP") {
             $dns = $sync.configs.dns.$DNSProvider
             if($null -eq $dns) {
-                Write-Warning "DNS provider $DNSProvider was not found in configuration."
-                Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "DNS provider $DNSProvider was not found in configuration."
+                Write-Warning "O provedor de DNS $DNSProvider não foi encontrado na configuração."
+                Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "O provedor de DNS $DNSProvider não foi encontrado na configuração."
                 return $false
             }
         }
 
         $dohSupported = [bool](Get-Command Add-DnsClientDohServerAddress -ErrorAction SilentlyContinue)
         if ($DNSProvider -ne "DHCP" -and $dns.DohOnly -and -not $dohSupported) {
-            Write-Warning "DNS provider $DNSProvider requires DNS over HTTPS, which is not supported on this system."
-            Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "DNS provider $DNSProvider requires DNS over HTTPS, which is not supported on this system."
+            Write-Warning "O provedor de DNS $DNSProvider exige DNS over HTTPS, que não é suportado neste sistema."
+            Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "O provedor de DNS $DNSProvider exige DNS over HTTPS, que não é suportado neste sistema."
             return $false
         }
 
@@ -61,7 +61,7 @@ function Set-WinUtilDNS {
             $interfaceParams = "$dnscacheBase\$($Adapter.InterfaceGuid)"
 
             if($DNSProvider -eq "DHCP") {
-                Write-WinUtilLog -Component "DNS" -Message "Resetting DNS to DHCP on adapter $($Adapter.Name) (ifIndex: $($Adapter.ifIndex))."
+                Write-WinUtilLog -Component "DNS" -Message "Redefinindo o DNS para DHCP no adaptador $($Adapter.Name) (ifIndex: $($Adapter.ifIndex))."
                 Set-DnsClientServerAddress -InterfaceIndex $Adapter.ifIndex -ResetServerAddresses
                 netsh interface ip set dnsservers name="$($Adapter.Name)" source=dhcp
                 netsh interface ipv6 set dnsservers name="$($Adapter.Name)" source=dhcp
@@ -76,7 +76,7 @@ function Set-WinUtilDNS {
 
                         foreach ($ip in $dohServerAddresses) {
                             if (Get-DnsClientDohServerAddress -ServerAddress $ip -ErrorAction SilentlyContinue) {
-                                Write-WinUtilLog -Component "DNS" -Message "Removing DoH registration for $ip."
+                                Write-WinUtilLog -Component "DNS" -Message "Removendo o registro DoH de $ip."
                                 Remove-DnsClientDohServerAddress -ServerAddress $ip -Confirm:$false -ErrorAction Stop
                             }
                         }
@@ -101,7 +101,7 @@ function Set-WinUtilDNS {
                             if ($existing) {
                                 Set-DnsClientDohServerAddress -ServerAddress $ip -DohTemplate $dohTemplate -AllowFallbackToUdp $false -AutoUpgrade $true -ErrorAction Stop
                             } else {
-                                Write-WinUtilLog -Component "DNS" -Message "Registering DoH template for $ip."
+                                Write-WinUtilLog -Component "DNS" -Message "Registrando o modelo DoH de $ip."
                                 Add-DnsClientDohServerAddress -ServerAddress $ip -DohTemplate $dohTemplate -AllowFallbackToUdp $false -AutoUpgrade $true -ErrorAction Stop
                             }
 
@@ -118,26 +118,26 @@ function Set-WinUtilDNS {
                             throw
                         }
 
-                        Write-Warning "DNS over HTTPS setup for provider $DNSProvider failed; continuing with plain DNS."
-                        Write-WinUtilLog -Level "WARN" -Component "DNS" -Message "DNS over HTTPS setup for provider $DNSProvider failed; continuing with plain DNS: $($psitem.Exception.Message)"
+                        Write-Warning "A configuração de DNS over HTTPS para o provedor $DNSProvider falhou; continuando com DNS simples."
+                        Write-WinUtilLog -Level "WARN" -Component "DNS" -Message "A configuração de DNS over HTTPS para o provedor $DNSProvider falhou; continuando com DNS simples: $($psitem.Exception.Message)"
                     }
                 }
 
-                Write-WinUtilLog -Component "DNS" -Message "Setting IPv4 DNS on adapter $($Adapter.Name) (ifIndex: $($Adapter.ifIndex)) to $($dns.Primary), $($dns.Secondary)."
+                Write-WinUtilLog -Component "DNS" -Message "Definindo o DNS IPv4 no adaptador $($Adapter.Name) (ifIndex: $($Adapter.ifIndex)) como $($dns.Primary), $($dns.Secondary)."
                 Set-DnsClientServerAddress -InterfaceIndex $Adapter.ifIndex -ServerAddresses $ipv4Addresses -ErrorAction Stop
-                Write-WinUtilLog -Component "DNS" -Message "Setting IPv6 DNS on adapter $($Adapter.Name) (ifIndex: $($Adapter.ifIndex)) to $($dns.Primary6), $($dns.Secondary6)."
+                Write-WinUtilLog -Component "DNS" -Message "Definindo o DNS IPv6 no adaptador $($Adapter.Name) (ifIndex: $($Adapter.ifIndex)) como $($dns.Primary6), $($dns.Secondary6)."
                 Set-DnsClientServerAddress -InterfaceIndex $Adapter.ifIndex -ServerAddresses $ipv6Addresses -ErrorAction Stop
             }
         }
         if ($DNSProvider -ne "DHCP" -and $dohSupported -and $dns.DohTemplate) {
             Clear-DnsClientCache
         }
-        Write-WinUtilLog -Component "DNS" -Message "DNS provider change completed: $DNSProvider"
+        Write-WinUtilLog -Component "DNS" -Message "Alteração do provedor de DNS concluída: $DNSProvider"
         return $true
     } catch {
-        Write-Warning "DNS provider $DNSProvider was not completed because an error occurred."
+        Write-Warning "O provedor de DNS $DNSProvider não foi aplicado porque ocorreu um erro."
         Write-Warning $psitem.Exception.Message
-        Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "DNS provider $DNSProvider was not completed: $($psitem.Exception.Message)"
+        Write-WinUtilLog -Level "ERROR" -Component "DNS" -Message "O provedor de DNS $DNSProvider não foi concluído: $($psitem.Exception.Message)"
         return $false
     }
 }

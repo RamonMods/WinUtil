@@ -1,91 +1,109 @@
-# Chris Titus Tech's Windows Utility
+# WinUtil — utilitário para Windows em português
 
-[![Version](https://img.shields.io/github/v/release/ChrisTitusTech/winutil?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/ChrisTitusTech/winutil/releases/latest)
-![Downloads](https://img.shields.io/github/downloads/ChrisTitusTech/winutil/winutil.ps1?label=Total%20Downloads&style=for-the-badge)
-[![Discord](https://dcbadge.limes.pink/api/server/https://discord.gg/RUbZUZyByQ?theme=default-inverted&style=for-the-badge)](https://discord.gg/RUbZUZyByQ)
+[![Versão](https://img.shields.io/github/v/release/RamonMods/WinUtil?color=%230567ff&label=Última%20versão&style=for-the-badge)](https://github.com/RamonMods/WinUtil/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/RamonMods/WinUtil/winutil.ps1?label=Downloads&style=for-the-badge)](https://github.com/RamonMods/WinUtil/releases)
+<a href="https://pixgg.com/ramon"><img src="https://img.shields.io/badge/Pix-pixgg.com%2Framon-32BCAD?style=for-the-badge&logo=pix&logoColor=white" alt="Apoiar o projeto" /></a>
 
-A curated compilation of Windows system tasks to streamline **installs**, debloat with **tweaks**, troubleshoot with **config**, and configure **Windows updates**. Run it fresh on every new Windows install.
+Um só lugar para **instalar programas**, **enxugar o Windows** com ajustes, **consertar** o que quebrou e **controlar as atualizações**. Feito para rodar do zero em cada instalação nova do Windows 10 ou 11.
 
-![Title Screen](docs/src/assets/branding/title-screen.png)
-
-
----
-
-## Quick Start
-
-> **WinUtil must be run as Administrator** because it performs system-wide changes.
-
-Open PowerShell or Terminal as admin, then run:
-
-**Stable Branch (recommended)**
-```ps1
-irm https://christitus.com/win | iex
-```
-
-**Development Branch**
-```ps1
-irm https://christitus.com/windev | iex
-```
-
-### How to open an admin terminal
-
-- **Start menu:** Right-click Start → *Windows PowerShell (Admin)* or *Terminal (Admin)*
-- **Search:** Press the `Windows key`, and type `PowerShell` or `Terminal`, then `Ctrl + Shift + Enter`
+![Tela inicial](docs/src/assets/branding/title-screen.png)
 
 ---
 
-## Automation / Presets
+## Início rápido
 
-Apply a predefined configuration without manual selection:
+> **Precisa rodar como Administrador** — o WinUtil altera o sistema de verdade.
+
+Abra o PowerShell ou o Terminal como administrador e cole:
+
+```ps1
+irm https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1 | iex
+```
+
+Rodando do código-fonte desta pasta:
 
 ```powershell
-& ([ScriptBlock]::Create((irm https://christitus.com/win))) -Preset Standard
+.\Compile.ps1 -Run
 ```
 
-| Preset | Description |
-|--------|-------------|
-| `Standard` | Balanced defaults for most users |
-| `Minimal` | Minimal changes to suit every user |
-| `Advanced` | Deep tweaks for power users |
+### Como abrir um terminal como administrador
 
-To view exactly what each preset does, see:
-https://github.com/ChrisTitusTech/winutil/blob/main/config/preset.json
+- **Menu Iniciar:** clique com o botão direito em Iniciar → *Windows PowerShell (Admin)* ou *Terminal (Admin)*
+- **Pesquisa:** aperte a tecla `Windows`, digite `PowerShell` ou `Terminal` e use `Ctrl + Shift + Enter`
 
 ---
 
-## Build & Develop
+## As abas
 
-See https://github.com/ChrisTitusTech/winutil/blob/main/.github/CONTRIBUTING.md
-
----
-
-## Resources
-
-- [Official Documentation](https://winutil.christitus.com/)
-- [YouTube Tutorial](https://www.youtube.com/watch?v=6UQZ5oQg8XA)
-- [ChrisTitus.com Article](https://christitus.com/windows-tool/)
-- [Known Issues](https://winutil.christitus.com/knownissues/)
-- [Report an Issue](https://github.com/ChrisTitusTech/winutil/issues)
+| Aba | O que faz | Números |
+|---|---|---|
+| **Instalar** | Instala programas por winget ou Chocolatey, com busca, categorias e ícones | 200+ programas no catálogo |
+| **Ajustes** | Liga e desliga recursos do sistema com opção de desfazer | 100+ ajustes |
+| **Configurações** | Conserta Windows Update, rede, winget e faz reparo do sistema | 6 correções |
+| **Atualizações** | Define se o Windows Update fica padrão, desligado ou só com segurança | 3 modos |
+| **Recursos** | Liga recursos opcionais do Windows (.NET, Hyper-V, WSL etc.) | por edição do Windows |
+| **Criador do Win11** | Monta uma ISO do Windows 11 com ajustes e programas embutidos | ISO + USB |
+| **Aparência** | Tema claro/escuro e cor de destaque da interface | 2 temas |
 
 ---
 
-## Support
+## Automação / predefinições
 
-- Leave a ⭐ to show support! 😊
-- Faster Dotnet Implementation for sale here: https://www.cttstore.com/windows-toolbox
+Aplique uma configuração pronta sem clicar em nada:
 
-## Sponsors
+```powershell
+& ([ScriptBlock]::Create((irm https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1))) -Preset Standard
+```
 
-These are the sponsors that help keep this project alive with monthly contributions.
+| Predefinição | O que é |
+|---|---|
+| `Standard` | Equilíbrio para a maioria dos usuários |
+| `Minimal` | Mexe o mínimo possível |
+| `Advanced` | Ajustes profundos, para quem sabe o que está fazendo |
 
-<!-- sponsors --><a href="https://github.com/dwelfusius"><img src="https:&#x2F;&#x2F;github.com&#x2F;dwelfusius.png" width="60px" alt="User avatar: " /></a><a href="https://github.com/mews-se"><img src="https:&#x2F;&#x2F;github.com&#x2F;mews-se.png" width="60px" alt="User avatar: Martin" /></a><a href="https://github.com/jdiegmueller"><img src="https:&#x2F;&#x2F;github.com&#x2F;jdiegmueller.png" width="60px" alt="User avatar: Jason A. Diegmueller" /></a><a href="https://github.com/robertsandrock"><img src="https:&#x2F;&#x2F;github.com&#x2F;robertsandrock.png" width="60px" alt="User avatar: RMS" /></a><a href="https://github.com/paulsheets"><img src="https:&#x2F;&#x2F;github.com&#x2F;paulsheets.png" width="60px" alt="User avatar: Paul" /></a><a href="https://github.com/djones369"><img src="https:&#x2F;&#x2F;github.com&#x2F;djones369.png" width="60px" alt="User avatar: Dave J  (WhamGeek)" /></a><a href="https://github.com/anthonymendez"><img src="https:&#x2F;&#x2F;github.com&#x2F;anthonymendez.png" width="60px" alt="User avatar: Anthony Mendez" /></a><a href="https://github.com/FatBastard0"><img src="https:&#x2F;&#x2F;github.com&#x2F;FatBastard0.png" width="60px" alt="User avatar: " /></a><a href="https://github.com/DursleyGuy"><img src="https:&#x2F;&#x2F;github.com&#x2F;DursleyGuy.png" width="60px" alt="User avatar: DursleyGuy" /></a><a href="https://github.com/DwayneTheRockLobster1"><img src="https:&#x2F;&#x2F;github.com&#x2F;DwayneTheRockLobster1.png" width="60px" alt="User avatar: " /></a><a href="https://github.com/KieraKujisawa"><img src="https:&#x2F;&#x2F;github.com&#x2F;KieraKujisawa.png" width="60px" alt="User avatar: Kiera Meredith" /></a><a href="https://github.com/seanh1995"><img src="https:&#x2F;&#x2F;github.com&#x2F;seanh1995.png" width="60px" alt="User avatar: Sean (ANGRYxScotsman)" /></a><a href="https://github.com/josencarnacao"><img src="https:&#x2F;&#x2F;github.com&#x2F;josencarnacao.png" width="60px" alt="User avatar: José Encarnação" /></a><a href="https://github.com/sqlinjected"><img src="https:&#x2F;&#x2F;github.com&#x2F;sqlinjected.png" width="60px" alt="User avatar: sql" /></a><!-- sponsors -->
+O que cada predefinição faz exatamente está em [`config/preset.json`](config/preset.json).
 
-*<sub>Sponsors with a recurring subscription also get access to the .NET alternative.</sub>
+Também dá para exportar/importar a seleção pela própria interface (`Configurações → Importar/Exportar`), em JSON.
 
 ---
 
-## Contributors
+## Compilar e desenvolver
 
-[![Contributors](https://contrib.rocks/image?repo=ChrisTitusTech/winutil)](https://github.com/ChrisTitusTech/winutil/graphs/contributors)
+```powershell
+.\Compile.ps1          # gera winutil.ps1 a partir de functions/, config/ e xaml/
+.\Compile.ps1 -Run     # gera e abre a interface
+```
 
-Thanks to everyone who has contributed time and effort to this project. Keep rocking 🍻
+Testes (Pester 5.8.0):
+
+```powershell
+Install-Module -Name Pester -RequiredVersion 5.8.0 -Repository PSGallery -Scope CurrentUser -Force -SkipPublisherCheck
+Import-Module Pester -RequiredVersion 5.8.0 -Force
+Invoke-Pester -Path 'pester/*.Tests.ps1' -Output Detailed -CI
+```
+
+Guia de contribuição: [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · contrato do projeto: [`SPEC.md`](SPEC.md) · regras para agentes: [`AGENTS.md`](AGENTS.md).
+
+---
+
+## Documentação
+
+- Código e issues: <https://github.com/RamonMods/WinUtil>
+- Documentação em `docs/` (Astro Starlight) — veja [`docs/README.md`](docs/README.md) para rodar localmente
+- Referência de funções: [`docs/src/content/docs/code-reference/`](docs/src/content/docs/code-reference)
+
+---
+
+## Apoiar o projeto
+
+<a href="https://pixgg.com/ramon"><img src="https://img.shields.io/badge/Pix-pixgg.com%2Framon-32BCAD?style=for-the-badge&logo=pix&logoColor=white" alt="Apoiar o projeto" /></a>
+
+Pix: **[pixgg.com/ramon](https://pixgg.com/ramon)**
+
+Deixe uma ⭐ no repositório se o projeto te ajudou — é de graça e ajuda bastante.
+
+---
+
+## Créditos
+
+Este projeto é um fork traduzido e adaptado do [WinUtil de Chris Titus Tech](https://github.com/ChrisTitusTech/winutil), distribuído sob a licença MIT. O aviso de copyright original foi preservado no [`LICENSE`](LICENSE), como a licença exige.

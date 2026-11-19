@@ -1,8 +1,8 @@
 <#
 .NOTES
-    Author         : Chris Titus @christitustech
+    Author         : Ramon @RamonMods
     Runspace Author: @DeveloperDurp
-    GitHub         : https://github.com/ChrisTitusTech
+    GitHub         : https://github.com/RamonMods
     Version        : #{replaceme}
 #>
 
@@ -169,7 +169,7 @@ if (`$launch.Headless) { `$env:WINUTIL_HEADLESS_CHILD = '1' }
 if (`$launch.ScriptPath) {
     & `$launch.ScriptPath @invokeParameters
 } else {
-    `$remoteScript = [ScriptBlock]::Create((Invoke-RestMethod 'https://github.com/ChrisTitusTech/winutil/releases/latest/download/winutil.ps1'))
+    `$remoteScript = [ScriptBlock]::Create((Invoke-RestMethod 'https://github.com/RamonMods/WinUtil/releases/latest/download/winutil.ps1'))
     & `$remoteScript @invokeParameters
 }
 "@

@@ -11,24 +11,24 @@ function Set-WinUtilClassicContextMenu {
     try {
         $workaroundKey = Get-Item -LiteralPath $workaroundPath -ErrorAction Stop
     } catch [System.Management.Automation.ItemNotFoundException] {
-        # The newer registration is optional.
+        # A chave de registro mais recente é opcional.
     }
     $marker = if ($null -ne $workaroundKey) { $workaroundKey.GetValue($markerName) }
     $ownsWorkaround = $marker -is [int] -and $marker -eq 1
 
     if ($Undo) {
-        # Older WinUtil builds applied the original override without an ownership marker.
+        # Versões antigas do WinUtil aplicavam a substituição original sem um marcador de propriedade.
         try {
             Remove-Item -LiteralPath $legacyPath -Recurse -Force -ErrorAction Stop
         } catch [System.Management.Automation.ItemNotFoundException] {
-            # The original override is already absent.
+            # A substituição original já está ausente.
         }
 
         if ($ownsWorkaround) {
             try {
                 if ($workaroundKey.ValueCount -gt 1 -or
                     ($workaroundKey.GetSubKeyNames() | Where-Object { $_ -ne 'InprocServer32' })) {
-                    throw "The classic context menu registry key '$workaroundPath' has additional entries and was left intact."
+                    throw "A chave de registro do menu de contexto clássico '$workaroundPath' possui entradas adicionais e foi mantida intacta."
                 }
                 if ($workaroundKey.SubKeyCount -gt 0) {
                     $serverKey = Get-Item -LiteralPath $serverPath -ErrorAction Stop
@@ -37,19 +37,19 @@ function Set-WinUtilClassicContextMenu {
                             ($serverKey.GetValueNames() -notcontains '' -or
                              $serverKey.GetValueKind('') -ne [Microsoft.Win32.RegistryValueKind]::String -or
                              $serverKey.GetValue('') -ne ''))) {
-                        throw "The classic context menu registry key '$serverPath' has been changed and was left intact."
+                        throw "A chave de registro do menu de contexto clássico '$serverPath' foi alterada e mantida intacta."
                     }
                 }
                 Remove-Item -LiteralPath $workaroundPath -Recurse -Force -ErrorAction Stop
             } catch [System.Management.Automation.ItemNotFoundException] {
-                # The key disappeared before cleanup completed.
+                # A chave desapareceu antes da limpeza ser concluída.
             }
         }
     } else {
         New-Item -Path $legacyPath -Name InprocServer32 -Value '' -Force -ErrorAction Stop | Out-Null
 
         if ($null -eq $workaroundKey) {
-            # The first override ensures the CLSID parent exists, so -Force is unnecessary.
+            # A primeira substituição garante que o CLSID pai exista, então -Force é desnecessário.
             $workaroundKey = New-Item -Path $workaroundPath -ErrorAction Stop
             try {
                 New-ItemProperty -LiteralPath $workaroundPath -Name $markerName -Value 1 -PropertyType DWord -ErrorAction Stop | Out-Null
@@ -66,7 +66,7 @@ function Set-WinUtilClassicContextMenu {
         } elseif ($ownsWorkaround) {
             $serverKey = Get-Item -LiteralPath $serverPath -ErrorAction Stop
             if ($serverKey.ValueCount -eq 0 -and $serverKey.SubKeyCount -eq 0) {
-                # Key creation can succeed before assigning its default value fails.
+                # A criação da chave pode dar certo antes de falhar a atribuição do seu valor padrão.
                 Set-Item -LiteralPath $serverPath -Value '' -Force -ErrorAction Stop
             }
         }

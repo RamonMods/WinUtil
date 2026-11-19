@@ -1,13 +1,13 @@
 function Set-WinUtilRegistryComboState {
     <#
     .SYNOPSIS
-        Applies and verifies a config-defined registry combo-box state.
+        Aplica e verifica um estado de caixa de combinação de registro definido na configuração.
 
     .PARAMETER Registry
-        Registry settings containing a value mapping for each supported state.
+        Configurações de registro contendo o mapeamento de valor para cada estado suportado.
 
     .PARAMETER State
-        The state name to apply.
+        O nome do estado a aplicar.
     #>
     param(
         [Parameter(Mandatory)]
@@ -18,10 +18,10 @@ function Set-WinUtilRegistryComboState {
     )
 
     if ($Registry[0].Values.PSObject.Properties.Name -notcontains $State) {
-        throw "Unknown registry state '$State'."
+        throw "Estado de registro desconhecido '$State'."
     }
 
-    # Preserve exact prior values so a partial update can be rolled back.
+    # Preserva os valores anteriores exatos para que uma atualização parcial possa ser revertida.
     $previousValues = foreach ($setting in @($Registry)) {
         $currentValue = Get-WinUtilRegistryComboValue -Setting $setting
         [pscustomobject]@{ Setting = $setting; Exists = $currentValue.Exists; Value = $currentValue.Value }
@@ -36,7 +36,7 @@ function Set-WinUtilRegistryComboState {
             }
         }
 
-        # Set-WinUtilRegistry reports write errors without throwing, so verify each result explicitly.
+        # Set-WinUtilRegistry relata erros de escrita sem lançar exceção, então verifica cada resultado explicitamente.
         foreach ($setting in @($Registry)) {
             $configuredValue = $setting.Values.PSObject.Properties[$State].Value
             $currentValue = Get-WinUtilRegistryComboValue -Setting $setting
@@ -46,13 +46,13 @@ function Set-WinUtilRegistryComboState {
                 $currentValue.Exists -and [string]$currentValue.Value -eq [string]$configuredValue
             }
             if (-not $writeMatches) {
-                throw "The registry values did not match the requested state."
+                throw "Os valores de registro não correspondem ao estado solicitado."
             }
         }
     } catch {
         $applyError = $_.Exception.Message
         if ([string]::IsNullOrWhiteSpace($applyError)) {
-            $applyError = "The registry values did not match the requested state."
+            $applyError = "Os valores de registro não correspondem ao estado solicitado."
         }
         $rollbackFailed = $false
         foreach ($previousValue in $previousValues) {
@@ -71,8 +71,8 @@ function Set-WinUtilRegistryComboState {
             }
         }
         if ($rollbackFailed) {
-            throw "Unable to apply registry state '$State': $applyError. The previous registry state could not be restored."
+            throw "Não foi possível aplicar o estado de registro '$State': $applyError. O estado anterior do registro não pôde ser restaurado."
         }
-        throw "Unable to apply registry state '$State': $applyError"
+        throw "Não foi possível aplicar o estado de registro '$State': $applyError"
     }
 }

@@ -1,19 +1,19 @@
 function Set-WinUtilWorkingView {
     <#
         .SYNOPSIS
-            Shows or hides a tab working view (spinner + live status)
+            Mostra ou oculta a visão de trabalho de uma aba (spinner + status ao vivo)
 
         .DESCRIPTION
-            While a long run is in flight the tab content is replaced with the
-            centered spinning arrow and the current status beneath it, mirroring
-            the Win11 Creator working page. The bottom progress bar keeps
-            reporting as before.
+            Enquanto uma execução longa está em andamento, o conteúdo da aba é substituído
+            pela seta giratória centralizada e pelo status atual abaixo dela, espelhando
+            a página de trabalho do Criador do Win11. A barra de progresso inferior continua
+            reportando como antes.
 
-            Areas map job names to tabs: Install covers Install/Uninstall/
-            Upgrade, Tweaks covers Tweaks/Undo. Adding a new area is a new
-            XAML panel plus one entry in the map below.
+            As áreas mapeiam nomes de job para abas: Install cobre Install/Uninstall/
+            Upgrade, Tweaks cobre Tweaks/Undo. Adicionar uma nova área é um novo
+            painel XAML mais uma entrada no mapa abaixo.
 
-            A no-op without a window, so job bodies stay free of UI checks.
+            Não faz nada sem uma janela, então o corpo dos jobs fica livre de verificações de UI.
     #>
     param(
         [Parameter(Mandatory)]
@@ -29,8 +29,8 @@ function Set-WinUtilWorkingView {
     Invoke-WPFUIThread -Parameters @{ Area = $Area; Working = $Working; Label = $Label } -ScriptBlock {
         param($Area, $Working, $Label)
 
-        # Resolved here rather than by the caller: the block is rebuilt from its
-        # text on the interface thread, so only flat values travel reliably.
+        # Resolvido aqui em vez de pelo chamador: o bloco é reconstruído a partir do seu
+        # texto na thread da interface, então apenas valores simples viajam de forma confiável.
         if ([string]::IsNullOrEmpty($Area)) { return }
         $controls = @{
             Install = @{

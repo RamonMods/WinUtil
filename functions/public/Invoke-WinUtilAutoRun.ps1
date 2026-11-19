@@ -2,22 +2,23 @@ function Invoke-WinUtilAutoRun {
     <#
 
     .SYNOPSIS
-        Runs every selected action to completion without a window
+        Executa cada ação selecionada até o fim sem janela
 
     .DESCRIPTION
-        The headless path. Each action is the same job the button would start, run one at a time
-        because the job layer allows one at a time, and waited on until the worker clears the
-        busy flag.
+        O caminho sem interface. Cada ação é o mesmo trabalho que o botão iniciaria, executado
+        uma por vez porque a camada de jobs permite apenas um por vez, e aguardado até que o
+        worker limpe o sinalizador de ocupado.
 
-        Returns a summary of what ran so the caller can decide the exit code. Nothing here
-        touches the interface, so it behaves the same whether a window exists or not.
+        Retorna um resumo do que foi executado para que quem chamou possa decidir o código de
+        saída. Nada aqui toca a interface, então o comportamento é o mesmo com ou sem janela.
 
     .PARAMETER StopTimeoutSeconds
-        How long a step that timed out is given to stop before the run gives up on the rest.
+        Quanto tempo uma etapa que estourou o tempo recebe para parar antes de a execução
+        desistir do restante.
 
     .PARAMETER StepTimeoutSeconds
-        How long a single action may take before the run gives up on it. Without a ceiling an
-        installer waiting on something that will never arrive hangs the run for good.
+        Quanto tempo uma única ação pode levar antes de a execução desistir dela. Sem um teto,
+        um instalador esperando por algo que nunca vai chegar trava a execução de vez.
 
     #>
     param(
@@ -36,11 +37,11 @@ function Invoke-WinUtilAutoRun {
 
     $planned = @($steps | Where-Object { $_.Count -gt 0 })
     if ($planned.Count -eq 0) {
-        Write-WinUtilLog -Level "WARN" -Component "AutoRun" -Message "Nothing was selected, so there is nothing to do."
+        Write-WinUtilLog -Level "WARN" -Component "AutoRun" -Message "Nada foi selecionado, então não há nada a fazer."
         return [pscustomobject]@{ Steps = @(); Failed = 0; TimedOut = 0; Errors = 0; Warnings = 0 }
     }
 
-    Write-WinUtilLog -Component "AutoRun" -Message "Headless run starting: $(($planned | ForEach-Object { "$($_.Name) ($($_.Count))" }) -join ', ')"
+    Write-WinUtilLog -Component "AutoRun" -Message "Iniciando execução sem interface: $(($planned | ForEach-Object { "$($_.Name) ($($_.Count))" }) -join ', ')"
 
     $results = New-Object System.Collections.ArrayList
     $runClock = [System.Diagnostics.Stopwatch]::StartNew()
@@ -51,19 +52,19 @@ function Invoke-WinUtilAutoRun {
         $stepClock = [System.Diagnostics.Stopwatch]::StartNew()
         $timedOut = $false
 
-        Write-WinUtilLog -Component "AutoRun" -Message "$($step.Name): starting $($step.Count) item(s)."
+        Write-WinUtilLog -Component "AutoRun" -Message "$($step.Name): iniciando $($step.Count) item(ns)."
 
         try {
             & $step.Action
         } catch {
-            Write-WinUtilErrorRecord -ErrorRecord $_ -Component "AutoRun" -Context "Starting $($step.Name)"
+            Write-WinUtilErrorRecord -ErrorRecord $_ -Component "AutoRun" -Context "Iniciando $($step.Name)"
         }
 
-        # The action starts a job and returns; the run is over when the worker clears the flag
+        # A ação inicia um job e retorna; a execução termina quando o worker limpa o sinalizador
         while ($sync.ActiveJob) {
             if ($stepClock.Elapsed.TotalSeconds -ge $StepTimeoutSeconds) {
                 $timedOut = $true
-                Write-WinUtilLog -Level "ERROR" -Component "AutoRun" -Message "$($step.Name) did not finish within $StepTimeoutSeconds seconds, moving on."
+                Write-WinUtilLog -Level "ERROR" -Component "AutoRun" -Message "$($step.Name) não terminou em $StepTimeoutSeconds segundos, seguindo adiante."
                 break
             }
             Start-Sleep -Milliseconds 200
