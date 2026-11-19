@@ -12,7 +12,7 @@ body:
 
         ## ⚠️ **IMPORTANTE**
         - 🛠️ **Apenas ambientes suportados:** Só damos suporte ao Windows 11.
-        - 💡 Para dúvidas gerais, use a [seção Discussões](https://github.com/RamonMods/WinUtil/discussions) ou entre no nosso [Servidor Discord](https://github.com/RamonMods/WinUtil) mantido pela comunidade.
+        - 💡 Para dúvidas gerais, use a [seção Discussões](https://github.com/RamonMods/WinUtil/discussions).
 
   - type: textarea
     id: proposed_solution

@@ -8,8 +8,8 @@ body:
     attributes:
       value: |
         - Lembre-se: só damos suporte ao Windows 11. Se encontrar problemas no Windows 10, considere atualizar para o Windows 11.
-        - Para dúvidas gerais, entre no nosso [Servidor Discord](https://github.com/RamonMods/WinUtil) mantido pela comunidade.
-        - Para problemas relacionados ao WinOneShot, recorra ao [repositório respectivo](https://github.com/CT-Tech-Group/winoneshot/issues) (se você for patrocinador no GitHub) ou ao [rastreador público](https://issues.RamonMods.com)
+        - Para dúvidas gerais, use a aba [Discussions](https://github.com/RamonMods/WinUtil/discussions).
+        - Para problemas relacionados ao WinOneShot, use o [repositório respectivo](https://github.com/CT-Tech-Group/winoneshot/issues).
 
   - type: checkboxes
     id: read_issues

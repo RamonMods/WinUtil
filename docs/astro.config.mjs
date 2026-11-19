@@ -24,7 +24,6 @@ export default defineConfig({
 			],
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RamonMods/WinUtil' },
-				{ icon: 'discord', label: 'Discord', href: 'https://github.com/RamonMods/WinUtil' },
 			],
 			// Sobrescritas de tema globais (cores, fontes, estilos das seções da página inicial).
 			customCss: ['./src/styles/theme.css'],

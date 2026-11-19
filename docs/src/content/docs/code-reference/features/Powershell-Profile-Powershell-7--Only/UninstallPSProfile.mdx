@@ -12,37 +12,37 @@ Esta página é gerada a partir de [`functions/private/Invoke-WinUtilUninstallPS
 function Invoke-WinUtilUninstallPSProfile {
     <#
     .SYNOPSIS
-        Restores the PowerShell 7 profile the CTT profile replaced
+        Restaura o perfil do PowerShell 7 que o perfil do RamonMods substituiu
 
     .DESCRIPTION
-        The profile path has to come from pwsh itself. $PROFILE inside this job is the worker's
-        own Windows PowerShell profile, which is not the file the install wrote.
+        O caminho do perfil deve vir do próprio pwsh. $PROFILE dentro deste job é o perfil
+        do próprio Windows PowerShell do worker, que não é o arquivo que a instalação escreveu.
     #>
 
     $pwshPath = Get-WinUtilPowerShell7Path
     if (-not $pwshPath) {
-        throw "PowerShell 7 is not installed, so there is no CTT profile to remove."
+        throw "O PowerShell 7 não está instalado, portanto não há perfil do RamonMods para remover."
     }
 
     $profilePath = (& $pwshPath -NoProfile -NonInteractive -Command '$PROFILE' | Select-Object -First 1)
     if ([string]::IsNullOrWhiteSpace($profilePath)) {
-        throw "Could not determine the PowerShell 7 profile path."
+        throw "Não foi possível determinar o caminho do perfil do PowerShell 7."
     }
     $profilePath = $profilePath.Trim()
     $backupPath = "$profilePath.bak"
 
     if (Test-Path $backupPath) {
         Move-Item -Path $backupPath -Destination $profilePath -Force
-        Write-WinUtilLog -Component "Feature" -Message "Restored the profile that was in place before: $profilePath"
+        Write-WinUtilLog -Component "Feature" -Message "Perfil restaurado ao estado anterior: $profilePath"
         return
     }
 
     if (Test-Path $profilePath) {
         Remove-Item -Path $profilePath -Force
-        Write-WinUtilLog -Component "Feature" -Message "Removed the CTT PowerShell profile: $profilePath"
+        Write-WinUtilLog -Component "Feature" -Message "Perfil do RamonMods do PowerShell removido: $profilePath"
         return
     }
 
-    Write-WinUtilLog -Level "WARN" -Component "Feature" -Message "No PowerShell 7 profile found at $profilePath, nothing to remove."
+    Write-WinUtilLog -Level "WARN" -Component "Feature" -Message "Nenhum perfil do PowerShell 7 encontrado em $profilePath; nada a remover."
 }
 ```

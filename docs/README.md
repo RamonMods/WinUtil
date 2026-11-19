@@ -87,4 +87,4 @@ O primeiro `docker compose up` (ou qualquer comando antes de existir imagem) mon
 
 ## 👀 Quer saber mais?
 
-Veja a [documentação do Starlight](https://starlight.astro.build/) (inclusive o [guia de overrides de componente](https://starlight.astro.build/guides/overriding-components/)), leia a [documentação do Astro](https://docs.astro.build) ou entre no [Discord do Astro](https://astro.build/chat).
+Veja a [documentação do Starlight](https://starlight.astro.build/) (inclusive o [guia de overrides de componente](https://starlight.astro.build/guides/overriding-components/)) e a [documentação do Astro](https://docs.astro.build).

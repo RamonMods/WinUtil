@@ -2,7 +2,7 @@ function Invoke-WPFUpdatesdefault {
     <#
 
     .SYNOPSIS
-        Resets Windows Update settings to default
+        Redefine as configurações do Windows Update para os padrões
 
     #>
     Write-WinUtilLog -Component "Updates" -Message "Redefinindo as configurações do Windows Update para os padrões."
@@ -54,13 +54,13 @@ function Invoke-WPFUpdatesdefault {
     Write-Host "Reativando os serviços do Windows Update..." -ForegroundColor Green
     Write-WinUtilLog -Component "Updates" -Message "Restaurando os tipos de inicialização dos serviços do Windows Update."
 
-    # Other tweak tools can deny SYSTEM write access to these keys. Set-Service goes through the Service
-    # Control Manager, which runs as SYSTEM, so clear those rules before restoring startup types.
+    # Outras ferramentas de ajuste podem negar ao SYSTEM o acesso de escrita a estas chaves. O Set-Service passa
+    # pelo Service Control Manager, que executa como SYSTEM: remova essas regras antes de restaurar os tipos de inicialização.
     foreach ($serviceName in @("BITS", "wuauserv", "UsoSvc", "WaaSMedicSvc")) {
         $serviceKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\$serviceName"
         try {
             $serviceKeyAcl = Get-Acl -Path $serviceKeyPath -ErrorAction Stop
-            # Match the SID because the SYSTEM account name is localized on some Windows languages.
+            # Corresponde ao SID porque o nome da conta SYSTEM é localizado em alguns idiomas do Windows.
             $systemDenyRules = @($serviceKeyAcl.GetAccessRules($true, $false, [System.Security.Principal.SecurityIdentifier]) | Where-Object {
                 $_.AccessControlType -eq "Deny" -and $_.IdentityReference.Value -eq "S-1-5-18"
             })
@@ -92,7 +92,7 @@ function Invoke-WPFUpdatesdefault {
     Set-Service -Name UsoSvc -StartupType Automatic
     Start-Service -Name UsoSvc
 
-    # WaaSMedicSvc is launch protected, so Set-Service is denied even for administrators.
+    # O WaaSMedicSvc é protegido contra inicialização, então o Set-Service é negado até para administradores.
     $waaSMedicKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc"
     if ((Get-ItemProperty -Path $waaSMedicKeyPath -Name "Start" -ErrorAction SilentlyContinue).Start -ne 3) {
         try {

@@ -16,24 +16,24 @@ jobs:
     - name: Fechar issues inativas
       uses: actions/stale@v10
       with:
-        # A list of labels to reference when looking through issues,
-        # and only when one (or even more) of these labels is found.
-        # then skip this issue, and never try to stale and/or close it.
+        # Uma lista de rótulos a serem considerados ao examinar as issues:
+        # somente quando um (ou mais) desses rótulos for encontrado,
+        # a issue é ignorada, nunca sendo marcada como inativa e/ou fechada.
         exempt-issue-labels: "Keep Issue Open"
-        # Split it into two weeks, after one week, the issue will be marked as stale,
-        # after another week have passed without any update, the issue will then be closed.
+        # O prazo é dividido em duas semanas: após uma semana, a issue é marcada como inativa;
+        # após outra semana sem nenhuma atualização, a issue é então fechada.
         days-before-issue-stale: 90
         days-before-issue-close: 365
-        # NEVER mark PRs as Stale or Close + this workflow should never have write permissions on PRs, EVER!
+        # NUNCA marcar PRs como inativos nem fechá-los + este fluxo nunca deve ter permissão de escrita em PRs, NUNCA!
         days-before-pr-stale: -1
         days-before-pr-close: -1
-        # Sends a message for both the Stale and Close events of an issue.
-        stale-issue-message: "This issue was marked as stale due to inactivity."
-        close-issue-message: "This issue was closed after remaining stale without updates."
-        # Increase this value if the project receives a lot of
-        # PRs (yes.. apparently they're processed no matter what) & Issues.
-        # Default value for it (according to the docs) is 30
+        # Envia uma mensagem tanto para o evento de inatividade quanto para o de fechamento de uma issue.
+        stale-issue-message: "Esta issue foi marcada como inativa devido à falta de atividade."
+        close-issue-message: "Esta issue foi fechada após permanecer inativa sem atualizações."
+        # Aumente este valor se o projeto receber muitos
+        # PRs (sim.. aparentemente eles são processados de qualquer forma) e issues.
+        # O valor padrão (segundo a documentação) é 30
         operations-per-run: 200
-        # Make this field equal true if you want to test your configuration if it works correctly or not
+        # Defina este campo como true se quiser testar se a configuração funciona corretamente
         debug-only: false
         repo-token: ${{ secrets.GITHUB_TOKEN }}

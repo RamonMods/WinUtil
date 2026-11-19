@@ -12,11 +12,11 @@ Esta página é gerada a partir de [`functions/public/Invoke-WPFFixesNTPPool.ps1
 function Invoke-WPFFixesNTPPool {
     <#
     .SYNOPSIS
-        Configures Windows to use pool.ntp.org for NTP synchronization
+        Configura o Windows para usar pool.ntp.org na sincronização NTP
 
     .DESCRIPTION
-        Replaces the default Windows NTP server (time.windows.com) with
-        pool.ntp.org for improved time synchronization accuracy and reliability.
+        Substitui o servidor NTP padrão do Windows (time.windows.com) por
+        pool.ntp.org para melhorar a precisão e a confiabilidade da sincronização de horário.
     #>
 
     Start-Service w32time

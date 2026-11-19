@@ -60,7 +60,7 @@ function Update-WinUtilSelections {
             throw "Chave de seleção desconhecida: '$cbkey'."
         }
 
-        # Importa��es de substitui��o tamb�m devem se comportar como sele��es de caixa de sele��o, n�o como a��es repetidas.
+        # Importações de substituição também devem se comportar como seleções de caixa de seleção, não como ações repetidas.
         if ($nextSelections[$listName] -notcontains $cbkey) {
             $nextSelections[$listName].Add($cbkey)
         }
@@ -80,7 +80,7 @@ function Update-WinUtilSelections {
 
     foreach ($listName in $nextSelections.Keys) {
         foreach ($cbkey in $nextSelections[$listName]) {
-            # Ao acrescentar, a mesma entrada pode j� estar presente: uma predefini��o e uma configura��o que a
+            # Ao acrescentar, a mesma entrada pode já estar presente: uma predefinição e uma configuração que a
             # nomeiam acabariam selecionando-a duas vezes
             if ($sync.$listName -notcontains $cbkey) {
                 $sync.$listName.Add($cbkey)

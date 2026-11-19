@@ -2,18 +2,18 @@ function Invoke-WPFundoall {
     <#
 
     .SYNOPSIS
-        Undoes every selected tweak
+        Desfaz todos os ajustes selecionados
 
     #>
 
     $tweaks = $sync.selectedTweaks
 
     if ($tweaks.count -eq 0) {
-        Show-WinUtilMessage -Message "Please check the tweaks you wish to undo." -Title "WinUtil" -Button "OK" -Icon "Warning"
+        Show-WinUtilMessage -Message "Marque os ajustes que deseja desfazer." -Title "WinUtil" -Button "OK" -Icon "Warning"
         return
     }
 
-    Start-WinUtilJob -Name "Undo tweaks" -Description "Undoing tweaks" -QueueIfBusy -Parameters @{
+    Start-WinUtilJob -Name "Undo tweaks" -Description "Desfazendo ajustes" -QueueIfBusy -Parameters @{
         Tweaks = @($tweaks)
     } -ScriptBlock {
         param($Tweaks)

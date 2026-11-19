@@ -570,9 +570,8 @@ function Invoke-WPFUIElements {
         }
     }
 
-    # Um evento de busca pode ocorrer dentro de um dos frames do dispatcher cedidos acima. Os
-    # controles adicionados depois desse evento começam visíveis, então reaplique o filtro ativo
-    # assim que esta aba estiver completa.
+    # Um evento de busca pode ocorrer dentro de um dos frames do dispatcher cedidos acima. Os controles
+    # adicionados depois desse evento começam visíveis, então reaplique o filtro ativo quando a aba estiver pronta.
     $filterPanel = switch ($sync.currentTab) {
         "Tweaks" { "tweakspanel" }
         "AppX" { "appxpanel" }

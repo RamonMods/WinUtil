@@ -33,29 +33,26 @@ function Invoke-WPFUIThread {
         .DESCRIPTION
             Os controles só podem ser acessados pela thread que possui a janela.
 
-            O corpo é entregue como texto e reconstruído no runspace da interface, em vez de ser
-            empacotado como scriptblock: um scriptblock mantém o estado da sessão em que foi
-            escrito, e executá-lo entre runspaces custa cerca de vinte vezes mais por comando.
-            Por isso, os valores entram por Parameters em vez de serem capturados do escopo do
-            chamador.
+            O corpo é entregue como texto e reconstruído no runspace da interface, em vez de empacotado
+            como scriptblock: um scriptblock mantém o estado da sessão em que foi escrito, e executá-lo
+            entre runspaces custa cerca de vinte vezes mais por comando. Por isso, os valores entram
+            por Parameters em vez de serem capturados do escopo do chamador.
 
-            Não faz nada depois que a janela desaparece, para que um job que sobreviva à interface
-            termine silenciosamente.
+            Não faz nada quando a janela desaparece, para que um job que sobreviva à interface termine
+            silenciosamente.
 
         .PARAMETER ScriptBlock
-            O trabalho a executar na thread da interface. Declare um bloco param para tudo o que
-            ele precisar.
+            O trabalho a executar na thread da interface. Declare um bloco param para o que ele precisar.
 
         .PARAMETER Parameters
             Valores passados ao corpo por nome.
 
         .PARAMETER Async
-            Posta e retorna em vez de esperar. Para atualizações de progresso e de log, que nunca
-            devem bloquear o chamador.
+            Posta e retorna em vez de esperar. Para progresso e logs, que nunca devem bloquear o chamador.
 
         .PARAMETER PassThru
-            Retorna o que o corpo produziu. Desativado por padrão para que um chamador que só
-            queria atualizar um controle não receba saída indesejada.
+            Retorna o que o corpo produziu. Desativado por padrão, para que um chamador que só queria
+            atualizar um controle não receba saída indesejada.
     #>
     param(
         [Parameter(Mandatory, Position = 0)]
@@ -124,9 +121,8 @@ function Invoke-WPFUIThread {
     $work = @{
         Body = $ScriptBlock.ToString()
         Parameters = $Parameters
-        # Um chamador síncrono está aguardando uma transferência obrigatória para a interface e
-        # precisa ver a falha. Postagens sem retorno não têm ninguém para receber uma exceção,
-        # então o delegado apenas a registra no log.
+        # Um chamador síncrono aguarda uma transferência obrigatória para a interface e precisa ver a falha.
+        # Postagens sem retorno não têm ninguém para receber uma exceção, então o delegado só a registra no log.
         PropagateErrors = -not $Async
     }
 

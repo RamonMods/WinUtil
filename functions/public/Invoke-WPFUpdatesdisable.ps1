@@ -2,10 +2,10 @@ function Invoke-WPFUpdatesdisable {
     <#
 
     .SYNOPSIS
-        Disables Windows Update
+        Desativa o Windows Update
 
     .NOTES
-        Disabling Windows Update is not recommended. This is only for advanced users who know what they are doing.
+        Não é recomendado desativar o Windows Update. Isso é apenas para usuários avançados que sabem o que estão fazendo.
 
     #>
     param([switch]$Confirmed)
@@ -18,8 +18,8 @@ function Invoke-WPFUpdatesdisable {
 
     Write-Host "Configurando as configurações do registro..." -ForegroundColor Yellow
     Write-WinUtilLog -Component "Updates" -Message "Configurando os valores de política do registro do Windows Update para o modo desativado."
-    # New-Item -Force on an existing registry key deletes the key and its subkeys first, so only
-    # create missing keys and keep any other policies already stored under them.
+    # O New-Item -Force em uma chave de registro existente exclui a chave e suas subchaves primeiro,
+    # então crie apenas as chaves ausentes e preserve as demais políticas já armazenadas nelas.
     if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU")) {
         New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Force | Out-Null
     }
@@ -65,8 +65,8 @@ function Invoke-WPFUpdatesdisable {
 
 function Confirm-WPFUpdatesdisable {
     $confirmation = Show-WinUtilMessage `
-        -Message "Disabling Windows Update stops update services, disables scheduled tasks, and clears downloaded update files. Security updates will not be installed until defaults are restored. Continue?" `
-        -Title "Disable Windows Update?" `
+        -Message "Desativar o Windows Update interrompe os serviços de atualização, desativa as tarefas agendadas e limpa os arquivos de atualização baixados. As atualizações de segurança não serão instaladas até que os padrões sejam restaurados. Continuar?" `
+        -Title "Desativar o Windows Update?" `
         -Button "YesNo" `
         -Icon "Warning"
 

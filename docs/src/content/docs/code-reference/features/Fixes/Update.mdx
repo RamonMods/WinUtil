@@ -14,36 +14,36 @@ function Invoke-WPFFixesUpdate {
     <#
 
     .SYNOPSIS
-        Performs various tasks in an attempt to repair Windows Update
+        Executa diversas tarefas na tentativa de reparar o Windows Update
 
     .DESCRIPTION
-        1. (Aggressive Only) Scans the system for corruption using the Invoke-WPFSystemRepair function
-        2. Stops Windows Update Services
-        3. Remove the QMGR Data file, which stores BITS jobs
-        4. (Aggressive Only) Renames the DataStore and CatRoot2 folders
-            DataStore - Contains the Windows Update History and Log Files
-            CatRoot2 - Contains the Signatures for Windows Update Packages
-        5. Renames the Windows Update Download Folder
-        6. Deletes the Windows Update Log
-        7. (Aggressive Only) Resets the Security Descriptors on the Windows Update Services
-        8. Reregisters the BITS and Windows Update DLLs
-        9. Removes the WSUS client settings
-        10. Resets WinSock
-        11. Gets and deletes all BITS jobs
-        12. Sets the startup type of the Windows Update Services then starts them
-        13. Forces Windows Update to check for updates
+        1. (Somente Agressivo) Verifica o sistema em busca de corrupção usando a função Invoke-WPFSystemRepair
+        2. Interrompe os serviços do Windows Update
+        3. Remove o arquivo de dados do QMGR, que armazena os jobs do BITS
+        4. (Somente Agressivo) Renomeia as pastas DataStore e CatRoot2
+            DataStore - Contém o histórico e os arquivos de log do Windows Update
+            CatRoot2 - Contém as assinaturas dos pacotes do Windows Update
+        5. Renomeia a pasta de download do Windows Update
+        6. Exclui o log do Windows Update
+        7. (Somente Agressivo) Redefine os descritores de segurança dos serviços do Windows Update
+        8. Registra novamente as DLLs do BITS e do Windows Update
+        9. Remove as configurações de cliente do WSUS
+        10. Redefine o WinSock
+        11. Obtém e exclui todos os jobs do BITS
+        12. Define o tipo de inicialização dos serviços do Windows Update e os inicia
+        13. Força o Windows Update a verificar atualizações
 
     .PARAMETER Aggressive
-        If specified, the script will take additional steps to repair Windows Update that are more dangerous, take a significant amount of time, or are generally unnecessary
+        Se especificado, o script executará etapas adicionais para reparar o Windows Update que são mais arriscadas, demoram bastante ou geralmente são desnecessárias
 
     #>
 
     param($Aggressive = $false)
 
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -PercentComplete 0
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -PercentComplete 0
     Step-WinUtilJob -State "Indeterminate"
-    Write-Host "Starting Windows Update Repair..."
-    # Wait for the first progress bar to show, otherwise the second one won't show
+    Write-Host "Iniciando o reparo do Windows Update..."
+    # Aguarda a primeira barra de progresso aparecer; caso contrário, a segunda não aparecerá
     Start-Sleep -Milliseconds 200
 
     if ($Aggressive) {
@@ -51,54 +51,54 @@ function Invoke-WPFFixesUpdate {
     }
 
 
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Stopping Windows Update Services..." -PercentComplete 10
-    # Stop the Windows Update Services
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Interrompendo os serviços do Windows Update..." -PercentComplete 10
+    # Interrompe os serviços do Windows Update
     $services = @("BITS", "wuauserv", "appidsvc", "cryptsvc")
     for ($i = 0; $i -lt $services.Count; $i++) {
         $svc = $services[$i]
         $pct = [int](($i / $services.Count) * 100)
-        Write-Progress -Id 2 -ParentId 0 -Activity "Stopping Services" -Status "Stopping $svc..." -PercentComplete $pct
+        Write-Progress -Id 2 -ParentId 0 -Activity "Parando serviços" -Status "Parando $svc..." -PercentComplete $pct
         Stop-Service -Name $svc -Force
     }
-    Write-Progress -Id 2 -ParentId 0 -Activity "Stopping Services" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 2 -ParentId 0 -Activity "Parando serviços" -Status "Concluído" -PercentComplete 100
 
 
-    # Remove the QMGR Data file
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Renaming/Removing Files..." -PercentComplete 20
-    Write-Progress -Id 3 -ParentId 0 -Activity "Renaming/Removing Files" -Status "Removing QMGR Data files..." -PercentComplete 0
+    # Remove o arquivo de dados do QMGR
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Renomeando/removendo arquivos..." -PercentComplete 20
+    Write-Progress -Id 3 -ParentId 0 -Activity "Renomeando/removendo arquivos" -Status "Removendo arquivos de dados do QMGR..." -PercentComplete 0
     Remove-Item "$env:allusersprofile\Application Data\Microsoft\Network\Downloader\qmgr*.dat" -ErrorAction SilentlyContinue
 
 
     if ($Aggressive) {
-        # Rename the Windows Update Log and Signature Folders
-        Write-Progress -Id 3 -ParentId 0 -Activity "Renaming/Removing Files" -Status "Renaming the Windows Update Log, Download, and Signature Folder..." -PercentComplete 20
+        # Renomeia o log do Windows Update e as pastas de assinaturas
+        Write-Progress -Id 3 -ParentId 0 -Activity "Renomeando/removendo arquivos" -Status "Renomeando o log, o download e a pasta de assinaturas do Windows Update..." -PercentComplete 20
         Rename-Item $env:systemroot\SoftwareDistribution\DataStore DataStore.bak -ErrorAction SilentlyContinue
         Rename-Item $env:systemroot\System32\Catroot2 catroot2.bak -ErrorAction SilentlyContinue
     }
 
-    # Rename the Windows Update Download Folder
-    Write-Progress -Id 3 -ParentId 0 -Activity "Renaming/Removing Files" -Status "Renaming the Windows Update Download Folder..." -PercentComplete 20
+    # Renomeia a pasta de download do Windows Update
+    Write-Progress -Id 3 -ParentId 0 -Activity "Renomeando/removendo arquivos" -Status "Renomeando a pasta de download do Windows Update..." -PercentComplete 20
     Rename-Item $env:systemroot\SoftwareDistribution\Download Download.bak -ErrorAction SilentlyContinue
 
-    # Delete the legacy Windows Update Log
-    Write-Progress -Id 3 -ParentId 0 -Activity "Renaming/Removing Files" -Status "Removing the old Windows Update log..." -PercentComplete 80
+    # Exclui o log antigo do Windows Update
+    Write-Progress -Id 3 -ParentId 0 -Activity "Renomeando/removendo arquivos" -Status "Removendo o log antigo do Windows Update..." -PercentComplete 80
     Remove-Item $env:systemroot\WindowsUpdate.log -ErrorAction SilentlyContinue
-    Write-Progress -Id 3 -ParentId 0 -Activity "Renaming/Removing Files" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 3 -ParentId 0 -Activity "Renomeando/removendo arquivos" -Status "Concluído" -PercentComplete 100
 
 
     if ($Aggressive) {
-        # Reset the Security Descriptors on the Windows Update Services
-        Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Resetting the WU Service Security Descriptors..." -PercentComplete 25
-        Write-Progress -Id 4 -ParentId 0 -Activity "Resetting the WU Service Security Descriptors" -Status "Resetting the BITS Security Descriptor..." -PercentComplete 0
+        # Redefine os descritores de segurança dos serviços do Windows Update
+        Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Redefinindo os descritores de segurança dos serviços do WU..." -PercentComplete 25
+        Write-Progress -Id 4 -ParentId 0 -Activity "Redefinindo os descritores de segurança dos serviços do WU" -Status "Redefinindo o descritor de segurança do BITS..." -PercentComplete 0
         Start-Process -NoNewWindow -FilePath "sc.exe" -ArgumentList "sdset", "bits", "D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)" -Wait
-        Write-Progress -Id 4 -ParentId 0 -Activity "Resetting the WU Service Security Descriptors" -Status "Resetting the wuauserv Security Descriptor..." -PercentComplete 50
+        Write-Progress -Id 4 -ParentId 0 -Activity "Redefinindo os descritores de segurança dos serviços do WU" -Status "Redefinindo o descritor de segurança do wuauserv..." -PercentComplete 50
         Start-Process -NoNewWindow -FilePath "sc.exe" -ArgumentList "sdset", "wuauserv", "D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)" -Wait
-        Write-Progress -Id 4 -ParentId 0 -Activity "Resetting the WU Service Security Descriptors" -Status "Completed" -PercentComplete 100
+        Write-Progress -Id 4 -ParentId 0 -Activity "Redefinindo os descritores de segurança dos serviços do WU" -Status "Concluído" -PercentComplete 100
     }
 
 
-    # Reregister the BITS and Windows Update DLLs
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Reregistering DLLs..." -PercentComplete 40
+    # Registra novamente as DLLs do BITS e do Windows Update
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Registrando novamente as DLLs..." -PercentComplete 40
     $oldLocation = Get-Location
     Set-Location $env:systemroot\system32
     $i = 0
@@ -113,39 +113,39 @@ function Invoke-WPFFixesUpdate {
     )
     foreach ($dll in $DLLs) {
         if ($i % 5 -eq 0 -or $i -eq ($DLLs.Count - 1)) {
-            Write-Progress -Id 5 -ParentId 0 -Activity "Reregistering DLLs" -Status "Registering $dll..." -PercentComplete (($i / $DLLs.Count) * 100)
+            Write-Progress -Id 5 -ParentId 0 -Activity "Registrando novamente as DLLs" -Status "Registrando $dll..." -PercentComplete (($i / $DLLs.Count) * 100)
         }
         $i++
         Start-Process -NoNewWindow -FilePath "regsvr32.exe" -ArgumentList "/s", $dll
     }
     Set-Location $oldLocation
-    Write-Progress -Id 5 -ParentId 0 -Activity "Reregistering DLLs" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 5 -ParentId 0 -Activity "Registrando novamente as DLLs" -Status "Concluído" -PercentComplete 100
 
 
-    # Remove the WSUS client settings
+    # Remove as configurações de cliente do WSUS
     if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate") {
-        Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Removing WSUS client settings..." -PercentComplete 60
-        Write-Progress -Id 6 -ParentId 0 -Activity "Removing WSUS client settings" -PercentComplete 0
+        Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Removendo as configurações de cliente do WSUS..." -PercentComplete 60
+        Write-Progress -Id 6 -ParentId 0 -Activity "Removendo as configurações de cliente do WSUS" -PercentComplete 0
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name "AccountDomainSid" -ErrorAction SilentlyContinue
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name "PingID" -ErrorAction SilentlyContinue
         Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name "SusClientId" -ErrorAction SilentlyContinue
-        Write-Progress -Id 6 -ParentId 0 -Activity "Removing WSUS client settings" -Status "Completed" -PercentComplete 100
+        Write-Progress -Id 6 -ParentId 0 -Activity "Removendo as configurações de cliente do WSUS" -Status "Concluído" -PercentComplete 100
     }
 
-    # Remove Group Policy Windows Update settings
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Removing Group Policy Windows Update settings..." -PercentComplete 60
-    Write-Progress -Id 7 -ParentId 0 -Activity "Removing Group Policy Windows Update settings" -PercentComplete 0
+    # Remove as configurações de Política de Grupo do Windows Update
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Removendo as configurações de Política de Grupo do Windows Update..." -PercentComplete 60
+    Write-Progress -Id 7 -ParentId 0 -Activity "Removendo as configurações de Política de Grupo do Windows Update" -PercentComplete 0
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "ExcludeWUDriversInQualityUpdate" -ErrorAction SilentlyContinue
-    Write-Host "Defaulting driver offering through Windows Update..."
+    Write-Host "Restaurando a oferta de drivers pelo Windows Update..."
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" -Name "PreventDeviceMetadataFromNetwork" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverSearching" -Name "DontPromptForWindowsUpdate" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverSearching" -Name "DontSearchWindowsUpdate" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverSearching" -Name "DriverUpdateWizardWuSearchEnabled" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "ExcludeWUDriversInQualityUpdate" -ErrorAction SilentlyContinue
-    Write-Host "Defaulting Windows Update automatic restart..."
+    Write-Host "Restaurando a reinicialização automática do Windows Update..."
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoRebootWithLoggedOnUsers" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUPowerManagement" -ErrorAction SilentlyContinue
-    Write-Host "Clearing ANY Windows Update Policy settings..."
+    Write-Host "Limpando TODAS as configurações de Política do Windows Update..."
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "BranchReadinessLevel" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "DeferFeatureUpdatesPeriodInDays" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "DeferQualityUpdatesPeriodInDays" -ErrorAction SilentlyContinue
@@ -164,58 +164,58 @@ function Invoke-WPFFixesUpdate {
     Start-Process -NoNewWindow -FilePath "cmd.exe" -ArgumentList "/c RD /S /Q $env:WinDir\System32\GroupPolicyUsers" -Wait
     Start-Process -NoNewWindow -FilePath "cmd.exe" -ArgumentList "/c RD /S /Q $env:WinDir\System32\GroupPolicy" -Wait
     Start-Process -NoNewWindow -FilePath "gpupdate" -ArgumentList "/force" -Wait
-    Write-Progress -Id 7 -ParentId 0 -Activity "Removing Group Policy Windows Update settings" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 7 -ParentId 0 -Activity "Removendo as configurações de Política de Grupo do Windows Update" -Status "Concluído" -PercentComplete 100
 
 
-    # Reset WinSock
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Resetting WinSock..." -PercentComplete 65
-    Write-Progress -Id 7 -ParentId 0 -Activity "Resetting WinSock" -Status "Resetting WinSock..." -PercentComplete 0
+    # Redefine o WinSock
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Redefinindo o WinSock..." -PercentComplete 65
+    Write-Progress -Id 7 -ParentId 0 -Activity "Redefinindo o WinSock" -Status "Redefinindo o WinSock..." -PercentComplete 0
     Start-Process -NoNewWindow -FilePath "netsh" -ArgumentList "winsock", "reset"
     Start-Process -NoNewWindow -FilePath "netsh" -ArgumentList "winhttp", "reset", "proxy"
     Start-Process -NoNewWindow -FilePath "netsh" -ArgumentList "int", "ip", "reset"
-    Write-Progress -Id 7 -ParentId 0 -Activity "Resetting WinSock" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 7 -ParentId 0 -Activity "Redefinindo o WinSock" -Status "Concluído" -PercentComplete 100
 
 
-    # Get and delete all BITS jobs
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Deleting BITS jobs..." -PercentComplete 75
-    Write-Progress -Id 8 -ParentId 0 -Activity "Deleting BITS jobs" -Status "Deleting BITS jobs..." -PercentComplete 0
+    # Obtém e exclui todos os jobs do BITS
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Excluindo jobs do BITS..." -PercentComplete 75
+    Write-Progress -Id 8 -ParentId 0 -Activity "Excluindo jobs do BITS" -Status "Excluindo jobs do BITS..." -PercentComplete 0
     Get-BitsTransfer | Remove-BitsTransfer
-    Write-Progress -Id 8 -ParentId 0 -Activity "Deleting BITS jobs" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 8 -ParentId 0 -Activity "Excluindo jobs do BITS" -Status "Concluído" -PercentComplete 100
 
 
-    # Change the startup type of the Windows Update Services and start them
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Starting Windows Update Services..." -PercentComplete 90
-    Write-Progress -Id 9 -ParentId 0 -Activity "Starting Windows Update Services" -Status "Starting BITS..." -PercentComplete 0
+    # Altera o tipo de inicialização dos serviços do Windows Update e os inicia
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Iniciando os serviços do Windows Update..." -PercentComplete 90
+    Write-Progress -Id 9 -ParentId 0 -Activity "Iniciando os serviços do Windows Update" -Status "Iniciando o BITS..." -PercentComplete 0
     Get-Service BITS | Set-Service -StartupType Manual -PassThru | Start-Service
-    Write-Progress -Id 9 -ParentId 0 -Activity "Starting Windows Update Services" -Status "Starting wuauserv..." -PercentComplete 25
+    Write-Progress -Id 9 -ParentId 0 -Activity "Iniciando os serviços do Windows Update" -Status "Iniciando o wuauserv..." -PercentComplete 25
     Get-Service wuauserv | Set-Service -StartupType Manual -PassThru | Start-Service
-    Write-Progress -Id 9 -ParentId 0 -Activity "Starting Windows Update Services" -Status "Starting AppIDSvc..." -PercentComplete 50
-    # The AppIDSvc service is protected, so the startup type has to be changed in the registry
+    Write-Progress -Id 9 -ParentId 0 -Activity "Iniciando os serviços do Windows Update" -Status "Iniciando o AppIDSvc..." -PercentComplete 50
+    # O serviço AppIDSvc é protegido, então o tipo de inicialização precisa ser alterado no Registro
     Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\AppIDSvc" -Name "Start" -Value "3" # Manual
     Start-Service AppIDSvc
-    Write-Progress -Id 9 -ParentId 0 -Activity "Starting Windows Update Services" -Status "Starting CryptSvc..." -PercentComplete 75
+    Write-Progress -Id 9 -ParentId 0 -Activity "Iniciando os serviços do Windows Update" -Status "Iniciando o CryptSvc..." -PercentComplete 75
     Get-Service CryptSvc | Set-Service -StartupType Manual -PassThru | Start-Service
-    Write-Progress -Id 9 -ParentId 0 -Activity "Starting Windows Update Services" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 9 -ParentId 0 -Activity "Iniciando os serviços do Windows Update" -Status "Concluído" -PercentComplete 100
 
 
-    # Force Windows Update to check for updates
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Forcing discovery..." -PercentComplete 95
-    Write-Progress -Id 10 -ParentId 0 -Activity "Forcing discovery" -Status "Forcing discovery..." -PercentComplete 0
+    # Força o Windows Update a verificar atualizações
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Forçando a detecção..." -PercentComplete 95
+    Write-Progress -Id 10 -ParentId 0 -Activity "Forçando a detecção" -Status "Forçando a detecção..." -PercentComplete 0
     try {
         (New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow()
     } catch {
-        Write-WinUtilLog -Level "ERROR" -Component "Updates" -Message "Failed to create Windows Update COM object: $_"
-        Write-Warning "Failed to create Windows Update COM object: $_"
+        Write-WinUtilLog -Level "ERROR" -Component "Updates" -Message "Falha ao criar o objeto COM do Windows Update: $_"
+        Write-Warning "Falha ao criar o objeto COM do Windows Update: $_"
     }
     Start-Process -NoNewWindow -FilePath "wuauclt" -ArgumentList "/resetauthorization", "/detectnow"
-    Write-Progress -Id 10 -ParentId 0 -Activity "Forcing discovery" -Status "Completed" -PercentComplete 100
-    Write-Progress -Id 0 -Activity "Repairing Windows Update" -Status "Completed" -PercentComplete 100
+    Write-Progress -Id 10 -ParentId 0 -Activity "Forçando a detecção" -Status "Concluído" -PercentComplete 100
+    Write-Progress -Id 0 -Activity "Reparando o Windows Update" -Status "Concluído" -PercentComplete 100
 
-    Show-WinUtilMessage -Message "Stock settings loaded.`n Please reboot your computer" -Title "Reset Windows Update" -Button "OK" -Icon "Information" | Out-Null
+    Show-WinUtilMessage -Message "Configurações padrão carregadas.`n Reinicie o computador" -Title "Redefinir Windows Update" -Button "OK" -Icon "Information" | Out-Null
 
-    # Remove the progress bars
+    # Remove as barras de progresso
     foreach ($id in 0..10) {
-        Write-Progress -Id $id -Activity "Completed" -Completed -ErrorAction SilentlyContinue
+        Write-Progress -Id $id -Activity "Concluído" -Completed -ErrorAction SilentlyContinue
     }
 }
 ```

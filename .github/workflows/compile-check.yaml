@@ -1,22 +1,22 @@
-name: Compile & Check
+name: Compilar e verificar
 
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-  workflow_dispatch: # Manual trigger added
-  workflow_call: # Allow other Actions to call this workflow
+  workflow_dispatch: # Gatilho manual adicionado
+  workflow_call: # Permite que outras Actions chamem este fluxo de trabalho
 
 jobs:
   Compile-and-Check:
     runs-on: windows-latest
     steps:
-    - name: Checkout Sources
+    - name: Checkout do código-fonte
       uses: actions/checkout@v7
 
-    - name: Compile and Syntax check winutil.ps1
+    - name: Compilar e verificar a sintaxe de winutil.ps1
       shell: pwsh
       run: |
         Set-ExecutionPolicy Bypass -Scope Process -Force; ./Compile.ps1
-      continue-on-error: false # Directly fail the job on error, removing the need for a separate check
+      continue-on-error: false # Falha o job diretamente em caso de erro, eliminando a necessidade de uma verificação separada

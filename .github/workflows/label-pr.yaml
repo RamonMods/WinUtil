@@ -1,4 +1,4 @@
-name: Label PRs by Type of Change
+name: Rotular PRs por tipo de alteração
 
 on:
   pull_request_target:
@@ -14,9 +14,9 @@ jobs:
     permissions:
       pull-requests: write
       issues: write
-      contents: read  # Often needed for github-script
+      contents: read  # Geralmente necessário para o github-script
     steps:
-      - name: Check PR Title for Type of Change
+      - name: Verificar o título do PR quanto ao tipo de alteração
         uses: actions/github-script@v9
         with:
           script: |
@@ -34,7 +34,7 @@ jobs:
               'ui-ux': 'ui update'
             };
 
-            // Title format from the PR template: "tag(section): description" or "docs: description"
+            // Formato de título do modelo de PR: "tag(seção): descrição" ou "docs: descrição"
             const match = title.match(/^\s*(feat|fix|chore|docs|ui-ux)(?:\([^)]*\))?:/i);
             const typeLabel = match && labelsByTag[match[1].toLowerCase()];
             const managedLabels = Object.values(labelsByTag);

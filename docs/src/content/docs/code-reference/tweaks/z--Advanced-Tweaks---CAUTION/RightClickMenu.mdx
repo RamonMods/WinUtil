@@ -9,19 +9,16 @@ Esta página é gerada a partir de [`config/tweaks.json`](https://github.com/Ram
 :::
 
 ```json title="config/tweaks.json"
-  "WPFTweaksRightClickMenu": {
-    "Content": "Menu de clique direito: layout anterior - Ativar",
-    "Description": "Tenta restaurar o menu de contexto clássico do Explorador de Arquivos do Windows 11 em builds mais novas. A compatibilidade pode variar.",
-    "category": "z__Advanced Tweaks - CAUTION",
-    "panel": "1",
-    "InvokeScript": [
-      "
-      New-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Name InprocServer32 -Value \"\" -Force
-      Stop-Process -Name explorer
-      "
-    ],
-    "UndoScript": [
-      "Remove-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Recurse"
-    ],
-  }
+"WPFTweaksRightClickMenu": {
+  "Content": "Menu de clique direito: layout anterior - Ativar",
+  "Description": "Tenta restaurar o menu de contexto clássico do Explorador de Arquivos do Windows 11 em builds mais novas. A compatibilidade pode variar.",
+  "category": "z__Advanced Tweaks - CAUTION",
+  "panel": "1",
+  "InvokeScript": [
+    "Set-WinUtilClassicContextMenu"
+  ],
+  "UndoScript": [
+    "Set-WinUtilClassicContextMenu -Undo"
+  ],
+}
 ```

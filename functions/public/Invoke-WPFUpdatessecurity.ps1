@@ -2,13 +2,13 @@ function Invoke-WPFUpdatessecurity {
     <#
 
     .SYNOPSIS
-        Sets Windows Update to recommended settings
+        Define o Windows Update para as configurações recomendadas
 
     .DESCRIPTION
-        1. Disables driver offering through Windows Update
-        2. Defers feature updates for 365 days
-        3. Defers quality updates for 4 days
-        4. Configures automatic updates to notify when downloaded updates are ready to install
+        1. Desativa a oferta de drivers por meio do Windows Update
+        2. Adia atualizações de recursos por 365 dias
+        3. Adia atualizações de qualidade por 4 dias
+        4. Configura as atualizações automáticas para notificar quando as atualizações baixadas estiverem prontas para instalação
 
     #>
 
@@ -25,8 +25,8 @@ function Invoke-WPFUpdatessecurity {
     Remove-ItemProperty -Path $automaticUpdatePolicyPath -Name "NoAutoUpdate" -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -ErrorAction SilentlyContinue
 
-    # O Criar Win11 bloqueia o Windows Update até a limpeza de primeiro logon rodar. Limpa o que sobrou desse bloqueio,
-    # but keep a real WSUS server.
+    # O Criador do Win11 bloqueia o Windows Update até a limpeza de primeiro logon rodar. Limpa o que sobrou desse bloqueio,
+    # mas mantém um servidor WSUS real.
     Remove-ItemProperty -Path $windowsUpdatePolicyPath -Name "DisableWindowsUpdateAccess" -ErrorAction SilentlyContinue
     if ((Get-ItemProperty -Path $windowsUpdatePolicyPath -Name "WUServer" -ErrorAction SilentlyContinue).WUServer -eq "http://localhost:8080") {
         Remove-ItemProperty -Path $windowsUpdatePolicyPath -Name "WUServer" -ErrorAction SilentlyContinue
@@ -51,8 +51,8 @@ function Invoke-WPFUpdatessecurity {
         Get-ScheduledTask -TaskPath $Task -ErrorAction SilentlyContinue | Enable-ScheduledTask -ErrorAction SilentlyContinue
     }
 
-    # New-Item -Force on an existing registry key deletes the key and its subkeys first, so only
-    # create missing keys and keep any other policies already stored under them.
+    # O New-Item -Force em uma chave de registro existente exclui a chave e suas subchaves primeiro,
+    # então crie apenas as chaves ausentes e preserve as demais políticas já armazenadas nelas.
     if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata")) {
         New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" -Force | Out-Null
     }
@@ -91,10 +91,10 @@ function Invoke-WPFUpdatessecurity {
         New-Item -Path $automaticUpdatePolicyPath -Force | Out-Null
     }
 
-    # Remove the previous scheduled-install reboot policy when switching to download-and-notify.
+    # Remove a política anterior de reinicialização para instalação agendada ao alternar para baixar e notificar.
     Remove-ItemProperty -Path $automaticUpdatePolicyPath -Name "NoAutoRebootWithLoggedOnUsers" -ErrorAction SilentlyContinue
 
-    # AUOptions 3 downloads updates and notifies before installation; it does not control restarts.
+    # AUOptions 3 baixa as atualizações e notifica antes da instalação; não controla as reinicializações.
     Set-ItemProperty -Path $automaticUpdatePolicyPath -Name "AUOptions" -Type DWord -Value 3
     Set-ItemProperty -Path $automaticUpdatePolicyPath -Name "AUPowerManagement" -Type DWord -Value 0
 

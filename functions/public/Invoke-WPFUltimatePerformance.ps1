@@ -7,7 +7,7 @@ function Invoke-WPFUltimatePerformance ([switch]$Enable) {
     #>
 
     if ($Enable) {
-        Step-WinUtilJob -Status "Adding the Ultimate Performance power plan" -State "Indeterminate"
+        Step-WinUtilJob -Status "Adicionando o plano de energia Ultimate Performance" -State "Indeterminate"
         Write-WinUtilLog -Component "Power" -Message "Duplicando e ativando o plano de energia Ultimate Performance."
 
         $duplicated = powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61
@@ -27,7 +27,7 @@ function Invoke-WPFUltimatePerformance ([switch]$Enable) {
 
         Write-WinUtilLog -Component "Power" -Message "Plano de energia Ultimate Performance instalado e ativado."
     } else {
-        Step-WinUtilJob -Status "Restoring the default power plans" -State "Indeterminate"
+        Step-WinUtilJob -Status "Restaurando os planos de energia padrão" -State "Indeterminate"
         Write-WinUtilLog -Component "Power" -Message "Restaurando os esquemas de energia padrão."
 
         powercfg /restoredefaultschemes

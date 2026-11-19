@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-    - name: 💻 Discord da comunidade
-      url: https://github.com/RamonMods/WinUtil
-      about: Entre no nosso servidor Discord da comunidade para conversar com outros usuários da comunidade WinUtil.
+    - name: 💻 Discussões e perguntas
+      url: https://github.com/RamonMods/WinUtil/discussions
+      about: Perguntas e conversas sobre o WinUtil ficam nas Discussões do GitHub.
     - name: Sugerir um aplicativo
       url: https://github.com/RamonMods/WinUtil/discussions/new?category=app-suggestion
       about: Se quiser sugerir a adição de um aplicativo, crie uma discussão usando o modelo fornecido
